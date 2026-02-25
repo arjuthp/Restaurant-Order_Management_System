@@ -1,0 +1,163 @@
+@baseUrl = http://localhost:5000
+@accessToken = 
+@refreshToken = 
+
+#############################################
+# 🔐 AUTH ENDPOINTS
+#############################################
+
+### 1. Register Customer
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "password123"
+}
+
+###
+
+### 2. Login Customer
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "john@example.com",
+  "password": "password123"
+}
+
+###
+
+### 3. Register Admin (manually set role in DB)
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Admin User",
+  "email": "admin@example.com",
+  "password": "admin123"
+}
+
+###
+
+### 4. Admin Login
+POST {{baseUrl}}/api/auth/admin/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "admin123"
+}
+
+###
+
+### 5. Refresh Access Token
+POST {{baseUrl}}/api/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+###
+
+### 6. Logout
+POST {{baseUrl}}/api/auth/logout
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+###
+
+#############################################
+# 👤 USER ENDPOINTS
+#############################################
+
+### 7. Get My Profile (Customer)
+GET {{baseUrl}}/api/users/me
+Authorization: Bearer {{accessToken}}
+
+###
+
+### 8. Update My Profile (Customer)
+PATCH {{baseUrl}}/api/users/me
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "John Updated",
+  "phone": "1234567890",
+  "address": "123 Main St"
+}
+
+###
+
+### 9. Delete My Account (Customer)
+DELETE {{baseUrl}}/api/users/me
+Authorization: Bearer {{accessToken}}
+
+###
+
+### 10. Get All Users (Admin Only)
+GET {{baseUrl}}/api/users
+Authorization: Bearer {{accessToken}}
+
+###
+
+#############################################
+# 🧪 TEST SCENARIOS
+#############################################
+
+### TEST 1: Register → Login → Get Profile
+# Step 1: Register
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Test User",
+  "email": "test@example.com",
+  "password": "test123"
+}
+
+# Step 2: Copy accessToken from response above, paste in @accessToken variable
+# Step 3: Run Get My Profile
+
+###
+
+### TEST 2: Invalid Login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "wrong@example.com",
+  "password": "wrongpass"
+}
+
+###
+
+### TEST 3: Access Protected Route Without Token
+GET {{baseUrl}}/api/users/me
+
+###
+
+### TEST 4: Customer Trying Admin Route (Should Fail)
+GET {{baseUrl}}/api/users
+Authorization: Bearer {{accessToken}}
+
+###
+
+#############################################
+# 📝 INSTRUCTIONS
+#############################################
+# 1. Start server: cd src && npm start
+# 2. Run "Register Customer" request
+# 3. Copy the "accessToken" from response
+# 4. Paste it in @accessToken variable at top
+# 5. Copy the "refreshToken" from response
+# 6. Paste it in @refreshToken variable at top
+# 7. Now you can test protected routes
+# 8. To test admin routes, manually change user role to "admin" in MongoDB
+#############################################

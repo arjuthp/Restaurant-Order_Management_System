@@ -1,0 +1,27 @@
+{
+  "name": "restaurant-order-management-system",
+  "version": "1.0.0",
+  "description": "Restaurant Order Management System - Full Stack",
+  "scripts": {
+    "start": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd src && npm start",
+    "client": "cd client && npm run dev",
+    "build": "cd client && npm run build",
+    "prod": "npm run build && cd src && npm start",
+    "install-all": "cd src && npm install && cd ../client && npm install",
+    "seed": "cd src && node seedProducts.js"
+  },
+  "keywords": [
+    "restaurant",
+    "order-management",
+    "react",
+    "nodejs",
+    "express",
+    "mongodb"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

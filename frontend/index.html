@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Order Management</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Restaurant Home Page -->
+    <div id="homePage" class="page active">
+        <div class="hero-section">
+            <div class="hero-content">
+                <h1 id="restaurantName" class="restaurant-name">🍽️ Loading...</h1>
+                <p id="restaurantDescription" class="restaurant-tagline">Welcome to our restaurant</p>
+                <div id="restaurantDetails" class="restaurant-info"></div>
+                
+                <div class="auth-buttons">
+                    <button class="btn btn-primary btn-large" onclick="showLogin()">Login</button>
+                    <button class="btn btn-outline btn-large" onclick="showRegister()">Register</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="features-section">
+            <div class="container">
+                <h2>Why Choose Us?</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🍕</div>
+                        <h3>Fresh Ingredients</h3>
+                        <p>We use only the freshest ingredients in all our dishes</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🚚</div>
+                        <h3>Fast Delivery</h3>
+                        <p>Quick and reliable delivery to your location</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">⭐</div>
+                        <h3>Quality Service</h3>
+                        <p>Exceptional customer service guaranteed</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Profile Page -->
+    <div id="userProfilePage" class="page">
+        <nav class="navbar">
+            <div class="nav-container">
+                <h2>🍽️ Restaurant</h2>
+                <div class="nav-right">
+                    <span id="userNameDisplay" class="user-name"></span>
+                    <button class="btn btn-outline" onclick="logout()">Logout</button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container profile-container">
+            <h1>My Profile</h1>
+            
+            <div class="profile-card">
+                <h3>Profile Information</h3>
+                <div id="profileInfo" class="profile-info">
+                    <p><strong>Name:</strong> <span id="profileName">-</span></p>
+                    <p><strong>Email:</strong> <span id="profileEmail">-</span></p>
+                    <p><strong>Role:</strong> <span id="profileRole">-</span></p>
+                    <p><strong>Phone:</strong> <span id="profilePhone">-</span></p>
+                    <p><strong>Address:</strong> <span id="profileAddress">-</span></p>
+                </div>
+                <button class="btn btn-primary" onclick="showEditProfile()">Edit Profile</button>
+            </div>
+
+            <div class="profile-card">
+                <h3>Quick Actions</h3>
+                <div class="action-buttons">
+                    <button class="btn btn-primary">Browse Menu</button>
+                    <button class="btn btn-primary">My Orders</button>
+                    <button class="btn btn-primary">My Cart</button>
+                </div>
+            </div>
+
+            <div class="profile-card danger-zone">
+                <h3>Danger Zone</h3>
+                <button class="btn btn-danger" onclick="deleteAccount()">Delete Account</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard Page -->
+    <div id="adminDashboardPage" class="page">
+        <nav class="navbar">
+            <div class="nav-container">
+                <h2>🍽️ Restaurant - Admin</h2>
+                <div class="nav-right">
+                    <span id="adminNameDisplay" class="user-name"></span>
+                    <button class="btn btn-outline" onclick="logout()">Logout</button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container admin-container">
+            <h1>Admin Dashboard</h1>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Users</h3>
+                    <p class="stat-number" id="totalUsers">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Orders</h3>
+                    <p class="stat-number">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Products</h3>
+                    <p class="stat-number">0</p>
+                </div>
+            </div>
+
+            <div class="admin-card">
+                <h3>All Users</h3>
+                <div id="usersTable" class="table-container">
+                    <p class="loading">Loading users...</p>
+                </div>
+            </div>
+
+            <div class="admin-card">
+                <h3>Restaurant Settings</h3>
+                <form id="restaurantForm" onsubmit="handleUpdateRestaurant(event)">
+                    <div class="form-group">
+                        <label>Restaurant Name</label>
+                        <input type="text" id="adminRestaurantName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="adminRestaurantDescription" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Address</label>
+                        <input type="text" id="adminRestaurantAddress" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input type="tel" id="adminRestaurantPhone" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Opening Hours</label>
+                        <input type="text" id="adminRestaurantHours" placeholder="Mon-Sun: 9AM-10PM">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update Restaurant Info</button>
+                </form>
+            </div>
+
+            <div class="admin-card">
+                <h3>Quick Actions</h3>
+                <div class="action-buttons">
+                    <button class="btn btn-primary">Manage Products</button>
+                    <button class="btn btn-primary">View All Orders</button>
+                    <button class="btn btn-primary">Restaurant Settings</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('loginModal')">&times;</span>
+            <h2>Login to Your Account</h2>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="loginEmail" placeholder="your@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" placeholder="Enter password" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Login</button>
+            </form>
+            <p class="modal-footer">
+                Don't have an account? <a href="#" onclick="switchToRegister()">Register here</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('registerModal')">&times;</span>
+            <h2>Create New Account</h2>
+            <form id="registerForm" onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label>Register As</label>
+                    <select id="registerRole" class="role-select">
+                        <option value="customer">Customer</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="registerName" placeholder="John Doe" required>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="registerEmail" placeholder="your@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="registerPassword" placeholder="Minimum 6 characters" required minlength="6">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Register</button>
+            </form>
+            <p class="modal-footer">
+                Already have an account? <a href="#" onclick="switchToLogin()">Login here</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div id="editProfileModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('editProfileModal')">&times;</span>
+            <h2>Edit Profile</h2>
+            <form id="editProfileForm" onsubmit="handleUpdateProfile(event)">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="editName" placeholder="Your name">
+                </div>
+                <div class="form-group">
+                    <label>Phone</label>
+                    <input type="tel" id="editPhone" placeholder="1234567890">
+                </div>
+                <div class="form-group">
+                    <label>Address</label>
+                    <textarea id="editAddress" rows="3" placeholder="Your address"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Update Profile</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Menu - Restaurant</title>
+    <link rel="stylesheet" href="css/menu.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h2>🍽️ Restaurant Menu</h2>
+            </div>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="menu.html" class="active">Menu</a>
+                <button class="btn-cart" onclick="viewCart()">
+                    🛒 Cart <span id="cartCount" class="cart-badge">0</span>
+                </button>
+                <button class="btn btn-outline" onclick="handleAuth()">Login</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="menu-hero">
+        <div class="container">
+            <h1>Discover Our Delicious Menu</h1>
+            <p>From traditional Nepali cuisine to fusion delights</p>
+        </div>
+    </section>
+
+    <!-- Category Filter -->
+    <section class="category-filter">
+        <div class="container">
+            <div class="filter-buttons">
+                <button class="filter-btn active" onclick="filterCategory('all')">All Items</button>
+                <button class="filter-btn" onclick="filterCategory('Nepali')">🇳🇵 Nepali</button>
+                <button class="filter-btn" onclick="filterCategory('Fusion')">🌏 Fusion</button>
+                <button class="filter-btn" onclick="filterCategory('Western')">🍕 Western</button>
+                <button class="filter-btn" onclick="filterCategory('Snacks')">🍟 Snacks</button>
+                <button class="filter-btn" onclick="filterCategory('Desserts')">🍰 Desserts</button>
+                <button class="filter-btn" onclick="filterCategory('Drinks')">🥤 Drinks</button>
+            </div>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search menu items..." onkeyup="searchProducts()">
+                <span class="search-icon">🔍</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Grid -->
+    <section class="products-section">
+        <div class="container">
+            <div id="productsGrid" class="products-grid">
+                <!-- Loading state -->
+                <div class="loading-state">
+                    <div class="spinner"></div>
+                    <p>Loading delicious items...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cart Sidebar -->
+    <div id="cartSidebar" class="cart-sidebar">
+        <div class="cart-header">
+            <h3>🛒 Your Cart</h3>
+            <button class="close-cart" onclick="closeCart()">&times;</button>
+        </div>
+        <div id="cartItems" class="cart-items">
+            <p class="empty-cart">Your cart is empty</p>
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span id="cartTotal">Rs. 0</span>
+            </div>
+            <button class="btn btn-primary btn-block" onclick="checkout()">Proceed to Checkout</button>
+        </div>
+    </div>
+
+    <!-- Product Detail Modal -->
+    <div id="productModal" class="modal">
+        <div class="modal-content product-modal">
+            <span class="close" onclick="closeProductModal()">&times;</span>
+            <div class="product-detail">
+                <div class="product-image-large">
+                    <div class="product-icon-large" id="modalIcon">🍽️</div>
+                </div>
+                <div class="product-info-large">
+                    <h2 id="modalName">Product Name</h2>
+                    <p class="modal-category" id="modalCategory">Category</p>
+                    <p class="modal-description" id="modalDescription">Description</p>
+                    <div class="modal-price" id="modalPrice">Rs. 0</div>
+                    <div class="quantity-selector">
+                        <button onclick="decreaseQuantity()">-</button>
+                        <input type="number" id="modalQuantity" value="1" min="1" readonly>
+                        <button onclick="increaseQuantity()">+</button>
+                    </div>
+                    <button class="btn btn-primary btn-large" onclick="addToCartFromModal()">
+                        Add to Cart - <span id="modalTotalPrice">Rs. 0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script src="js/menu.js"></script>
+</body>
+</html>
