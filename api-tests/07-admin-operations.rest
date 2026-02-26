@@ -1,0 +1,442 @@
+### ============================================
+### 👑 ADMIN OPERATIONS - CONSOLIDATED TESTS
+### ============================================
+### This file contains all admin-specific operations across modules
+
+@baseUrl = http://localhost:5000/api
+@adminToken = your_admin_token_here
+@customerToken = your_customer_token_here
+@productId = your_product_id_here
+@orderId = your_order_id_here
+
+### ============================================
+### ADMIN AUTHENTICATION
+### ============================================
+
+### ============================================
+### 1. ADMIN LOGIN - Success
+### ============================================
+POST {{baseUrl}}/auth/admin/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "admin123"
+}
+
+### Expected Response: 200 OK
+### Returns: accessToken with role: "admin"
+### Copy accessToken and update @adminToken variable
+
+
+### ============================================
+### 2. VERIFY ADMIN TOKEN - Get Admin Profile
+### ============================================
+GET {{baseUrl}}/users/me
+Authorization: Bearer {{adminToken}}
+
+### Expected Response: 200 OK
+### Returns: User object with role: "admin"
+
+
+### ============================================
+### PRODUCT MANAGEMENT
+### ============================================
+
+### ============================================
+### 3. CREATE NEW PRODUCT
+### ============================================
+POST {{baseUrl}}/products
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Margherita Pizza",
+  "description": "Classic Italian pizza with fresh mozzarella, tomatoes, and basil",
+  "price": 12.99,
+  "category": "Pizza",
+  "image_url": "https://example.com/images/margherita.jpg",
+  "is_available": true
+}
+
+### Expected Response: 201 Created
+### Returns: New product object with _id
+
+
+### ============================================
+### 4. UPDATE PRODUCT
+### ============================================
+PATCH {{baseUrl}}/products/{{productId}}
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "price": 14.99,
+  "description": "Updated: Premium Margherita Pizza with buffalo mozzarella"
+}
+
+### Expected Response: 200 OK
+### Returns: Updated product
+
+
+### ============================================
+### 5. MARK PRODUCT AS UNAVAILABLE
+### ============================================
+PATCH {{baseUrl}}/products/{{productId}}
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "is_available": false
+}
+
+### Expected Response: 200 OK
+### Returns: Product with is_available: false
+
+
+### ============================================
+### 6. DELETE PRODUCT
+### ============================================
+DELETE {{baseUrl}}/products/{{productId}}
+Authorization: Bearer {{adminToken}}
+
+### Expected Response: 200 OK
+### Message: "Product deleted successfully"
+
+
+### ============================================
+### ORDER MANAGEMENT
+### ============================================
+
+### ============================================
+### 7. VIEW ALL ORDERS FROM ALL CUSTOMERS
+### ============================================
+GET {{baseUrl}}/orders/admin/all
+Authorization: Bearer {{adminToken}}
+
+### Expected Response: 200 OK
+### Returns: Array of all orders with customer details
+
+
+### ============================================
+### 8. CONFIRM PENDING ORDER
+### ============================================
+PATCH {{baseUrl}}/orders/{{orderId}}/status
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "status": "confirmed"
+}
+
+### Expected Response: 200 OK
+### Returns: Order with status: "confirmed"
+
+
+### ============================================
+### 9. UPDATE ORDER TO PREPARING
+### ============================================
+PATCH {{baseUrl}}/orders/{{orderId}}/status
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "status": "preparing"
+}
+
+### Expected Response: 200 OK
+### Returns: Order with status: "preparing"
+
+
+### ============================================
+### 10. MARK ORDER AS DELIVERED
+### ============================================
+PATCH {{baseUrl}}/orders/{{orderId}}/status
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "status": "delivered"
+}
+
+### Expected Response: 200 OK
+### Returns: Order with status: "delivered"
+
+
+### ============================================
+### 11. CANCEL ORDER (Admin Override)
+### ============================================
+PATCH {{baseUrl}}/orders/{{orderId}}/status
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "status": "cancelled"
+}
+
+### Expected Response: 200 OK
+### Returns: Order with status: "cancelled"
+
+
+### ============================================
+### USER MANAGEMENT
+### ============================================
+
+### ============================================
+### 12. VIEW ALL USERS
+### ============================================
+GET {{baseUrl}}/users
+Authorization: Bearer {{adminToken}}
+
+### Expected Response: 200 OK
+### Returns: Array of all users (customers and admins)
+
+
+### ============================================
+### RESTAURANT MANAGEMENT
+### ============================================
+
+### ============================================
+### 13. UPDATE RESTAURANT INFO
+### ============================================
+PATCH {{baseUrl}}/restaurant
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Admin Updated Restaurant",
+  "description": "Updated by admin",
+  "address": "123 Admin Street",
+  "phone": "+1-555-ADMIN",
+  "opening_hours": "24/7"
+}
+
+### Expected Response: 200 OK
+### Returns: Updated restaurant object
+
+
+### ============================================
+### AUTHORIZATION TESTS - Customer Trying Admin Operations
+### ============================================
+
+### ============================================
+### 14. Customer Tries to Create Product (Error)
+### ============================================
+POST {{baseUrl}}/products
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "name": "Hacked Product",
+  "price": 9.99
+}
+
+### Expected Response: 403 Forbidden
+### Message: "Access Denied. admin only."
+
+
+### ============================================
+### 15. Customer Tries to Update Product (Error)
+### ============================================
+PATCH {{baseUrl}}/products/{{productId}}
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "price": 0.01
+}
+
+### Expected Response: 403 Forbidden
+### Message: "Access Denied. admin only."
+
+
+### ============================================
+### 16. Customer Tries to Delete Product (Error)
+### ============================================
+DELETE {{baseUrl}}/products/{{productId}}
+Authorization: Bearer {{customerToken}}
+
+### Expected Response: 403 Forbidden
+### Message: "Access Denied. admin only."
+
+
+### ============================================
+### 17. Customer Tries to View All Orders (Error)
+### ============================================
+GET {{baseUrl}}/orders/admin/all
+Authorization: Bearer {{customerToken}}
+
+### Expected Response: 403 Forbidden
+### Message: "Access Denied. admin only."
+
+
+### ============================================
+### 18. Customer Tries to Update Order Status (Error)
+### ============================================
+PATCH {{baseUrl}}/orders/{{orderId}}/status
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "status": "delivered"
+}
+
+### Expected Response: 403 Forbidden
+### Message: "Access Denied. admin only."
+
+
+### ============================================
+### 19. Customer Tries to View All Users (Error)
+### ============================================
+GET {{baseUrl}}/users
+Authorization: Bearer {{customerToken}}
+
+### Expected Response: 403 Forbidden
+### Message: "Access Denied. admin only."
+
+
+### ============================================
+### 20. Customer Tries to Update Restaurant (Error)
+### ============================================
+PATCH {{baseUrl}}/restaurant
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "name": "Hacked Restaurant"
+}
+
+### Expected Response: 403 Forbidden
+### Message: "Access Denied. admin only."
+
+
+### ============================================
+### COMPLETE ADMIN WORKFLOW - NEW PRODUCT TO ORDER
+### ============================================
+### Run these in sequence:
+
+### Step 1: Admin creates new product
+POST {{baseUrl}}/products
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Pepperoni Pizza",
+  "description": "Classic pepperoni with extra cheese",
+  "price": 15.99,
+  "category": "Pizza",
+  "is_available": true
+}
+
+###
+
+### Step 2: Admin views all products
+GET {{baseUrl}}/products
+Authorization: Bearer {{adminToken}}
+
+###
+
+### Step 3: Customer adds product to cart
+POST {{baseUrl}}/cart/items
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "product_id": "{{productId}}",
+  "quantity": 2
+}
+
+###
+
+### Step 4: Customer creates order
+POST {{baseUrl}}/orders
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "notes": "Extra napkins please"
+}
+
+###
+
+### Step 5: Admin views all orders
+GET {{baseUrl}}/orders/admin/all
+Authorization: Bearer {{adminToken}}
+
+###
+
+### Step 6: Admin confirms order
+PATCH {{baseUrl}}/orders/{{orderId}}/status
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "status": "confirmed"
+}
+
+###
+
+### Step 7: Admin starts preparing
+PATCH {{baseUrl}}/orders/{{orderId}}/status
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "status": "preparing"
+}
+
+###
+
+### Step 8: Admin marks as delivered
+PATCH {{baseUrl}}/orders/{{orderId}}/status
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "status": "delivered"
+}
+
+###
+
+### Step 9: Admin views all users
+GET {{baseUrl}}/users
+Authorization: Bearer {{adminToken}}
+
+###
+
+### Step 10: Admin updates restaurant info
+PATCH {{baseUrl}}/restaurant
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "opening_hours": "Updated: Mon-Sun 9AM-11PM"
+}
+
+
+### ============================================
+### ADMIN DASHBOARD DATA COLLECTION
+### ============================================
+### Simulate fetching all data for admin dashboard
+
+### Get all products
+GET {{baseUrl}}/products
+Authorization: Bearer {{adminToken}}
+
+###
+
+### Get all orders
+GET {{baseUrl}}/orders/admin/all
+Authorization: Bearer {{adminToken}}
+
+###
+
+### Get all users
+GET {{baseUrl}}/users
+Authorization: Bearer {{adminToken}}
+
+###
+
+### Get restaurant info
+GET {{baseUrl}}/restaurant
+Authorization: Bearer {{adminToken}}

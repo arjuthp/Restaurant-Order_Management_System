@@ -42,7 +42,7 @@ class CartService {
         cart.items.push({
             product_id: productId,
             quantity: quantity,
-            unit_price: product.price
+            unit_price: product.price *quantity
         });
     }
     await cart.save();

@@ -1,0 +1,270 @@
+### ============================================
+### 🏪 RESTAURANT API TESTS
+### ============================================
+
+@baseUrl = http://localhost:5000/api
+@adminToken = your_admin_token_here
+@customerToken = your_customer_token_here
+
+### ============================================
+### PUBLIC ENDPOINTS
+### ============================================
+
+### ============================================
+### 1. GET RESTAURANT INFO - Success (No Auth Required)
+### ============================================
+GET {{baseUrl}}/restaurant
+
+### Expected Response: 200 OK
+### Returns: Restaurant object (name, description, address, phone, opening_hours)
+
+
+### ============================================
+### 2. GET RESTAURANT INFO - With Customer Token
+### ============================================
+GET {{baseUrl}}/restaurant
+Authorization: Bearer {{customerToken}}
+
+### Expected Response: 200 OK
+### Returns: Restaurant object (same as without token)
+
+
+### ============================================
+### 3. GET RESTAURANT INFO - With Admin Token
+### ============================================
+GET {{baseUrl}}/restaurant
+Authorization: Bearer {{adminToken}}
+
+### Expected Response: 200 OK
+### Returns: Restaurant object
+
+
+### ============================================
+### 4. GET RESTAURANT INFO - No Restaurant in DB (Error)
+### ============================================
+### Only if database has no restaurant document
+GET {{baseUrl}}/restaurant
+
+### Expected Response: 404 Not Found
+### Message: "Restaurant not found"
+
+
+### ============================================
+### ADMIN ENDPOINTS
+### ============================================
+
+### ============================================
+### 5. UPDATE RESTAURANT INFO - Update Name
+### ============================================
+PATCH {{baseUrl}}/restaurant
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Delicious Bites Restaurant"
+}
+
+### Expected Response: 200 OK
+### Returns: Updated restaurant object
+
+
+### ============================================
+### 6. UPDATE RESTAURANT INFO - Update Description
+### ============================================
+PATCH {{baseUrl}}/restaurant
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "description": "Experience authentic cuisine with fresh ingredients and traditional recipes. Family-owned since 1995."
+}
+
+### Expected Response: 200 OK
+### Returns: Restaurant with updated description
+
+
+### ============================================
+### 7. UPDATE RESTAURANT INFO - Update Address
+### ============================================
+PATCH {{baseUrl}}/restaurant
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "address": "123 Food Street, Culinary District, New York, NY 10001"
+}
+
+### Expected Response: 200 OK
+### Returns: Restaurant with updated address
+
+
+### ============================================
+### 8. UPDATE RESTAURANT INFO - Update Phone
+### ============================================
+PATCH {{baseUrl}}/restaurant
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "phone": "+1-555-FOOD-123"
+}
+
+### Expected Response: 200 OK
+### Returns: Restaurant with updated phone
+
+
+### ============================================
+### 9. UPDATE RESTAURANT INFO - Update Opening Hours
+### ============================================
+PATCH {{baseUrl}}/restaurant
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "opening_hours": "Mon-Fri: 11:00 AM - 10:00 PM, Sat-Sun: 10:00 AM - 11:00 PM"
+}
+
+### Expected Response: 200 OK
+### Returns: Restaurant with updated opening hours
+
+
+### ============================================
+### 10. UPDATE RESTAURANT INFO - Update Multiple Fields
+### ============================================
+PATCH {{baseUrl}}/restaurant
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "The Golden Fork",
+  "description": "Fine dining experience with a modern twist on classic dishes",
+  "address": "456 Gourmet Avenue, Downtown, Los Angeles, CA 90001",
+  "phone": "+1-555-DINE-456",
+  "opening_hours": "Daily: 5:00 PM - 11:00 PM"
+}
+
+### Expected Response: 200 OK
+### Returns: Restaurant with all updated fields
+
+
+### ============================================
+### 11. UPDATE RESTAURANT INFO - Empty Body
+### ============================================
+PATCH {{baseUrl}}/restaurant
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+}
+
+### Expected Response: 200 OK
+### Returns: Restaurant object unchanged
+
+
+### ============================================
+### 12. UPDATE RESTAURANT INFO - Customer Access (Error)
+### ============================================
+PATCH {{baseUrl}}/restaurant
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "name": "Hacked Restaurant"
+}
+
+### Expected Response: 403 Forbidden
+### Message: "Access Denied. admin only."
+
+
+### ============================================
+### 13. UPDATE RESTAURANT INFO - No Token (Error)
+### ============================================
+PATCH {{baseUrl}}/restaurant
+Content-Type: application/json
+
+{
+  "name": "Unauthorized Update"
+}
+
+### Expected Response: 401 Unauthorized
+### Message: "Access token required"
+
+
+### ============================================
+### 14. UPDATE RESTAURANT INFO - Invalid Token (Error)
+### ============================================
+PATCH {{baseUrl}}/restaurant
+Content-Type: application/json
+Authorization: Bearer invalid_token_string
+
+{
+  "name": "Test Restaurant"
+}
+
+### Expected Response: 403 Forbidden
+### Message: "Invalid or expired token"
+
+
+### ============================================
+### COMPLETE RESTAURANT MANAGEMENT WORKFLOW
+### ============================================
+### Run these in sequence:
+
+### Step 1: Customer views restaurant info
+GET {{baseUrl}}/restaurant
+
+###
+
+### Step 2: Admin updates basic info
+PATCH {{baseUrl}}/restaurant
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Bella Italia Ristorante",
+  "description": "Authentic Italian cuisine in the heart of the city"
+}
+
+###
+
+### Step 3: Verify changes as customer
+GET {{baseUrl}}/restaurant
+
+###
+
+### Step 4: Admin updates contact details
+PATCH {{baseUrl}}/restaurant
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "address": "789 Pasta Lane, Little Italy, NY 10013",
+  "phone": "+1-555-PASTA-99"
+}
+
+###
+
+### Step 5: Admin updates opening hours
+PATCH {{baseUrl}}/restaurant
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "opening_hours": "Mon-Thu: 12:00 PM - 9:00 PM, Fri-Sat: 12:00 PM - 11:00 PM, Sun: Closed"
+}
+
+###
+
+### Step 6: View final restaurant info
+GET {{baseUrl}}/restaurant
+
+###
+
+### Step 7: Customer tries to update (should fail)
+PATCH {{baseUrl}}/restaurant
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "name": "Hacked Name"
+}

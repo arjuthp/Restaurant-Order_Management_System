@@ -1,0 +1,696 @@
+### ============================================
+### ⚠️ EDGE CASES & ERROR SCENARIOS
+### ============================================
+### This file tests error handling, validation, and edge cases
+
+@baseUrl = http://localhost:5000/api
+@customerToken = your_customer_token_here
+@adminToken = your_admin_token_here
+
+### ============================================
+### AUTHENTICATION EDGE CASES
+### ============================================
+
+### ============================================
+### 1. Register with Invalid Email Format
+### ============================================
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Test User",
+  "email": "invalid-email-format",
+  "password": "password123"
+}
+
+### Expected Response: 500 Internal Server Error
+### Message: Validation error
+
+
+### ============================================
+### 2. Register with Very Short Password
+### ============================================
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Test User",
+  "email": "test@example.com",
+  "password": "123"
+}
+
+### Expected Response: 201 Created (if no password validation)
+### Note: Consider adding password length validation
+
+
+### ============================================
+### 3. Register with Empty String Values
+### ============================================
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "",
+  "email": "",
+  "password": ""
+}
+
+### Expected Response: 500 Internal Server Error
+### Message: Validation error
+
+
+### ============================================
+### 4. Login with SQL Injection Attempt
+### ============================================
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com' OR '1'='1",
+  "password": "password' OR '1'='1"
+}
+
+### Expected Response: 401 Unauthorized
+### Message: "Invalid Credientials"
+
+
+### ============================================
+### 5. Login with XSS Attempt in Email
+### ============================================
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "<script>alert('XSS')</script>@example.com",
+  "password": "password123"
+}
+
+### Expected Response: 401 Unauthorized
+
+
+### ============================================
+### 6. Expired Access Token
+### ============================================
+### Wait 15+ minutes after login, then try:
+GET {{baseUrl}}/users/me
+Authorization: Bearer expired_token_here
+
+### Expected Response: 403 Forbidden
+### Message: "Invalid or expired token"
+
+
+### ============================================
+### 7. Malformed JWT Token
+### ============================================
+GET {{baseUrl}}/users/me
+Authorization: Bearer not.a.valid.jwt.token
+
+### Expected Response: 403 Forbidden
+### Message: "Invalid or expired token"
+
+
+### ============================================
+### 8. Token with Wrong Signature
+### ============================================
+GET {{baseUrl}}/users/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+
+### Expected Response: 403 Forbidden
+### Message: "Invalid or expired token"
+
+
+### ============================================
+### PRODUCT EDGE CASES
+### ============================================
+
+### ============================================
+### 9. Create Product with Negative Price
+### ============================================
+POST {{baseUrl}}/products
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Test Product",
+  "price": -10.99,
+  "category": "Test"
+}
+
+### Expected Response: 500 Internal Server Error
+### Message: Validation error (price must be >= 0)
+
+
+### ============================================
+### 10. Create Product with Zero Price
+### ============================================
+POST {{baseUrl}}/products
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Free Item",
+  "price": 0,
+  "category": "Promotional"
+}
+
+### Expected Response: 201 Created
+### Returns: Product with price: 0
+
+
+### ============================================
+### 11. Create Product with Extremely Long Name
+### ============================================
+POST {{baseUrl}}/products
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "This is an extremely long product name that goes on and on and on and should probably be truncated or rejected by validation because it's way too long for any reasonable product name in a restaurant menu system",
+  "price": 9.99,
+  "category": "Test"
+}
+
+### Expected Response: 201 Created (if no length validation)
+### Note: Consider adding max length validation
+
+
+### ============================================
+### 12. Create Product with Special Characters
+### ============================================
+POST {{baseUrl}}/products
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Spicy 🌶️ Pizza™ <>&\"'",
+  "description": "Test special chars: <script>alert('xss')</script>",
+  "price": 12.99,
+  "category": "Test"
+}
+
+### Expected Response: 201 Created
+### Note: Check if special characters are properly escaped
+
+
+### ============================================
+### 13. Update Product with Invalid MongoDB ID
+### ============================================
+PATCH {{baseUrl}}/products/invalid-id-format
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "price": 15.99
+}
+
+### Expected Response: 500 Internal Server Error
+### Message: Cast error
+
+
+### ============================================
+### 14. Get Product with Non-existent ID
+### ============================================
+GET {{baseUrl}}/products/507f1f77bcf86cd799439011
+
+### Expected Response: 404 Not Found
+### Message: "Product not found"
+
+
+### ============================================
+### CART EDGE CASES
+### ============================================
+
+### ============================================
+### 15. Add Item with Quantity Zero
+### ============================================
+POST {{baseUrl}}/cart/items
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "product_id": "valid_product_id",
+  "quantity": 0
+}
+
+### Expected Response: 400 Bad Request or removes item
+### Behavior depends on implementation
+
+
+### ============================================
+### 16. Add Item with Negative Quantity
+### ============================================
+POST {{baseUrl}}/cart/items
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "product_id": "valid_product_id",
+  "quantity": -5
+}
+
+### Expected Response: 400 Bad Request or removes item
+
+
+### ============================================
+### 17. Add Item with Extremely Large Quantity
+### ============================================
+POST {{baseUrl}}/cart/items
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "product_id": "valid_product_id",
+  "quantity": 999999
+}
+
+### Expected Response: 200 OK (if no max quantity validation)
+### Note: Consider adding max quantity validation
+
+
+### ============================================
+### 18. Add Item with String Quantity
+### ============================================
+POST {{baseUrl}}/cart/items
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "product_id": "valid_product_id",
+  "quantity": "five"
+}
+
+### Expected Response: 400 Bad Request
+### Message: Validation error
+
+
+### ============================================
+### 19. Add Item with Decimal Quantity
+### ============================================
+POST {{baseUrl}}/cart/items
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "product_id": "valid_product_id",
+  "quantity": 2.5
+}
+
+### Expected Response: 200 OK (MongoDB may round or accept)
+### Note: Consider validating integer quantities
+
+
+### ============================================
+### 20. Update Cart Item with Missing Product ID
+### ============================================
+PATCH {{baseUrl}}/cart/items/
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "quantity": 5
+}
+
+### Expected Response: 404 Not Found
+### Message: Route not found
+
+
+### ============================================
+### ORDER EDGE CASES
+### ============================================
+
+### ============================================
+### 21. Create Order with Extremely Long Notes
+### ============================================
+POST {{baseUrl}}/orders
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "notes": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. This note is intentionally very long to test validation."
+}
+
+### Expected Response: 201 Created (if no length validation)
+### Note: Consider adding max length for notes
+
+
+### ============================================
+### 22. Create Order with Special Characters in Notes
+### ============================================
+POST {{baseUrl}}/orders
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "notes": "Special chars: <script>alert('xss')</script> & \"quotes\" 'apostrophes' 🍕"
+}
+
+### Expected Response: 201 Created
+### Note: Verify special characters are properly escaped
+
+
+### ============================================
+### 23. Update Order Status with Invalid Status
+### ============================================
+PATCH {{baseUrl}}/orders/valid_order_id/status
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "status": "shipped"
+}
+
+### Expected Response: 500 Internal Server Error
+### Message: Validation error (not in enum)
+
+
+### ============================================
+### 24. Update Order Status with Empty String
+### ============================================
+PATCH {{baseUrl}}/orders/valid_order_id/status
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "status": ""
+}
+
+### Expected Response: 400 Bad Request or 500
+### Message: Status is required or validation error
+
+
+### ============================================
+### 25. Cancel Already Delivered Order
+### ============================================
+### First create and deliver an order
+DELETE {{baseUrl}}/orders/delivered_order_id
+Authorization: Bearer {{customerToken}}
+
+### Expected Response: 400 Bad Request
+### Message: "Cannot cancel delivered order"
+
+
+### ============================================
+### USER PROFILE EDGE CASES
+### ============================================
+
+### ============================================
+### 26. Update Profile with Invalid Email Format
+### ============================================
+PATCH {{baseUrl}}/users/me
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "email": "not-an-email"
+}
+
+### Expected Response: 500 Internal Server Error
+### Message: Validation error
+
+
+### ============================================
+### 27. Update Profile with Extremely Long Name
+### ============================================
+PATCH {{baseUrl}}/users/me
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "name": "A".repeat(500)
+}
+
+### Expected Response: 200 OK (if no length validation)
+### Note: Consider adding max length validation
+
+
+### ============================================
+### 28. Update Profile with SQL Injection Attempt
+### ============================================
+PATCH {{baseUrl}}/users/me
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "name": "'; DROP TABLE users; --"
+}
+
+### Expected Response: 200 OK
+### Note: MongoDB is not vulnerable to SQL injection
+
+
+### ============================================
+### 29. Update Profile with XSS Attempt
+### ============================================
+PATCH {{baseUrl}}/users/me
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "name": "<script>alert('XSS')</script>",
+  "address": "<img src=x onerror=alert('XSS')>"
+}
+
+### Expected Response: 200 OK
+### Note: Verify data is properly escaped when displayed
+
+
+### ============================================
+### RESTAURANT EDGE CASES
+### ============================================
+
+### ============================================
+### 30. Update Restaurant with Empty Required Fields
+### ============================================
+PATCH {{baseUrl}}/restaurant
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "",
+  "address": "",
+  "phone": ""
+}
+
+### Expected Response: 500 Internal Server Error
+### Message: Validation error (required fields)
+
+
+### ============================================
+### 31. Update Restaurant with Very Long Description
+### ============================================
+PATCH {{baseUrl}}/restaurant
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "description": "Lorem ipsum ".repeat(100)
+}
+
+### Expected Response: 200 OK (if no length validation)
+
+
+### ============================================
+### CONCURRENT REQUEST EDGE CASES
+### ============================================
+
+### ============================================
+### 32. Add Same Product to Cart Twice Simultaneously
+### ============================================
+### Run these two requests at the same time (click both quickly)
+POST {{baseUrl}}/cart/items
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "product_id": "valid_product_id",
+  "quantity": 1
+}
+
+###
+
+POST {{baseUrl}}/cart/items
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "product_id": "valid_product_id",
+  "quantity": 1
+}
+
+### Expected Response: Both 200 OK
+### Note: Check if quantity is correctly incremented to 2
+
+
+### ============================================
+### 33. Create Order While Another User Deletes Product
+### ============================================
+### Requires coordination between two users
+### Customer adds product to cart and creates order
+### Admin deletes product at the same time
+### Expected: Order should succeed with product snapshot
+
+
+### ============================================
+### RATE LIMITING & PERFORMANCE
+### ============================================
+
+### ============================================
+### 34. Rapid Fire Requests (10 in a row)
+### ============================================
+### Click "Send Request" rapidly 10 times
+GET {{baseUrl}}/products
+
+### Expected Response: All 200 OK (if no rate limiting)
+### Note: Consider implementing rate limiting
+
+
+### ============================================
+### 35. Very Large Request Body
+### ============================================
+POST {{baseUrl}}/products
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Test Product",
+  "description": "A".repeat(10000),
+  "price": 9.99,
+  "category": "Test"
+}
+
+### Expected Response: 201 Created or 413 Payload Too Large
+### Note: Check body parser limits
+
+
+### ============================================
+### MISSING HEADERS & MALFORMED REQUESTS
+### ============================================
+
+### ============================================
+### 36. POST Request Without Content-Type Header
+### ============================================
+POST {{baseUrl}}/auth/register
+
+{
+  "name": "Test User",
+  "email": "test@example.com",
+  "password": "password123"
+}
+
+### Expected Response: May fail to parse body
+
+
+### ============================================
+### 37. Request with Invalid JSON
+### ============================================
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Test User",
+  "email": "test@example.com",
+  "password": "password123"
+  // Missing closing brace
+
+### Expected Response: 400 Bad Request
+### Message: Invalid JSON
+
+
+### ============================================
+### 38. Authorization Header Without Bearer Prefix
+### ============================================
+GET {{baseUrl}}/users/me
+Authorization: {{customerToken}}
+
+### Expected Response: 401 Unauthorized
+### Message: "Access token required"
+
+
+### ============================================
+### 39. Multiple Authorization Headers
+### ============================================
+GET {{baseUrl}}/users/me
+Authorization: Bearer {{customerToken}}
+Authorization: Bearer {{adminToken}}
+
+### Expected Response: Depends on implementation
+### Note: Usually uses first or last header
+
+
+### ============================================
+### DATABASE EDGE CASES
+### ============================================
+
+### ============================================
+### 40. Access Deleted User's Cart
+### ============================================
+### 1. Delete user account
+### 2. Try to access cart with old token
+GET {{baseUrl}}/cart
+Authorization: Bearer deleted_user_token
+
+### Expected Response: 404 Not Found
+### Message: "User not found" or "Cart not found"
+
+
+### ============================================
+### 41. Order with Product That Gets Deleted
+### ============================================
+### 1. Add product to cart
+### 2. Admin deletes product
+### 3. Try to create order
+### Expected: Should handle gracefully
+
+
+### ============================================
+### BOUNDARY VALUE TESTING
+### ============================================
+
+### ============================================
+### 42. Product Price at Maximum Float Value
+### ============================================
+POST {{baseUrl}}/products
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Expensive Item",
+  "price": 999999999.99,
+  "category": "Test"
+}
+
+### Expected Response: 201 Created
+
+
+### ============================================
+### 43. Cart with Maximum Items
+### ============================================
+### Add 100+ different products to cart
+### Expected: Should handle large carts
+
+
+### ============================================
+### 44. Order with Single Item
+### ============================================
+### Minimum valid order
+### Expected: Should work with just 1 item
+
+
+### ============================================
+### CORS & SECURITY HEADERS
+### ============================================
+
+### ============================================
+### 45. Request from Different Origin
+### ============================================
+### Note: REST Client doesn't test CORS, use browser
+### Check if CORS headers are properly set
+
+
+### ============================================
+### 46. OPTIONS Preflight Request
+### ============================================
+OPTIONS {{baseUrl}}/products
+
+### Expected Response: 200 OK or 204 No Content
+### Should include CORS headers

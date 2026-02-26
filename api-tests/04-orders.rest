@@ -1,0 +1,478 @@
+### ============================================
+### 📦 ORDER API TESTS
+### ============================================
+
+@baseUrl = http://localhost:5000/api
+@customerToken = your_customer_token_here
+@adminToken = your_admin_token_here
+@orderId = your_order_id_here
+
+### ============================================
+### CUSTOMER ENDPOINTS
+### ============================================
+
+### ============================================
+### 1. CREATE ORDER FROM CART - Success
+### ============================================
+### Prerequisites: Cart must have items
+POST {{baseUrl}}/orders
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "notes": "Please deliver to the front door"
+}
+
+### Expected Response: 201 Created
+### Returns: Order object with items, total_price, status: "pending"
+### Copy order _id and update @orderId variable
+
+
+### ============================================
+### 2. CREATE ORDER - With Empty Notes
+### ============================================
+POST {{baseUrl}}/orders
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "notes": ""
+}
+
+### Expected Response: 201 Created
+### Returns: Order with empty notes
+
+
+### ============================================
+### 3. CREATE ORDER - Without Notes Field
+### ============================================
+POST {{baseUrl}}/orders
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+}
+
+### Expected Response: 201 Created
+### Returns: Order with notes: null
+
+
+### ============================================
+### 4. CREATE ORDER - Empty Cart (Error)
+### ============================================
+### First clear your cart: DELETE /api/cart
+POST {{baseUrl}}/orders
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "notes": "Test order"
+}
+
+### Expected Response: 400 Bad Request
+### Message: "Cart is empty"
+
+
+### ============================================
+### 5. CREATE ORDER - No Token (Error)
+### ============================================
+POST {{baseUrl}}/orders
+Content-Type: application/json
+
+{
+  "notes": "Test order"
+}
+
+### Expected Response: 401 Unauthorized
+### Message: "Access token required"
+
+
+### ============================================
+### 6. GET MY ORDERS - Success
+### ============================================
+GET {{baseUrl}}/orders
+Authorization: Bearer {{customerToken}}
+
+### Expected Response: 200 OK
+### Returns: Array of all orders for logged-in customer
+
+
+### ============================================
+### 7. GET MY ORDERS - No Orders Yet
+### ============================================
+### Use a newly registered customer token
+GET {{baseUrl}}/orders
+Authorization: Bearer {{customerToken}}
+
+### Expected Response: 200 OK
+### Returns: Empty array []
+
+
+### ============================================
+### 8. GET MY ORDERS - No Token (Error)
+### ============================================
+GET {{baseUrl}}/orders
+
+### Expected Response: 401 Unauthorized
+### Message: "Access token required"
+
+
+### ============================================
+### 9. GET ORDER BY ID - Success
+### ============================================
+GET {{baseUrl}}/orders/{{orderId}}
+Authorization: Bearer {{customerToken}}
+
+### Expected Response: 200 OK
+### Returns: Single order object with populated items
+
+
+### ============================================
+### 10. GET ORDER BY ID - Invalid Order ID (Error)
+### ============================================
+GET {{baseUrl}}/orders/507f1f77bcf86cd799439011
+Authorization: Bearer {{customerToken}}
+
+### Expected Response: 404 Not Found
+### Message: "Order not found"
+
+
+### ============================================
+### 11. GET ORDER BY ID - Another User's Order (Error)
+### ============================================
+### Use different customer token
+GET {{baseUrl}}/orders/{{orderId}}
+Authorization: Bearer another_customer_token
+
+### Expected Response: 404 Not Found
+### Message: "Order not found"
+
+
+### ============================================
+### 12. CANCEL ORDER - Success (Pending Order)
+### ============================================
+DELETE {{baseUrl}}/orders/{{orderId}}
+Authorization: Bearer {{customerToken}}
+
+### Expected Response: 200 OK
+### Returns: Order with status: "cancelled"
+
+
+### ============================================
+### 13. CANCEL ORDER - Already Cancelled (Error)
+### ============================================
+DELETE {{baseUrl}}/orders/{{orderId}}
+Authorization: Bearer {{customerToken}}
+
+### Expected Response: 400 Bad Request
+### Message: "Order is already cancelled"
+
+
+### ============================================
+### 14. CANCEL ORDER - Delivered Order (Error)
+### ============================================
+### First update order status to "delivered" as admin
+DELETE {{baseUrl}}/orders/delivered_order_id
+Authorization: Bearer {{customerToken}}
+
+### Expected Response: 400 Bad Request
+### Message: "Cannot cancel delivered order"
+
+
+### ============================================
+### 15. CANCEL ORDER - Invalid Order ID (Error)
+### ============================================
+DELETE {{baseUrl}}/orders/507f1f77bcf86cd799439011
+Authorization: Bearer {{customerToken}}
+
+### Expected Response: 404 Not Found
+### Message: "Order not found"
+
+
+### ============================================
+### 16. CANCEL ORDER - No Token (Error)
+### ============================================
+DELETE {{baseUrl}}/orders/{{orderId}}
+
+### Expected Response: 401 Unauthorized
+### Message: "Access token required"
+
+
+### ============================================
+### ADMIN ENDPOINTS
+### ============================================
+
+### ============================================
+### 17. GET ALL ORDERS - Admin Success
+### ============================================
+GET {{baseUrl}}/orders/admin/all
+Authorization: Bearer {{adminToken}}
+
+### Expected Response: 200 OK
+### Returns: Array of all orders from all customers
+
+
+### ============================================
+### 18. GET ALL ORDERS - Customer Access (Error)
+### ============================================
+GET {{baseUrl}}/orders/admin/all
+Authorization: Bearer {{customerToken}}
+
+### Expected Response: 403 Forbidden
+### Message: "Access Denied. admin only."
+
+
+### ============================================
+### 19. GET ALL ORDERS - No Token (Error)
+### ============================================
+GET {{baseUrl}}/orders/admin/all
+
+### Expected Response: 401 Unauthorized
+### Message: "Access token required"
+
+
+### ============================================
+### 20. UPDATE ORDER STATUS - Pending to Confirmed
+### ============================================
+PATCH {{baseUrl}}/orders/{{orderId}}/status
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "status": "confirmed"
+}
+
+### Expected Response: 200 OK
+### Returns: Order with status: "confirmed"
+
+
+### ============================================
+### 21. UPDATE ORDER STATUS - Confirmed to Preparing
+### ============================================
+PATCH {{baseUrl}}/orders/{{orderId}}/status
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "status": "preparing"
+}
+
+### Expected Response: 200 OK
+### Returns: Order with status: "preparing"
+
+
+### ============================================
+### 22. UPDATE ORDER STATUS - Preparing to Delivered
+### ============================================
+PATCH {{baseUrl}}/orders/{{orderId}}/status
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "status": "delivered"
+}
+
+### Expected Response: 200 OK
+### Returns: Order with status: "delivered"
+
+
+### ============================================
+### 23. UPDATE ORDER STATUS - Set to Cancelled
+### ============================================
+PATCH {{baseUrl}}/orders/{{orderId}}/status
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "status": "cancelled"
+}
+
+### Expected Response: 200 OK
+### Returns: Order with status: "cancelled"
+
+
+### ============================================
+### 24. UPDATE ORDER STATUS - Missing Status (Error)
+### ============================================
+PATCH {{baseUrl}}/orders/{{orderId}}/status
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+}
+
+### Expected Response: 400 Bad Request
+### Message: "Status is required"
+
+
+### ============================================
+### 25. UPDATE ORDER STATUS - Invalid Status (Error)
+### ============================================
+PATCH {{baseUrl}}/orders/{{orderId}}/status
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "status": "invalid_status"
+}
+
+### Expected Response: 500 Internal Server Error
+### Message: Validation error
+
+
+### ============================================
+### 26. UPDATE ORDER STATUS - Invalid Order ID (Error)
+### ============================================
+PATCH {{baseUrl}}/orders/507f1f77bcf86cd799439011/status
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "status": "confirmed"
+}
+
+### Expected Response: 404 Not Found
+### Message: "Order not found"
+
+
+### ============================================
+### 27. UPDATE ORDER STATUS - Customer Access (Error)
+### ============================================
+PATCH {{baseUrl}}/orders/{{orderId}}/status
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "status": "confirmed"
+}
+
+### Expected Response: 403 Forbidden
+### Message: "Access Denied. admin only."
+
+
+### ============================================
+### COMPLETE ORDER WORKFLOW TEST
+### ============================================
+### Run these in sequence:
+
+### Step 1: Add items to cart
+POST {{baseUrl}}/cart/items
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "product_id": "your_product_id",
+  "quantity": 2
+}
+
+###
+
+### Step 2: View cart before order
+GET {{baseUrl}}/cart
+Authorization: Bearer {{customerToken}}
+
+###
+
+### Step 3: Create order from cart
+POST {{baseUrl}}/orders
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "notes": "Please ring the doorbell twice"
+}
+
+###
+
+### Step 4: Verify cart is cleared after order
+GET {{baseUrl}}/cart
+Authorization: Bearer {{customerToken}}
+
+###
+
+### Step 5: View my orders
+GET {{baseUrl}}/orders
+Authorization: Bearer {{customerToken}}
+
+###
+
+### Step 6: Get specific order details
+GET {{baseUrl}}/orders/{{orderId}}
+Authorization: Bearer {{customerToken}}
+
+###
+
+### Step 7: Admin views all orders
+GET {{baseUrl}}/orders/admin/all
+Authorization: Bearer {{adminToken}}
+
+###
+
+### Step 8: Admin confirms order
+PATCH {{baseUrl}}/orders/{{orderId}}/status
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "status": "confirmed"
+}
+
+###
+
+### Step 9: Admin updates to preparing
+PATCH {{baseUrl}}/orders/{{orderId}}/status
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "status": "preparing"
+}
+
+###
+
+### Step 10: Admin marks as delivered
+PATCH {{baseUrl}}/orders/{{orderId}}/status
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "status": "delivered"
+}
+
+###
+
+### Step 11: Customer views updated order
+GET {{baseUrl}}/orders/{{orderId}}
+Authorization: Bearer {{customerToken}}
+
+
+### ============================================
+### ORDER CANCELLATION WORKFLOW
+### ============================================
+
+### Step 1: Create new order
+POST {{baseUrl}}/orders
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "notes": "Test cancellation"
+}
+
+###
+
+### Step 2: Customer cancels order immediately
+DELETE {{baseUrl}}/orders/{{orderId}}
+Authorization: Bearer {{customerToken}}
+
+###
+
+### Step 3: Verify order is cancelled
+GET {{baseUrl}}/orders/{{orderId}}
+Authorization: Bearer {{customerToken}}
+
+###
+
+### Step 4: Try to cancel again (should fail)
+DELETE {{baseUrl}}/orders/{{orderId}}
+Authorization: Bearer {{customerToken}}

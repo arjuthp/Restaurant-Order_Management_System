@@ -1,0 +1,338 @@
+### ============================================
+### 🛒 CART API TESTS
+### ============================================
+
+@baseUrl = http://localhost:5000/api
+# IMPORTANT: Replace this with actual token from login response
+@accessToken = your_customer_token_here
+@productId = your_product_id_here
+
+### 📝 HOW TO GET A VALID TOKEN:
+### 1. Go to api-tests/01-auth.rest
+### 2. Run the "CUSTOMER LOGIN - Success" request
+### 3. Copy the "accessToken" value from the response
+### 4. Paste it above replacing "your_customer_token_here"
+
+### ============================================
+### 1. GET MY CART - Empty Cart
+### ============================================
+GET {{baseUrl}}/cart
+Authorization: Bearer {{accessToken}}
+
+### Expected Response: 200 OK
+### Returns: Cart with empty items array
+
+
+### ============================================
+### 2. GET MY CART - No Token (Error)
+### ============================================
+GET {{baseUrl}}/cart
+
+### Expected Response: 401 Unauthorized
+### Message: "Access token required"
+
+
+### ============================================
+### 3. GET MY CART - Invalid Token (Error)
+### ============================================
+GET {{baseUrl}}/cart
+Authorization: Bearer invalid_token_string
+
+### Expected Response: 403 Forbidden
+### Message: "Invalid or expired token"
+
+
+### ============================================
+### 4. ADD ITEM TO CART - Success
+### ============================================
+### First get a product ID from GET /api/products
+POST {{baseUrl}}/cart/items
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "product_id": "{{productId}}",
+  "quantity": 2
+}
+
+### Expected Response: 200 OK
+### Returns: Updated cart with added item
+
+
+### ============================================
+### 5. ADD SAME ITEM AGAIN - Quantity Increases
+### ============================================
+POST {{baseUrl}}/cart/items
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "product_id": "{{productId}}",
+  "quantity": 1
+}
+
+### Expected Response: 200 OK
+### Returns: Cart with increased quantity (now 3)
+
+
+### ============================================
+### 6. ADD ITEM - Missing Product ID (Error)
+### ============================================
+POST {{baseUrl}}/cart/items
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "quantity": 2
+}
+
+### Expected Response: 400 Bad Request
+### Message: "Product ID and quantity are required"
+
+
+### ============================================
+### 7. ADD ITEM - Missing Quantity (Error)
+### ============================================
+POST {{baseUrl}}/cart/items
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "product_id": "{{productId}}"
+}
+
+### Expected Response: 400 Bad Request
+### Message: "Product ID and quantity are required"
+
+
+### ============================================
+### 8. ADD ITEM - Invalid Product ID (Error)
+### ============================================
+POST {{baseUrl}}/cart/items
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "product_id": "507f1f77bcf86cd799439011",
+  "quantity": 2
+}
+
+### Expected Response: 404 Not Found
+### Message: "Product not found"
+
+
+### ============================================
+### 9. ADD ITEM - Unavailable Product (Error)
+### ============================================
+### First create a product with is_available: false
+POST {{baseUrl}}/cart/items
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "product_id": "unavailable_product_id",
+  "quantity": 2
+}
+
+### Expected Response: 400 Bad Request
+### Message: "Product is not available"
+
+
+### ============================================
+### 10. UPDATE ITEM QUANTITY - Success
+### ============================================
+PATCH {{baseUrl}}/cart/items/{{productId}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "quantity": 5
+}
+
+### Expected Response: 200 OK
+### Returns: Cart with updated quantity
+
+
+### ============================================
+### 11. UPDATE ITEM QUANTITY - Set to Zero (Removes Item)
+### ============================================
+PATCH {{baseUrl}}/cart/items/{{productId}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "quantity": 0
+}
+
+### Expected Response: 200 OK
+### Returns: Cart with item removed
+
+
+### ============================================
+### 12. UPDATE ITEM QUANTITY - Negative Number (Removes Item)
+### ============================================
+### First add item back to cart
+PATCH {{baseUrl}}/cart/items/{{productId}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "quantity": -1
+}
+
+### Expected Response: 200 OK
+### Returns: Cart with item removed
+
+
+### ============================================
+### 13. UPDATE ITEM QUANTITY - Missing Quantity (Error)
+### ============================================
+PATCH {{baseUrl}}/cart/items/{{productId}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+}
+
+### Expected Response: 400 Bad Request
+### Message: "Quantity is required"
+
+
+### ============================================
+### 14. UPDATE ITEM QUANTITY - Item Not in Cart (Error)
+### ============================================
+PATCH {{baseUrl}}/cart/items/507f1f77bcf86cd799439011
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "quantity": 5
+}
+
+### Expected Response: 404 Not Found
+### Message: "Item not found in cart"
+
+
+### ============================================
+### 15. REMOVE ITEM FROM CART - Success
+### ============================================
+DELETE {{baseUrl}}/cart/items/{{productId}}
+Authorization: Bearer {{accessToken}}
+
+### Expected Response: 200 OK
+### Returns: Cart without removed item
+
+
+### ============================================
+### 16. REMOVE ITEM - No Token (Error)
+### ============================================
+DELETE {{baseUrl}}/cart/items/{{productId}}
+
+### Expected Response: 401 Unauthorized
+### Message: "Access token required"
+
+
+### ============================================
+### 17. CLEAR ENTIRE CART - Success
+### ============================================
+### First add some items to cart
+DELETE {{baseUrl}}/cart
+Authorization: Bearer {{accessToken}}
+
+### Expected Response: 200 OK
+### Message: "Cart cleared"
+### Returns: Empty cart
+
+
+### ============================================
+### 18. CLEAR CART - Already Empty
+### ============================================
+DELETE {{baseUrl}}/cart
+Authorization: Bearer {{accessToken}}
+
+### Expected Response: 200 OK
+### Message: "Cart cleared"
+
+
+### ============================================
+### 19. CLEAR CART - No Token (Error)
+### ============================================
+DELETE {{baseUrl}}/cart
+
+### Expected Response: 401 Unauthorized
+### Message: "Access token required"
+
+
+### ============================================
+### COMPLETE CART WORKFLOW TEST
+### ============================================
+### Run these in sequence:
+
+### Step 1: Get empty cart
+GET {{baseUrl}}/cart
+Authorization: Bearer {{accessToken}}
+
+###
+
+### Step 2: Add first item
+POST {{baseUrl}}/cart/items
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "product_id": "{{productId}}",
+  "quantity": 2
+}
+
+###
+
+### Step 3: Add second item (use different product_id)
+POST {{baseUrl}}/cart/items
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "product_id": "another_product_id",
+  "quantity": 1
+}
+
+###
+
+### Step 4: View cart with 2 items
+GET {{baseUrl}}/cart
+Authorization: Bearer {{accessToken}}
+
+###
+
+### Step 5: Update first item quantity
+PATCH {{baseUrl}}/cart/items/{{productId}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "quantity": 3
+}
+
+###
+
+### Step 6: Remove second item
+DELETE {{baseUrl}}/cart/items/another_product_id
+Authorization: Bearer {{accessToken}}
+
+###
+
+### Step 7: View cart with 1 item
+GET {{baseUrl}}/cart
+Authorization: Bearer {{accessToken}}
+
+###
+
+### Step 8: Clear cart
+DELETE {{baseUrl}}/cart
+Authorization: Bearer {{accessToken}}
+
+###
+
+### Step 9: Verify cart is empty
+GET {{baseUrl}}/cart
+Authorization: Bearer {{accessToken}}

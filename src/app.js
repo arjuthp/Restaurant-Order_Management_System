@@ -39,9 +39,12 @@ app.use(express.static(path.join(__dirname, '../frontend')));
 
 // SPA fallback: serve index.html for any route that doesn't match API or static files
 app.use((req, res, next) => {
-    // Skip API routes
+    // If it's an API route that didn't match, return 404 JSON
     if (req.path.startsWith('/api')) {
-        return next();
+        return res.status(404).json({ 
+            success: false, 
+            message: 'API endpoint not found' 
+        });
     }
     
     const fs = require('fs');

@@ -1,0 +1,225 @@
+### ============================================
+### 🔐 AUTHENTICATION API TESTS
+### ============================================
+
+@baseUrl = http://localhost:5000/api
+@accessToken = 
+@refreshToken = 
+
+### ============================================
+### 1. REGISTER CUSTOMER - Success
+### ============================================
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Januka thapa",
+  "email": "janu@gmail.com",
+  "password": "123456"
+}
+
+### Expected Response: 201 Created
+### Returns: accessToken, refreshToken, user object
+### Copy accessToken and update @accessToken variable above
+
+
+### ============================================
+### 2. REGISTER CUSTOMER - Email Already Exists (Error)
+### ============================================
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "password123"
+}
+
+### Expected Response: 400 Bad Request
+### Message: "Email already Exists"
+
+
+### ============================================
+### 3. REGISTER CUSTOMER - Missing Name (Error)
+### ============================================
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "password123"
+}
+
+### Expected Response: 500 Internal Server Error
+### Message: Validation error
+
+
+### ============================================
+### 4. REGISTER CUSTOMER - Missing Email (Error)
+### ============================================
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Test User",
+  "password": "password123"
+}
+
+### Expected Response: 500 Internal Server Error
+
+
+### ============================================
+### 5. REGISTER CUSTOMER - Missing Password (Error)
+### ============================================
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Test User",
+  "email": "test@example.com"
+}
+
+### Expected Response: 500 Internal Server Error
+
+
+### ============================================
+### 6. CUSTOMER LOGIN - Success
+### ============================================
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "john@example.com",
+  "password": "password123"
+}
+
+### Expected Response: 200 OK
+### Returns: accessToken, refreshToken, user object
+### Copy accessToken and update @accessToken variable
+
+
+### ============================================
+### 7. CUSTOMER LOGIN - Wrong Password (Error)
+### ============================================
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "john@example.com",
+  "password": "wrongpassword"
+}
+
+### Expected Response: 401 Unauthorized
+### Message: "Invalid credientials"
+
+
+### ============================================
+### 8. CUSTOMER LOGIN - Non-existent Email (Error)
+### ============================================
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "nonexistent@example.com",
+  "password": "password123"
+}
+
+### Expected Response: 401 Unauthorized
+### Message: "Invalid Credientials"
+
+
+### ============================================
+### 9. ADMIN LOGIN - Success
+### ============================================
+### NOTE: First create admin user in database or register with role: "admin"
+POST {{baseUrl}}/auth/admin/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "admin123"
+}
+
+### Expected Response: 200 OK
+### Returns: accessToken with role: "admin"
+
+
+### ============================================
+### 10. ADMIN LOGIN - Customer Tries Admin Login (Error)
+### ============================================
+POST {{baseUrl}}/auth/admin/login
+Content-Type: application/json
+
+{
+  "email": "john@example.com",
+  "password": "password123"
+}
+
+### Expected Response: 403 Forbidden
+### Message: "Access Denied. admin only."
+
+
+### ============================================
+### 11. REFRESH ACCESS TOKEN - Success
+### ============================================
+### Use this when access token expires (after 15 minutes)
+POST {{baseUrl}}/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+### Expected Response: 200 OK
+### Returns: new accessToken
+
+
+### ============================================
+### 12. REFRESH TOKEN - Invalid Token (Error)
+### ============================================
+POST {{baseUrl}}/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "invalid_token_string"
+}
+
+### Expected Response: 401 Unauthorized
+### Message: "Invalid refresh Token"
+
+
+### ============================================
+### 13. REFRESH TOKEN - Missing Token (Error)
+### ============================================
+POST {{baseUrl}}/auth/refresh
+Content-Type: application/json
+
+{
+}
+
+### Expected Response: 401 Unauthorized
+### Message: "Refresh token required"
+
+
+### ============================================
+### 14. LOGOUT - Success
+### ============================================
+POST {{baseUrl}}/auth/logout
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+### Expected Response: 200 OK
+### Message: "Logged out Successfully"
+
+
+### ============================================
+### 15. LOGOUT - Token Not Found (Error)
+### ============================================
+POST {{baseUrl}}/auth/logout
+Content-Type: application/json
+
+{
+  "

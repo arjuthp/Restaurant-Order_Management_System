@@ -35,8 +35,8 @@ async function updateItemQuantity(req, res){
         const { productId } = req.params;
         const {quantity } = req.body;
 
-        if(!quantity){
-            return res.status(400).json({message: 'Quantity is required'});
+        if(!quantity || quantity <= 0){
+            return res.status(400).json({message: 'Quantity must be greater than 0'});
         }
         const cart = await cartService.updateItemQuantity(req.user.id, productId, quantity);
         res.status(200).json(cart);
@@ -76,3 +76,8 @@ module.exports = {
     removeItemFromCart,
     clearCart
 };
+
+
+
+//quntiy update
+//unit-price multiply

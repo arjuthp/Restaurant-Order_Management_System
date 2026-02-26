@@ -1,0 +1,222 @@
+### ============================================
+### 🍕 PRODUCT API TESTS
+### ============================================
+
+@baseUrl = http://localhost:5000/api
+@accessToken = your_token_here
+@adminToken = your_admin_token_here
+@productId = 
+
+### ============================================
+### 1. GET ALL PRODUCTS - Success (Public)
+### ============================================
+GET {{baseUrl}}/products
+
+### Expected Response: 200 OK
+### Returns: Array of all products
+### No authentication required
+
+
+### ============================================
+### 2. GET SINGLE PRODUCT - Success (Public)
+### ============================================
+### First run "Get All Products" and copy a product _id
+GET {{baseUrl}}/products/{{productId}}
+
+### Expected Response: 200 OK
+### Returns: Single product object
+
+
+### ============================================
+### 3. GET SINGLE PRODUCT - Invalid ID (Error)
+### ============================================
+GET {{baseUrl}}/products/invalid123
+
+### Expected Response: 500 Internal Server Error
+### Message: Cast to ObjectId failed
+
+
+### ============================================
+### 4. GET SINGLE PRODUCT - Non-existent ID (Error)
+### ============================================
+GET {{baseUrl}}/products/507f1f77bcf86cd799439011
+
+### Expected Response: 404 Not Found
+### Message: "Product not found"
+
+
+### ============================================
+### 5. CREATE PRODUCT - Success (Admin Only)
+### ============================================
+POST {{baseUrl}}/products
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Veg Momo",
+  "description": "Steamed dumplings filled with fresh vegetables",
+  "price": 120,
+  "category": "Nepali",
+  "is_available": true,
+  "image_url": "https://example.com/vegmomo.jpg"
+}
+
+### Expected Response: 201 Created
+### Returns: Created product with _id
+### Copy _id and update @productId variable
+
+
+### ============================================
+### 6. CREATE PRODUCT - Customer Tries (Error)
+### ============================================
+POST {{baseUrl}}/products
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "Test Product",
+  "description": "Test description",
+  "price": 100,
+  "category": "Nepali",
+  "is_available": true
+}
+
+### Expected Response: 403 Forbidden
+### Message: "Access denied. Required role: admin"
+
+
+### ============================================
+### 7. CREATE PRODUCT - No Token (Error)
+### ============================================
+POST {{baseUrl}}/products
+Content-Type: application/json
+
+{
+  "name": "Test Product",
+  "description": "Test description",
+  "price": 100,
+  "category": "Nepali"
+}
+
+### Expected Response: 401 Unauthorized
+### Message: "Access token required"
+
+
+### ============================================
+### 8. CREATE PRODUCT - Missing Name (Error)
+### ============================================
+POST {{baseUrl}}/products
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "description": "Test description",
+  "price": 100,
+  "category": "Nepali"
+}
+
+### Expected Response: 500 Internal Server Error
+### Message: Validation error - name required
+
+
+### ============================================
+### 9. CREATE PRODUCT - Negative Price (Error)
+### ============================================
+POST {{baseUrl}}/products
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Test Product",
+  "description": "Test description",
+  "price": -10,
+  "category": "Nepali"
+}
+
+### Expected Response: 500 Internal Server Error
+### Message: Price validation error
+
+
+### ============================================
+### 10. UPDATE PRODUCT - Success (Admin Only)
+### ============================================
+PATCH {{baseUrl}}/products/{{productId}}
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "price": 130,
+  "is_available": false
+}
+
+### Expected Response: 200 OK
+### Returns: Updated product
+
+
+### ============================================
+### 11. UPDATE PRODUCT - Customer Tries (Error)
+### ============================================
+PATCH {{baseUrl}}/products/{{productId}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "price": 150
+}
+
+### Expected Response: 403 Forbidden
+### Message: "Access denied. Required role: admin"
+
+
+### ============================================
+### 12. UPDATE PRODUCT - Non-existent ID (Error)
+### ============================================
+PATCH {{baseUrl}}/products/507f1f77bcf86cd799439011
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "price": 150
+}
+
+### Expected Response: 404 Not Found
+### Message: "Product not found"
+
+
+### ============================================
+### 13. DELETE PRODUCT - Success (Admin Only)
+### ============================================
+DELETE {{baseUrl}}/products/{{productId}}
+Authorization: Bearer {{adminToken}}
+
+### Expected Response: 200 OK
+### Message: "Product deleted successfully"
+
+
+### ============================================
+### 14. DELETE PRODUCT - Customer Tries (Error)
+### ============================================
+DELETE {{baseUrl}}/products/{{productId}}
+Authorization: Bearer {{accessToken}}
+
+### Expected Response: 403 Forbidden
+### Message: "Access denied. Required role: admin"
+
+
+### ============================================
+### 15. DELETE PRODUCT - Non-existent ID (Error)
+### ============================================
+DELETE {{baseUrl}}/products/507f1f77bcf86cd799439011
+Authorization: Bearer {{adminToken}}
+
+### Expected Response: 404 Not Found
+### Message: "Product not found"
+
+
+### ============================================
+### 16. DELETE PRODUCT - No Token (Error)
+### ============================================
+DELETE {{baseUrl}}/products/{{productId}}
+
+### Expected Response: 401 Unauthorized
+### Message: "Access token required"

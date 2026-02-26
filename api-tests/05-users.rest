@@ -1,0 +1,321 @@
+### ============================================
+### 👤 USER API TESTS
+### ============================================
+
+@baseUrl = http://localhost:5000/api
+@customerToken = your_customer_token_here
+@adminToken = your_admin_token_here
+
+### ============================================
+### CUSTOMER ENDPOINTS
+### ============================================
+
+### ============================================
+### 1. GET MY PROFILE - Success
+### ============================================
+GET {{baseUrl}}/users/me
+Authorization: Bearer {{customerToken}}
+
+### Expected Response: 200 OK
+### Returns: User object (name, email, phone, address, role)
+### Note: Password is NOT returned
+
+
+### ============================================
+### 2. GET MY PROFILE - No Token (Error)
+### ============================================
+GET {{baseUrl}}/users/me
+
+### Expected Response: 401 Unauthorized
+### Message: "Access token required"
+
+
+### ============================================
+### 3. GET MY PROFILE - Invalid Token (Error)
+### ============================================
+GET {{baseUrl}}/users/me
+Authorization: Bearer invalid_token_string
+
+### Expected Response: 403 Forbidden
+### Message: "Invalid or expired token"
+
+
+### ============================================
+### 4. UPDATE MY PROFILE - Update Name
+### ============================================
+PATCH {{baseUrl}}/users/me
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "name": "John Updated Doe"
+}
+
+### Expected Response: 200 OK
+### Returns: Updated user object
+
+
+### ============================================
+### 5. UPDATE MY PROFILE - Update Phone
+### ============================================
+PATCH {{baseUrl}}/users/me
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "phone": "+1-555-0123"
+}
+
+### Expected Response: 200 OK
+### Returns: User with updated phone
+
+
+### ============================================
+### 6. UPDATE MY PROFILE - Update Address
+### ============================================
+PATCH {{baseUrl}}/users/me
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "address": "123 Main Street, Apt 4B, New York, NY 10001"
+}
+
+### Expected Response: 200 OK
+### Returns: User with updated address
+
+
+### ============================================
+### 7. UPDATE MY PROFILE - Update Multiple Fields
+### ============================================
+PATCH {{baseUrl}}/users/me
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "name": "Jane Smith",
+  "phone": "+1-555-9876",
+  "address": "456 Oak Avenue, Los Angeles, CA 90001"
+}
+
+### Expected Response: 200 OK
+### Returns: User with all updated fields
+
+
+### ============================================
+### 8. UPDATE MY PROFILE - Update Email
+### ============================================
+PATCH {{baseUrl}}/users/me
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "email": "newemail@example.com"
+}
+
+### Expected Response: 200 OK
+### Returns: User with updated email
+
+
+### ============================================
+### 9. UPDATE MY PROFILE - Duplicate Email (Error)
+### ============================================
+### Use email that already exists for another user
+PATCH {{baseUrl}}/users/me
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "email": "existing@example.com"
+}
+
+### Expected Response: 500 Internal Server Error
+### Message: Duplicate key error
+
+
+### ============================================
+### 10. UPDATE MY PROFILE - Empty Body
+### ============================================
+PATCH {{baseUrl}}/users/me
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+}
+
+### Expected Response: 200 OK
+### Returns: User object unchanged
+
+
+### ============================================
+### 11. UPDATE MY PROFILE - Try to Change Role (Should Ignore)
+### ============================================
+PATCH {{baseUrl}}/users/me
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "role": "admin"
+}
+
+### Expected Response: 200 OK
+### Returns: User object (role should remain "customer")
+### Note: Role changes should be ignored or handled by service
+
+
+### ============================================
+### 12. UPDATE MY PROFILE - No Token (Error)
+### ============================================
+PATCH {{baseUrl}}/users/me
+Content-Type: application/json
+
+{
+  "name": "Test User"
+}
+
+### Expected Response: 401 Unauthorized
+### Message: "Access token required"
+
+
+### ============================================
+### 13. DELETE MY ACCOUNT - Success
+### ============================================
+### WARNING: This will permanently delete the account
+DELETE {{baseUrl}}/users/me
+Authorization: Bearer {{customerToken}}
+
+### Expected Response: 200 OK
+### Message: "User deleted successfully"
+
+
+### ============================================
+### 14. DELETE MY ACCOUNT - Already Deleted (Error)
+### ============================================
+### Try to delete again with same token
+DELETE {{baseUrl}}/users/me
+Authorization: Bearer {{customerToken}}
+
+### Expected Response: 404 Not Found
+### Message: "User not found"
+
+
+### ============================================
+### 15. DELETE MY ACCOUNT - No Token (Error)
+### ============================================
+DELETE {{baseUrl}}/users/me
+
+### Expected Response: 401 Unauthorized
+### Message: "Access token required"
+
+
+### ============================================
+### ADMIN ENDPOINTS
+### ============================================
+
+### ============================================
+### 16. GET ALL USERS - Admin Success
+### ============================================
+GET {{baseUrl}}/users
+Authorization: Bearer {{adminToken}}
+
+### Expected Response: 200 OK
+### Returns: Array of all users (customers and admins)
+
+
+### ============================================
+### 17. GET ALL USERS - Customer Access (Error)
+### ============================================
+GET {{baseUrl}}/users
+Authorization: Bearer {{customerToken}}
+
+### Expected Response: 403 Forbidden
+### Message: "Access Denied. admin only."
+
+
+### ============================================
+### 18. GET ALL USERS - No Token (Error)
+### ============================================
+GET {{baseUrl}}/users
+
+### Expected Response: 401 Unauthorized
+### Message: "Access token required"
+
+
+### ============================================
+### COMPLETE USER PROFILE WORKFLOW
+### ============================================
+### Run these in sequence:
+
+### Step 1: Register new user
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Test User",
+  "email": "testuser@example.com",
+  "password": "password123"
+}
+
+###
+
+### Step 2: View initial profile
+GET {{baseUrl}}/users/me
+Authorization: Bearer {{customerToken}}
+
+###
+
+### Step 3: Add phone number
+PATCH {{baseUrl}}/users/me
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "phone": "+1-555-1234"
+}
+
+###
+
+### Step 4: Add address
+PATCH {{baseUrl}}/users/me
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "address": "789 Pine Street, Chicago, IL 60601"
+}
+
+###
+
+### Step 5: View updated profile
+GET {{baseUrl}}/users/me
+Authorization: Bearer {{customerToken}}
+
+###
+
+### Step 6: Update name and phone together
+PATCH {{baseUrl}}/users/me
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "name": "Test User Updated",
+  "phone": "+1-555-5678"
+}
+
+###
+
+### Step 7: Admin views all users
+GET {{baseUrl}}/users
+Authorization: Bearer {{adminToken}}
+
+###
+
+### Step 8: Delete account
+DELETE {{baseUrl}}/users/me
+Authorization: Bearer {{customerToken}}
+
+###
+
+### Step 9: Verify account is deleted (should fail)
+GET {{baseUrl}}/users/me
+Authorization: Bearer {{customerToken}}
