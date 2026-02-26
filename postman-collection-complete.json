@@ -1,0 +1,108 @@
+{
+  "info": {
+    "name": "Restaurant API - Complete Test Suite",
+    "description": "Comprehensive API tests - Admin & Customer scenarios",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {"key": "baseUrl", "value": "http://localhost:5000/api", "type": "string"},
+    {"key": "customerToken", "value": "", "type": "string"},
+    {"key": "customerRefreshToken", "value": "", "type": "string"},
+    {"key": "customerId", "value": "", "type": "string"},
+    {"key": "adminToken", "value": "", "type": "string"},
+    {"key": "adminRefreshToken", "value": "", "type": "string"},
+    {"key": "adminId", "value": "", "type": "string"},
+    {"key": "productId", "value": "", "type": "string"},
+    {"key": "productId2", "value": "", "type": "string"},
+    {"key": "orderId", "value": "", "type": "string"}
+  ],
+  "item": [
+    {
+      "name": "CUSTOMER FLOW",
+      "item": [
+        {
+          "name": "1. Authentication",
+          "item": [
+            {
+              "name": "Register Customer",
+              "event": [{
+                "listen": "test",
+                "script": {
+                  "exec": [
+                    "pm.test('Registration successful', () => {",
+                    "    pm.response.to.have.status(201);",
+                    "    const res = pm.response.json();",
+                    "    pm.collectionVariables.set('customerToken', res.accessToken);",
+                    "    pm.collectionVariables.set('customerRefreshToken', res.refreshToken);",
+                    "    pm.collectionVariables.set('customerId', res.user._id);",
+                    "    console.log('✅ Customer registered');",
+                    "});"
+                  ]
+                }
+              }],
+              "request": {
+                "method": "POST",
+                "header": [{"key": "Content-Type", "value": "application/json"}],
+                "body": {"mode": "raw", "raw": "{\n  \"name\": \"Test Customer\",\n  \"email\": \"customer{{$timestamp}}@test.com\",\n  \"password\": \"password123\"\n}"},
+                "url": {"raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth", "register"]}
+              }
+            },
+            {
+              "name": "Login Customer",
+              "event": [{
+                "listen": "test",
+                "script": {
+                  "exec": [
+                    "pm.test('Login successful', () => {",
+                    "    pm.response.to.have.status(200);",
+                    "    const res = pm.response.json();",
+                    "    pm.collectionVariables.set('customerToken', res.accessToken);",
+                    "    console.log('✅ Customer logged in');",
+                    "});"
+                  ]
+                }
+              }],
+              "request": {
+                "method": "POST",
+                "header": [{"key": "Content-Type", "value": "application/json"}],
+                "body": {"mode": "raw", "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\"\n}"},
+                "url": {"raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"]}
+              }
+            }
+          ]
+        },
+        {
+          "name": "2. Browse Products",
+          "item": [
+            {
+              "name": "Get All Products",
+              "event": [{
+                "listen": "test",
+                "script": {
+                  "exec": [
+                    "pm.test('Get products successful', () => {",
+                    "    pm.response.to.have.status(200);",
+                    "    const products = pm.response.json();",
+                    "    if (products.length > 0) {",
+                    "        pm.collectionVariables.set('productId', products[0]._id);",
+                    "    }",
+                    "    if (products.length > 1) {",
+                    "        pm.collectionVariables.set('productId2', products[1]._id);",
+                    "    }",
+                    "    console.log('✅ Products loaded');",
+                    "});"
+                  ]
+                }
+              }],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {"raw": "{{baseUrl}}/products", "host": ["{{baseUrl}}"], "path": ["products"]}
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
