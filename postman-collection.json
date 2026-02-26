@@ -1,0 +1,371 @@
+{
+  "info": {
+    "name": "Restaurant API - Complete Test Suite",
+    "description": "Comprehensive API tests for Restaurant Order Management System - Admin & Customer scenarios",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api",
+      "type": "string"
+    },
+    {
+      "key": "customerToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "customerRefreshToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "customerId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "adminRefreshToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "adminId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "productId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "productId2",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "orderId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Register User",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Registration successful', function() {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "if (pm.response.code === 201) {",
+              "    const response = pm.response.json();",
+              "    pm.collectionVariables.set('accessToken', response.accessToken);",
+              "    pm.collectionVariables.set('refreshToken', response.refreshToken);",
+              "    pm.collectionVariables.set('userId', response.user._id);",
+              "    console.log('✅ User registered and tokens saved');",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"testuser{{$timestamp}}@example.com\",\n  \"password\": \"password123\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/register",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "register"]
+        }
+      }
+    },
+    {
+      "name": "2. Login User",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Login successful', function() {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "if (pm.response.code === 200) {",
+              "    const response = pm.response.json();",
+              "    pm.collectionVariables.set('accessToken', response.accessToken);",
+              "    pm.collectionVariables.set('refreshToken', response.refreshToken);",
+              "    console.log('✅ Login successful, tokens updated');",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "login"]
+        }
+      }
+    },
+    {
+      "name": "3. Get All Products",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Get products successful', function() {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "if (pm.response.code === 200) {",
+              "    const products = pm.response.json();",
+              "    pm.test('Products array exists', function() {",
+              "        pm.expect(products).to.be.an('array');",
+              "    });",
+              "    ",
+              "    if (products.length > 0) {",
+              "        pm.collectionVariables.set('productId', products[0]._id);",
+              "        console.log('✅ Product ID saved:', products[0]._id);",
+              "    }",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/products",
+          "host": ["{{baseUrl}}"],
+          "path": ["products"]
+        }
+      }
+    },
+    {
+      "name": "4. Add Item to Cart (First Time - Qty 2)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Add to cart successful', function() {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "if (pm.response.code === 200) {",
+              "    const cart = pm.response.json();",
+              "    ",
+              "    pm.test('Cart has items', function() {",
+              "        pm.expect(cart.items).to.be.an('array');",
+              "        pm.expect(cart.items.length).to.be.greaterThan(0);",
+              "    });",
+              "    ",
+              "    const item = cart.items[0];",
+              "    ",
+              "    pm.test('Quantity is 2', function() {",
+              "        pm.expect(item.quantity).to.equal(2);",
+              "    });",
+              "    ",
+              "    pm.test('Unit price calculated correctly (price × quantity)', function() {",
+              "        const basePrice = item.product_id.price;",
+              "        const expectedPrice = basePrice * 2;",
+              "        pm.expect(item.unit_price).to.equal(expectedPrice);",
+              "        console.log('✅ Base price:', basePrice, '× 2 =', expectedPrice);",
+              "    });",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"product_id\": \"{{productId}}\",\n  \"quantity\": 2\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/cart",
+          "host": ["{{baseUrl}}"],
+          "path": ["cart"]
+        }
+      }
+    },
+    {
+      "name": "5. Add Same Item Again (Qty 3) - Should Update",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Add same product successful', function() {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "if (pm.response.code === 200) {",
+              "    const cart = pm.response.json();",
+              "    ",
+              "    pm.test('❗ CRITICAL: Only 1 item in cart (no duplicates)', function() {",
+              "        pm.expect(cart.items.length).to.equal(1);",
+              "    });",
+              "    ",
+              "    const item = cart.items[0];",
+              "    ",
+              "    pm.test('❗ CRITICAL: Quantity updated to 5 (2+3)', function() {",
+              "        pm.expect(item.quantity).to.equal(5);",
+              "    });",
+              "    ",
+              "    pm.test('❗ CRITICAL: Unit price recalculated (price × 5)', function() {",
+              "        const basePrice = item.product_id.price;",
+              "        const expectedPrice = basePrice * 5;",
+              "        pm.expect(item.unit_price).to.equal(expectedPrice);",
+              "        console.log('✅ Base price:', basePrice, '× 5 =', expectedPrice);",
+              "    });",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"product_id\": \"{{productId}}\",\n  \"quantity\": 3\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/cart",
+          "host": ["{{baseUrl}}"],
+          "path": ["cart"]
+        }
+      }
+    },
+    {
+      "name": "6. Get Cart",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Get cart successful', function() {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "if (pm.response.code === 200) {",
+              "    const cart = pm.response.json();",
+              "    console.log('📦 Cart items:', cart.items.length);",
+              "    ",
+              "    cart.items.forEach((item, index) => {",
+              "        console.log(`Item ${index + 1}:`, item.product_id.name, '- Qty:', item.quantity, '- Total:', item.unit_price);",
+              "    });",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/cart",
+          "host": ["{{baseUrl}}"],
+          "path": ["cart"]
+        }
+      }
+    },
+    {
+      "name": "7. Clear Cart",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Clear cart successful', function() {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "console.log('🗑️ Cart cleared for next test run');"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/cart",
+          "host": ["{{baseUrl}}"],
+          "path": ["cart"]
+        }
+      }
+    }
+  ]
+}
