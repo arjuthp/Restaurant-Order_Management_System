@@ -2,7 +2,6 @@ const OrderService = require('../service/order.service');
 
 const orderService = new OrderService();
 
-//customer: Create order from cart
 async function createOrder(req, res) {
     try{
         const { notes } = req.body;
@@ -14,7 +13,6 @@ async function createOrder(req, res) {
     }
 }
 
-//customer: Get my orders
 async function getMyOrders(req, res) {
     try{
         const orders = await orderService.getMyOrders(req.user.id);
@@ -25,10 +23,9 @@ async function getMyOrders(req, res) {
     }
 }
 
-//customer: Get singel order
 async function getOrderById(req, res) {
     try{
-        const order = await orderService.getOrderById(req.user.id, req.params.id);
+        const order = await orderService.getOrderById(req.user.id, req.params.id, req.user.role);
         res.status(200).json(order);
     }catch(error){
         const status = error.status || 500;
@@ -36,7 +33,6 @@ async function getOrderById(req, res) {
     }
 }
 
-//Admin: Get all orders
 async function getAllOrders(req, res) {
     try{
         const orders = await orderService.getAllOrders();
@@ -47,7 +43,6 @@ async function getAllOrders(req, res) {
     }
 }
 
-//Admin: Update order Status
 async function updateOrderStatus(req, res) {
     try{
         const { status } = req.body;
@@ -62,7 +57,6 @@ async function updateOrderStatus(req, res) {
     }
 }
 
-//customer : cancel order
 async function cancelOrder(req, res) {
     try{
     const order = await orderService.cancelOrder(req.user.id, req.params.id);
@@ -80,5 +74,4 @@ module.exports = {
     getAllOrders,
     updateOrderStatus,
     cancelOrder
-
 }

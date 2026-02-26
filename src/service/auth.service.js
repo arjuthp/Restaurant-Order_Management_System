@@ -11,14 +11,14 @@ class AuthService {
 
     async _findUserByEmail (email) {
         const user = await User.findOne({email});
-        if(!User){
+        if(!user){
             throw{status: 401, message: 'Invalid Credientials'};
         }
         return user;
     }
 
     async _findUserById(userId){
-        const user = await User.findById({userId});
+        const user = await User.findById(userId);
         if(!user){
             throw {status: 401, message: 'User not found'};
         }
@@ -74,11 +74,7 @@ class AuthService {
     }
 
 
-    //public methods
-
     async registerUser(name, email, password, role = 'customer'){
-
-        //check if emailexists
         const existingUser = await User.findOne({email});
         if(existingUser){
             throw {status: 400, message: 'Email already Exists'};
@@ -90,7 +86,7 @@ class AuthService {
             name,
             email,
             password: hashedPassword,
-            role: role || 'customer' // Use provided role or default to customer
+            role: role || 'customer'
         });
 
         return await this._generateAndStoreTokens(user);
@@ -110,10 +106,8 @@ class AuthService {
             throw {status: 401, message: 'Invalid refresh Token'};
         }
 
-        const decoded = verifyRefreshToken(token); //decoding signature
-
+        const decoded = verifyRefreshToken(token);
         const user = await this._findUserById(decoded.id);
-
         const newAccessToken = generateAccessToken(user._id, user.role);
 
         return {accessToken: newAccessToken}
@@ -129,9 +123,4 @@ class AuthService {
 
 } 
 
-
 module.exports = AuthService;
-//conveying skill
-//developer laii information flow
-// middlewares and sequencing
-// 

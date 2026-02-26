@@ -2,7 +2,6 @@ const UserService = require('../service/user.service');
 
 const userService = new UserService();
 
-//admin
 async function getAllUsers(req, res){
     try{
         const users = await userService.getAllUsers();
@@ -13,7 +12,15 @@ async function getAllUsers(req, res){
     }
 }
 
-//customer
+async function getUserById(req, res) {
+    try{
+        const user = await userService.getUserById(req.params.id);
+        res.status(200).json(user);
+    }catch(error){
+        const status = error.status || 500;
+        res.status(status).json({message: error.message});
+    }
+}
 
 async function getMyProfile(req, res) {
     try{
@@ -47,6 +54,7 @@ async function deleteMyAccount(req, res) {
 
 module.exports = {
     getAllUsers,
+    getUserById,
     getMyProfile,
     updateMyProfile,
     deleteMyAccount

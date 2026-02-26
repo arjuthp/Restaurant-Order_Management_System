@@ -1,7 +1,6 @@
-
 const {verifyAccessToken} = require('../utils/jwt');
+
 function verifyToken(req, res, next) {
-    //get token from header
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
 
@@ -20,7 +19,6 @@ function verifyToken(req, res, next) {
 
 function authorize(...allowedRoles){
     return(req, res, next) =>{
-        // Get token from header
         const authHeader = req.headers['authorization'];
         const token = authHeader && authHeader.split(' ')[1];
 
@@ -32,7 +30,6 @@ function authorize(...allowedRoles){
             const decoded = verifyAccessToken(token);
             req.user = decoded;
 
-            // Check if user has required role
             if(!allowedRoles.includes(req.user.role)){
                 return res.status(403).json({
                     message: `Access denied. Required role: ${allowedRoles.join(' or ')}`

@@ -13,17 +13,15 @@ const orderRoutes = require('./routes/order.routes');
 
 const app = express();
 
-// CORS - Allow frontend to connect
 app.use(cors({
-    origin: '*', // Allow all origins for development
+    origin: '*',
     credentials: true
 }));
 
-// Middleware
 app.use(express.json());
-app.use(express.urlencoded({extended:false})); // parse form data
+app.use(express.urlencoded({extended:false}));
 
-// API Routes (must come before static files)
+// API Routes
 app.use('/api/restaurant', restaurantRoutes);
 app.use('/api/auth', authRoutes);
 app.use("/api/users", userRoutes);
@@ -31,15 +29,12 @@ app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 
-// Serve React build files (production)
+// Serve static files
 app.use(express.static(path.join(__dirname, '../client/dist')));
-
-// Serve vanilla JS frontend (fallback)
 app.use(express.static(path.join(__dirname, '../frontend')));
 
-// SPA fallback: serve index.html for any route that doesn't match API or static files
-app.use((req, res, next) => {
-    // If it's an API route that didn't match, return 404 JSON
+// SPA fallback
+app.use((req, res) => {
     if (req.path.startsWith('/api')) {
         return res.status(404).json({ 
             success: false, 
@@ -51,7 +46,6 @@ app.use((req, res, next) => {
     const reactIndexPath = path.join(__dirname, '../client/dist', 'index.html');
     const vanillaIndexPath = path.join(__dirname, '../frontend', 'index.html');
     
-    // Serve React app if built, otherwise vanilla frontend
     if (fs.existsSync(reactIndexPath)) {
         res.sendFile(reactIndexPath);
     } else if (fs.existsSync(vanillaIndexPath)) {

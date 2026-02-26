@@ -18,6 +18,7 @@ router.delete('/:id', authorize('customer'), cancelOrder);
 
 //Admin routes
 router.get('/admin/all', authorize('admin'), getAllOrders);
+router.get('/admin/:id', authorize('admin'), getOrderById); 
 router.patch('/:id/status', authorize('admin'), updateOrderStatus);
 
 module.exports = router;

@@ -2,7 +2,6 @@ const CartService = require('../service/cart.service');
 
 const cartService = new CartService();
 
-//get users cart
 async function getCart(req, res){
     try{
         const cart = await cartService.getCart(req.user.id);
@@ -13,7 +12,6 @@ async function getCart(req, res){
     }
 }
 
-//add item to cart
 async function addItemToCart(req, res){
     try{
         const {product_id, quantity} = req.body;
@@ -29,14 +27,13 @@ async function addItemToCart(req, res){
     }
 }
 
-//update item quantity
 async function updateItemQuantity(req, res){
     try{
         const { productId } = req.params;
         const {quantity } = req.body;
 
-        if(!quantity || quantity <= 0){
-            return res.status(400).json({message: 'Quantity must be greater than 0'});
+        if(quantity === undefined || quantity === null){
+            return res.status(400).json({message: 'Quantity is required'});
         }
         const cart = await cartService.updateItemQuantity(req.user.id, productId, quantity);
         res.status(200).json(cart);
@@ -46,7 +43,6 @@ async function updateItemQuantity(req, res){
     }
 }
 
-//remove item from cart
 async function removeItemFromCart(req, res){
     try{
         const {productId} = req.params;
@@ -58,7 +54,6 @@ async function removeItemFromCart(req, res){
     }
 }
 
-//clear cart
 async function clearCart(req, res){
     try{
         const cart = await cartService.clearCart(req.user.id);
@@ -76,8 +71,3 @@ module.exports = {
     removeItemFromCart,
     clearCart
 };
-
-
-
-//quntiy update
-//unit-price multiply

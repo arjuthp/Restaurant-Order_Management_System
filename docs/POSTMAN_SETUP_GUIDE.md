@@ -160,9 +160,10 @@ pm.test("Should return 404", () => {
 
 **✉️ Add Item to Cart (Qty 2)**
 ```
-POST {{baseUrl}}/cart
+POST {{baseUrl}}/cart/items
 Headers:
 Authorization: Bearer {{customerToken}}
+Content-Type: application/json
 
 Body (JSON):
 {
@@ -182,9 +183,10 @@ pm.test("Add to cart successful", () => {
 
 **✉️ Add Same Item Again (Qty 3) - Should Update to 5**
 ```
-POST {{baseUrl}}/cart
+POST {{baseUrl}}/cart/items
 Headers:
 Authorization: Bearer {{customerToken}}
+Content-Type: application/json
 
 Body (JSON):
 {
@@ -205,9 +207,10 @@ pm.test("❗ CRITICAL: No duplicate items", () => {
 
 **✉️ Add Different Product**
 ```
-POST {{baseUrl}}/cart
+POST {{baseUrl}}/cart/items
 Headers:
 Authorization: Bearer {{customerToken}}
+Content-Type: application/json
 
 Body (JSON):
 {
@@ -239,9 +242,10 @@ pm.test("Get cart successful", () => {
 
 **✉️ Update Item Quantity**
 ```
-PUT {{baseUrl}}/cart/{{productId}}
+PATCH {{baseUrl}}/cart/items/{{productId}}
 Headers:
 Authorization: Bearer {{customerToken}}
+Content-Type: application/json
 
 Body (JSON):
 {
@@ -260,7 +264,7 @@ pm.test("Quantity updated", () => {
 
 **✉️ Remove Item from Cart**
 ```
-DELETE {{baseUrl}}/cart/{{productId2}}
+DELETE {{baseUrl}}/cart/items/{{productId2}}
 Headers:
 Authorization: Bearer {{customerToken}}
 
@@ -284,9 +288,10 @@ pm.test("Cart cleared", () => {
 
 **✉️ [ERROR] Add Unavailable Product**
 ```
-POST {{baseUrl}}/cart
+POST {{baseUrl}}/cart/items
 Headers:
 Authorization: Bearer {{customerToken}}
+Content-Type: application/json
 
 Body (JSON):
 {
@@ -381,9 +386,10 @@ pm.test("Should return 401", () => {
 
 **✉️ [ERROR] Add Negative Quantity**
 ```
-POST {{baseUrl}}/cart
+POST {{baseUrl}}/cart/items
 Headers:
 Authorization: Bearer {{customerToken}}
+Content-Type: application/json
 
 Body (JSON):
 {
@@ -399,9 +405,10 @@ pm.test("Should fail with negative quantity", () => {
 
 **✉️ [ERROR] Update to Zero Quantity**
 ```
-PUT {{baseUrl}}/cart/{{productId}}
+PATCH {{baseUrl}}/cart/items/{{productId}}
 Headers:
 Authorization: Bearer {{customerToken}}
+Content-Type: application/json
 
 Body (JSON):
 {
@@ -409,8 +416,11 @@ Body (JSON):
 }
 
 Tests:
-pm.test("Should fail with zero quantity", () => {
-    pm.response.to.have.status(400);
+pm.test("Zero quantity removes item", () => {
+    pm.response.to.have.status(200);
+    const cart = pm.response.json();
+    const item = cart.items.find(i => i.product_id._id === pm.collectionVariables.get("productId"));
+    pm.expect(item).to.be.undefined; // Item should be removed
 });
 ```
 
