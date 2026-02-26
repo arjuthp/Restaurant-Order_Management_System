@@ -10,6 +10,8 @@ Full-stack restaurant order management system with React frontend and Node.js ba
 - 🚀 **[QUICK_START.md](QUICK_START.md)** - Fast setup reference
 - 🏗️ **[ARCHITECTURE.md](ARCHITECTURE.md)** - System architecture & flow diagrams
 - 📦 **[DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)** - Deployment details
+- 🔄 **[DEVELOPER_FLOW_COMPLETE.md](DEVELOPER_FLOW_COMPLETE.md)** - Complete client-to-server flow for all scenarios
+- 📦 **[SPA_STATIC_SERVING_EXPLAINED.md](SPA_STATIC_SERVING_EXPLAINED.md)** - Static serving & SPA fallback explained
 
 ## 📋 Features
 

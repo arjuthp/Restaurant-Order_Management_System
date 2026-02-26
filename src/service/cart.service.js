@@ -24,16 +24,20 @@ class CartService {
             throw {status: 400, message: 'Product is not available'};
         }
 
-    //get or create cart
-    let cart = await this.getCart(userId); 
+    //get or create cart (without populate to compare IDs properly)
+    let cart = await Cart.findOne({user_id: userId});
+    if(!cart){
+        cart = await Cart.create({ user_id: userId, items: [] });
+    }
 
     //check if product already exists in cart
     const existingItemIndex = cart.items.findIndex(
-        item => item.product_id.toString() === productId
+        item => item.product_id.toString() === productId.toString()
     );
     if(existingItemIndex > -1){
         //update quantity
         cart.items[existingItemIndex].quantity += quantity;
+        cart.items[existingItemIndex].unit_price = product.price * cart.items[existingItemIndex].quantity;
     }else{
         cart.items.push({
             product_id: productId,
@@ -51,7 +55,6 @@ class CartService {
 
 
     async updateItemQuantity(userId, productId, quantity){
-        //find cart
         const cart = await this.getCart(userId);
 
         const itemIndex = cart.items.findIndex(
@@ -62,18 +65,18 @@ class CartService {
             throw {status: 404, message: 'Item not found in cart'};
         }
 
-        if(quantity <= 0){
-            cart.items.splice(itemIndex, 1);
-        }else{
-            cart.items[itemIndex].quantity = quantity;
-        }
+        cart.items[itemIndex].quantity = quantity;
+        const basePrice = cart.items[itemIndex].product_id.price;
+        cart.items[itemIndex].unit_price = basePrice * quantity;
 
         await cart.save();
         return await this.getCart(userId);
+    }
+
         //find index
         //if <0 remove 1
         // save
-    }
+    
 
     //remove item from cart
 
