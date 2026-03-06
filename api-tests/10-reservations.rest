@@ -1,0 +1,428 @@
+### ============================================
+### 📅 RESERVATION SYSTEM API TESTS
+### ============================================
+### Prerequisites:
+### 1. Server running on http://localhost:5000
+### 2. At least one table created (run 09-tables.rest first)
+### 3. Customer and Admin users logged in
+### ============================================
+
+@baseUrl = http://localhost:5000/api
+@accessToken = 
+@adminToken = 
+@tableId = 
+@reservationId = 
+
+### ============================================
+### 1. CHECK AVAILABILITY - Public (No Auth Required)
+### ============================================
+### This checks which tables are free for a specific date/time
+GET {{baseUrl}}/reservations/availability?date=2024-12-25&timeSlot=18:00&numberOfGuests=4
+Content-Type: application/json
+
+### Expected Response: 200 OK
+### Returns: Array of available tables that can fit 4 guests
+### Note: Only shows tables with capacity >= numberOfGuests and status = "active"
+
+
+### ============================================
+### 2. CHECK AVAILABILITY - Different Time Slot
+### ============================================
+GET {{baseUrl}}/reservations/availability?date=2024-12-25&timeSlot=19:00&numberOfGuests=2
+Content-Type: application/json
+
+### Expected Response: 200 OK
+### Returns: More tables available (capacity >= 2)
+
+
+### ============================================
+### 3. CHECK AVAILABILITY - Large Party
+### ============================================
+GET {{baseUrl}}/reservations/availability?date=2024-12-25&timeSlot=20:00&numberOfGuests=8
+Content-Type: application/json
+
+### Expected Response: 200 OK
+### Returns: Only tables with capacity >= 8
+
+
+### ============================================
+### 4. CHECK AVAILABILITY - Missing Parameters (Error)
+### ============================================
+GET {{baseUrl}}/reservations/availability?date=2024-12-25
+Content-Type: application/json
+
+### Expected Response: 400 Bad Request
+### Message: "Please provide date, timeSlot, and numberOfGuests"
+
+
+### ============================================
+### 5. CREATE RESERVATION - Customer (Success)
+### ============================================
+### IMPORTANT: Login as customer first and copy token above
+### Also copy a tableId from the availability check
+POST {{baseUrl}}/reservations
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "table": "{{tableId}}",
+  "date": "2024-12-25",
+  "timeSlot": "18:00",
+  "numberOfGuests": 4,
+  "contactPhone": "1234567890",
+  "specialRequests": "Window seat preferred"
+}
+
+### Expected Response: 201 Created
+### Returns: Created reservation with status "pending"
+### Copy the _id and update @reservationId variable above
+
+
+### ============================================
+### 6. CREATE RESERVATION - Different Customer
+### ============================================
+POST {{baseUrl}}/reservations
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "table": "{{tableId}}",
+  "date": "2024-12-26",
+  "timeSlot": "19:00",
+  "numberOfGuests": 2,
+  "contactPhone": "9876543210",
+  "specialRequests": "Anniversary dinner"
+}
+
+### Expected Response: 201 Created
+
+
+### ============================================
+### 7. CREATE RESERVATION - Without Auth (Error)
+### ============================================
+POST {{baseUrl}}/reservations
+Content-Type: application/json
+
+{
+  "table": "{{tableId}}",
+  "date": "2024-12-25",
+  "timeSlot": "18:00",
+  "numberOfGuests": 4,
+  "contactPhone": "1234567890"
+}
+
+### Expected Response: 401 Unauthorized
+### Message: "No token provided"
+
+
+### ============================================
+### 8. CREATE RESERVATION - Duplicate Booking (Error)
+### ============================================
+### Try to book the same table at the same time
+POST {{baseUrl}}/reservations
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "table": "{{tableId}}",
+  "date": "2024-12-25",
+  "timeSlot": "18:00",
+  "numberOfGuests": 4,
+  "contactPhone": "1234567890"
+}
+
+### Expected Response: 400 Bad Request
+### Message: "Table is already booked for this time slot"
+### Note: This is prevented by TRANSACTION in the service
+
+
+### ============================================
+### 9. CREATE RESERVATION - Missing Required Fields (Error)
+### ============================================
+POST {{baseUrl}}/reservations
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "date": "2024-12-25",
+  "timeSlot": "18:00"
+}
+
+### Expected Response: 400 Bad Request or 500 Internal Server Error
+### Message: Validation error
+
+
+### ============================================
+### 10. GET MY RESERVATIONS - Customer
+### ============================================
+### View all reservations for the logged-in customer
+GET {{baseUrl}}/reservations/my-reservations
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+### Expected Response: 200 OK
+### Returns: Array of user's reservations with table details populated
+### Sorted by date (newest first)
+
+
+### ============================================
+### 11. GET MY RESERVATIONS - Without Auth (Error)
+### ============================================
+GET {{baseUrl}}/reservations/my-reservations
+Content-Type: application/json
+
+### Expected Response: 401 Unauthorized
+
+
+### ============================================
+### 12. GET RESERVATION BY ID - Customer (Success)
+### ============================================
+### View specific reservation (must be owned by logged-in user)
+GET {{baseUrl}}/reservations/{{reservationId}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+### Expected Response: 200 OK
+### Returns: Single reservation with user and table details
+
+
+### ============================================
+### 13. GET RESERVATION BY ID - Wrong User (Error)
+### ============================================
+### Try to view someone else's reservation
+### (Login as different user first)
+GET {{baseUrl}}/reservations/{{reservationId}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+### Expected Response: 403 Forbidden
+### Message: "You can only view your own reservations"
+
+
+### ============================================
+### 14. GET RESERVATION BY ID - Invalid ID (Error)
+### ============================================
+GET {{baseUrl}}/reservations/invalid_id
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+### Expected Response: 404 Not Found or 500 Internal Server Error
+
+
+### ============================================
+### 15. CANCEL RESERVATION - Customer (Success)
+### ============================================
+### Customer cancels their own reservation
+PATCH {{baseUrl}}/reservations/{{reservationId}}/cancel
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+### Expected Response: 200 OK
+### Returns: Updated reservation with status "cancelled"
+### Note: Table becomes available again for booking
+
+
+### ============================================
+### 16. CANCEL RESERVATION - Already Cancelled (Error)
+### ============================================
+### Try to cancel the same reservation again
+PATCH {{baseUrl}}/reservations/{{reservationId}}/cancel
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+### Expected Response: 400 Bad Request
+### Message: "Reservation is already cancelled"
+
+
+### ============================================
+### 17. CANCEL RESERVATION - Wrong User (Error)
+### ============================================
+### Try to cancel someone else's reservation
+PATCH {{baseUrl}}/reservations/{{reservationId}}/cancel
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+### Expected Response: 400 Bad Request
+### Message: "You can only cancel your own reservations"
+
+
+### ============================================
+### 18. GET ALL RESERVATIONS - Admin Only
+### ============================================
+### Admin views all reservations in the system
+GET {{baseUrl}}/reservations/admin/all
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+### Expected Response: 200 OK
+### Returns: Array of ALL reservations with user and table details
+
+
+### ============================================
+### 19. GET ALL RESERVATIONS - Filter by Status
+### ============================================
+### Admin filters reservations by status
+GET {{baseUrl}}/reservations/admin/all?status=pending
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+### Expected Response: 200 OK
+### Returns: Only reservations with status "pending"
+
+
+### ============================================
+### 20. GET ALL RESERVATIONS - Filter by Date
+### ============================================
+### Admin filters reservations by date
+GET {{baseUrl}}/reservations/admin/all?date=2024-12-25
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+### Expected Response: 200 OK
+### Returns: Only reservations for December 25, 2024
+
+
+### ============================================
+### 21. GET ALL RESERVATIONS - Multiple Filters
+### ============================================
+### Admin uses both filters
+GET {{baseUrl}}/reservations/admin/all?date=2024-12-25&status=confirmed
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+### Expected Response: 200 OK
+### Returns: Confirmed reservations for December 25, 2024
+
+
+### ============================================
+### 22. GET ALL RESERVATIONS - Customer Tries (Error)
+### ============================================
+### Customer tries to access admin route
+GET {{baseUrl}}/reservations/admin/all
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+### Expected Response: 403 Forbidden
+### Message: "Admin access required" or similar
+
+
+### ============================================
+### 23. UPDATE RESERVATION STATUS - Admin (Success)
+### ============================================
+### Admin changes reservation status from pending to confirmed
+PATCH {{baseUrl}}/reservations/admin/{{reservationId}}/status
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "status": "confirmed"
+}
+
+### Expected Response: 200 OK
+### Returns: Updated reservation with new status
+
+
+### ============================================
+### 24. UPDATE RESERVATION STATUS - To Completed
+### ============================================
+### Admin marks reservation as completed (customer showed up)
+PATCH {{baseUrl}}/reservations/admin/{{reservationId}}/status
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "status": "completed"
+}
+
+### Expected Response: 200 OK
+
+
+### ============================================
+### 25. UPDATE RESERVATION STATUS - To No-Show
+### ============================================
+### Admin marks reservation as no-show (customer didn't show up)
+PATCH {{baseUrl}}/reservations/admin/{{reservationId}}/status
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "status": "no-show"
+}
+
+### Expected Response: 200 OK
+
+
+### ============================================
+### 26. UPDATE RESERVATION STATUS - Missing Status (Error)
+### ============================================
+PATCH {{baseUrl}}/reservations/admin/{{reservationId}}/status
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+}
+
+### Expected Response: 400 Bad Request
+### Message: "Status is required"
+
+
+### ============================================
+### 27. UPDATE RESERVATION STATUS - Invalid Status (Error)
+### ============================================
+PATCH {{baseUrl}}/reservations/admin/{{reservationId}}/status
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "status": "invalid_status"
+}
+
+### Expected Response: 400 Bad Request
+### Message: Validation error (status must be one of enum values)
+
+
+### ============================================
+### 28. UPDATE RESERVATION STATUS - Customer Tries (Error)
+### ============================================
+### Customer tries to update status (admin only)
+PATCH {{baseUrl}}/reservations/admin/{{reservationId}}/status
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "status": "confirmed"
+}
+
+### Expected Response: 403 Forbidden
+### Message: "Admin access required"
+
+
+### ============================================
+### 📝 TESTING NOTES
+### ============================================
+###
+### PUBLIC ROUTES (No authentication):
+### - GET /reservations/availability (check free tables)
+###
+### CUSTOMER ROUTES (Requires customer token):
+### - POST /reservations (create booking)
+### - GET /reservations/my-reservations (view my bookings)
+### - GET /reservations/:id (view specific booking - must own it)
+### - PATCH /reservations/:id/cancel (cancel my booking)
+###
+### ADMIN ROUTES (Requires admin token):
+### - GET /reservations/admin/all (view all bookings)
+### - PATCH /reservations/admin/:id/status (change booking status)
+###
+### RESERVATION STATUS LIFECYCLE:
+### 1. pending (default when created)
+### 2. confirmed (admin confirms)
+### 3. completed (customer showed up)
+### 4. cancelled (customer cancelled)
+### 5. no-show (customer didn't show up)
+###
+### TRANSACTION PROTECTION:
+### - Double booking is prevented using MongoDB transactions
+### - If two users try to book same table simultaneously, only one succeeds
+###
+### ============================================

@@ -1,0 +1,584 @@
+{
+	"info": {
+		"_postman_id": "table-reservation-api-2024",
+		"name": "Restaurant Tables & Reservations API",
+		"description": "Complete API testing for Table Management and Reservation System with automated authentication",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{accessToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:5000/api",
+			"type": "string"
+		},
+		{
+			"key": "accessToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "adminToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "tableId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "reservationId",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "🔐 Authentication",
+			"item": [
+				{
+					"name": "Login as Customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('accessToken', response.accessToken);",
+									"    pm.test('Login successful', () => {",
+									"        pm.expect(response.success).to.be.true;",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Login as Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('adminToken', response.accessToken);",
+									"    pm.test('Admin login successful', () => {",
+									"        pm.expect(response.success).to.be.true;",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"admin123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/admin/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "admin", "login"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "🪑 Table Management",
+			"item": [
+				{
+					"name": "Get All Tables (Public)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has tables array', () => {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.data).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/tables",
+							"host": ["{{baseUrl}}"],
+							"path": ["tables"]
+						}
+					}
+				},
+				{
+					"name": "Create Table (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('tableId', response.data._id);",
+									"    pm.test('Table created successfully', () => {",
+									"        pm.expect(response.success).to.be.true;",
+									"        pm.expect(response.data).to.have.property('tableNumber');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"tableNumber\": 1,\n  \"capacity\": 4,\n  \"location\": \"Window side\",\n  \"status\": \"active\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tables",
+							"host": ["{{baseUrl}}"],
+							"path": ["tables"]
+						}
+					}
+				},
+				{
+					"name": "Get Table by ID",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/tables/{{tableId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["tables", "{{tableId}}"]
+						}
+					}
+				},
+				{
+					"name": "Update Table (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"tableNumber\": 1,\n  \"capacity\": 6,\n  \"location\": \"Patio\",\n  \"status\": \"active\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tables/{{tableId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["tables", "{{tableId}}"]
+						}
+					}
+				},
+				{
+					"name": "Delete Table (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/tables/{{tableId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["tables", "{{tableId}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "📅 Reservations",
+			"item": [
+				{
+					"name": "Check Availability (Public)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Returns available tables', () => {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.data).to.be.an('array');",
+									"    pm.expect(response).to.have.property('count');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/reservations/availability?date=2024-12-25&timeSlot=18:00&numberOfGuests=4",
+							"host": ["{{baseUrl}}"],
+							"path": ["reservations", "availability"],
+							"query": [
+								{
+									"key": "date",
+									"value": "2024-12-25"
+								},
+								{
+									"key": "timeSlot",
+									"value": "18:00"
+								},
+								{
+									"key": "numberOfGuests",
+									"value": "4"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Reservation (Customer)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('reservationId', response.data._id);",
+									"    pm.test('Reservation created successfully', () => {",
+									"        pm.expect(response.success).to.be.true;",
+									"        pm.expect(response.data).to.have.property('status');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"table\": \"{{tableId}}\",\n  \"date\": \"2024-12-25\",\n  \"timeSlot\": \"18:00\",\n  \"numberOfGuests\": 4,\n  \"contactPhone\": \"1234567890\",\n  \"specialRequests\": \"Window seat preferred\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/reservations",
+							"host": ["{{baseUrl}}"],
+							"path": ["reservations"]
+						}
+					}
+				},
+				{
+					"name": "Get My Reservations (Customer)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Returns user reservations', () => {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.data).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/reservations/my-reservations",
+							"host": ["{{baseUrl}}"],
+							"path": ["reservations", "my-reservations"]
+						}
+					}
+				},
+				{
+					"name": "Get Reservation by ID (Customer)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/reservations/{{reservationId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["reservations", "{{reservationId}}"]
+						}
+					}
+				},
+				{
+					"name": "Cancel Reservation (Customer)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Reservation cancelled', () => {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.success).to.be.true;",
+									"    pm.expect(response.data.status).to.equal('cancelled');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/reservations/{{reservationId}}/cancel",
+							"host": ["{{baseUrl}}"],
+							"path": ["reservations", "{{reservationId}}", "cancel"]
+						}
+					}
+				},
+				{
+					"name": "Get All Reservations (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/reservations/admin/all?status=pending",
+							"host": ["{{baseUrl}}"],
+							"path": ["reservations", "admin", "all"],
+							"query": [
+								{
+									"key": "status",
+									"value": "pending",
+									"description": "Filter by status (optional)"
+								},
+								{
+									"key": "date",
+									"value": "2024-12-25",
+									"description": "Filter by date (optional)",
+									"disabled": true
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Update Reservation Status (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status updated successfully', () => {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.success).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"confirmed\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/reservations/admin/{{reservationId}}/status",
+							"host": ["{{baseUrl}}"],
+							"path": ["reservations", "admin", "{{reservationId}}", "status"]
+						}
+					}
+				}
+			]
+		}
+	]
+}

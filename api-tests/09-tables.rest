@@ -1,0 +1,290 @@
+### ============================================
+### 🪑 TABLE MANAGEMENT API TESTS
+### ============================================
+### Prerequisites: 
+### 1. Server running on http://localhost:5000
+### 2. Admin user created in database
+### 3. Run auth tests first to get tokens
+### ============================================
+
+@baseUrl = http://localhost:5000/api
+@adminToken = 
+@tableId = 
+
+### ============================================
+### 1. GET ALL TABLES - Public (No Auth Required)
+### ============================================
+GET {{baseUrl}}/tables
+Content-Type: application/json
+
+### Expected Response: 200 OK
+### Returns: Array of all tables with tableNumber, capacity, location, status
+### Note: This is a PUBLIC route - anyone can view tables
+
+
+### ============================================
+### 2. CREATE TABLE - Admin Only (Success)
+### ============================================
+### IMPORTANT: First login as admin in 01-auth.rest and copy token above
+POST {{baseUrl}}/tables
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "tableNumber": 1,
+  "capacity": 4,
+  "location": "Window side",
+  "status": "active"
+}
+
+### Expected Response: 201 Created
+### Returns: Created table object with _id
+### Copy the _id and update @tableId variable above
+
+
+### ============================================
+### 3. CREATE TABLE - Different Capacity
+### ============================================
+POST {{baseUrl}}/tables
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "tableNumber": 2,
+  "capacity": 6,
+  "location": "Patio",
+  "status": "active"
+}
+
+### Expected Response: 201 Created
+
+
+### ============================================
+### 4. CREATE TABLE - Large Table
+### ============================================
+POST {{baseUrl}}/tables
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "tableNumber": 3,
+  "capacity": 8,
+  "location": "Private room",
+  "status": "active"
+}
+
+### Expected Response: 201 Created
+
+
+### ============================================
+### 5. CREATE TABLE - Without Auth (Error)
+### ============================================
+POST {{baseUrl}}/tables
+Content-Type: application/json
+
+{
+  "tableNumber": 10,
+  "capacity": 4,
+  "location": "Corner"
+}
+
+### Expected Response: 401 Unauthorized
+### Message: "No token provided" or "Unauthorized"
+
+
+### ============================================
+### 6. CREATE TABLE - Duplicate Table Number (Error)
+### ============================================
+POST {{baseUrl}}/tables
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "tableNumber": 1,
+  "capacity": 4,
+  "location": "Different location"
+}
+
+### Expected Response: 400 Bad Request or 500 Internal Server Error
+### Message: Duplicate key error (tableNumber must be unique)
+
+
+### ============================================
+### 7. CREATE TABLE - Invalid Capacity (Error)
+### ============================================
+POST {{baseUrl}}/tables
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "tableNumber": 20,
+  "capacity": 0,
+  "location": "Test"
+}
+
+### Expected Response: 400 Bad Request
+### Message: "Capacity must be at least 1"
+
+
+### ============================================
+### 8. CREATE TABLE - Missing Required Fields (Error)
+### ============================================
+POST {{baseUrl}}/tables
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "location": "Test location"
+}
+
+### Expected Response: 400 Bad Request
+### Message: "Table number must be a positive number"
+
+
+### ============================================
+### 9. GET TABLE BY ID - Success
+### ============================================
+### Use tableId from create table response
+GET {{baseUrl}}/tables/{{tableId}}
+Content-Type: application/json
+
+### Expected Response: 200 OK
+### Returns: Single table object with all details
+
+
+### ============================================
+### 10. GET TABLE BY ID - Invalid ID (Error)
+### ============================================
+GET {{baseUrl}}/tables/invalid_id_format
+Content-Type: application/json
+
+### Expected Response: 404 Not Found or 500 Internal Server Error
+### Message: "Table not found" or "Cast to ObjectId failed"
+
+
+### ============================================
+### 11. GET TABLE BY ID - Non-existent ID (Error)
+### ============================================
+GET {{baseUrl}}/tables/507f1f77bcf86cd799439011
+Content-Type: application/json
+
+### Expected Response: 404 Not Found
+### Message: "Table not found"
+
+
+### ============================================
+### 12. UPDATE TABLE - Admin Only (Success)
+### ============================================
+PUT {{baseUrl}}/tables/{{tableId}}
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "tableNumber": 1,
+  "capacity": 6,
+  "location": "Window side - Updated",
+  "status": "active"
+}
+
+### Expected Response: 200 OK
+### Returns: Updated table object
+### Note: Capacity changed from 4 to 6
+
+
+### ============================================
+### 13. UPDATE TABLE - Change Status to Inactive
+### ============================================
+PUT {{baseUrl}}/tables/{{tableId}}
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "tableNumber": 1,
+  "capacity": 6,
+  "location": "Window side - Updated",
+  "status": "inactive"
+}
+
+### Expected Response: 200 OK
+### Note: Inactive tables won't show in availability
+
+
+### ============================================
+### 14. UPDATE TABLE - Without Auth (Error)
+### ============================================
+PUT {{baseUrl}}/tables/{{tableId}}
+Content-Type: application/json
+
+{
+  "capacity": 10
+}
+
+### Expected Response: 401 Unauthorized
+
+
+### ============================================
+### 15. UPDATE TABLE - Invalid Data (Error)
+### ============================================
+PUT {{baseUrl}}/tables/{{tableId}}
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "tableNumber": 1,
+  "capacity": -5,
+  "location": "Test"
+}
+
+### Expected Response: 400 Bad Request
+### Message: "Capacity must be at least 1"
+
+
+### ============================================
+### 16. DELETE TABLE - Admin Only (Success)
+### ============================================
+### WARNING: This will permanently delete the table
+DELETE {{baseUrl}}/tables/{{tableId}}
+Authorization: Bearer {{adminToken}}
+
+### Expected Response: 200 OK
+### Message: "Table deleted successfully"
+
+
+### ============================================
+### 17. DELETE TABLE - Without Auth (Error)
+### ============================================
+DELETE {{baseUrl}}/tables/{{tableId}}
+
+### Expected Response: 401 Unauthorized
+
+
+### ============================================
+### 18. DELETE TABLE - Non-existent ID (Error)
+### ============================================
+DELETE {{baseUrl}}/tables/507f1f77bcf86cd799439011
+Authorization: Bearer {{adminToken}}
+
+### Expected Response: 404 Not Found
+### Message: "Table not found"
+
+
+### ============================================
+### 📝 TESTING NOTES
+### ============================================
+### 
+### PUBLIC ROUTES (No authentication):
+### - GET /tables (view all tables)
+### - GET /tables/:id (view specific table)
+###
+### ADMIN ONLY ROUTES (Requires admin token):
+### - POST /tables (create table)
+### - PUT /tables/:id (update table)
+### - DELETE /tables/:id (delete table)
+###
+### VALIDATION RULES:
+### - tableNumber: Required, must be positive, unique
+### - capacity: Required, minimum 1
+### - location: Optional string
+### - status: "active" or "inactive" (default: "active")
+###
+### ============================================
