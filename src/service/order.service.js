@@ -200,8 +200,7 @@ class OrderService {
             .populate('reservation', 'date timeSlot numberOfGuests');
 
 
-    } 
-
-
+    }
+}
 
 module.exports = OrderService;

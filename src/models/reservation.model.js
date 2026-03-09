@@ -79,8 +79,8 @@ endTime:{
   timestamps: true
 });
 
-//auto calculatie endtime
-reservationSchema.pre('save', function(next){
+//auto calculate endtime before validation
+reservationSchema.pre('validate', function(next){
   if(this.date && this.timeSlot && this.duration){
     const [hours, minutes] = this.timeSlot.split(':');
     const startTime = new Date(this.date);
