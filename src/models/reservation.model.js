@@ -40,16 +40,14 @@ const reservationSchema = new mongoose.Schema({
   //duration
   duration: {
     type: Number,
-    required: true,
     min: 60,
     max: 240,
     default: 120
   },
 
-endTime:{
-  type: Date,
-  required: true
-},
+  endTime:{
+    type: Date
+  },
   //pre-order
   preOrder: {
     type: mongoose.Schema.Types.ObjectId,
@@ -81,11 +79,19 @@ endTime:{
 
 //auto calculate endtime before validation
 reservationSchema.pre('validate', function(next){
+  console.log('🔍 Pre-validate hook triggered');
+  console.log('📅 Date:', this.date);
+  console.log('⏰ TimeSlot:', this.timeSlot);
+  console.log('⏱️ Duration:', this.duration);
+  
   if(this.date && this.timeSlot && this.duration){
     const [hours, minutes] = this.timeSlot.split(':');
     const startTime = new Date(this.date);
     startTime.setHours(parseInt(hours), parseInt(minutes || 0), 0, 0);
     this.endTime = new Date(startTime.getTime() + this.duration * 60000);
+    console.log('✅ EndTime calculated:', this.endTime);
+  } else {
+    console.log('❌ Missing required fields for endTime calculation');
   }
   next();
 });
