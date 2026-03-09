@@ -44,18 +44,29 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  const updateUser = (updatedUser) => {
+    setUser(updatedUser);
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+  };
+
   const value = {
     user,
     login,
     register,
     adminLogin,
     logout,
-    isAuthenticated: authService.isAuthenticated(),
-    isAdmin: authService.isAdmin()
+    updateUser,
+    isAuthenticated: !!user,
+    isAdmin: user?.role === 'admin'
   };
 
   if (loading) {
-    return <div className="loading">Loading...</div>;
+    return (
+      <div className="loading" style={{ height: '100vh' }}>
+        <div className="spinner"></div>
+        <p>Setting up your dining experience...</p>
+      </div>
+    );
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

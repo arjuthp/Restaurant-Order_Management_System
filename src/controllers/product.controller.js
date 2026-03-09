@@ -3,10 +3,15 @@ const ProductService = require('../service/product.service');
 const productService = new ProductService();
 
 async function getAllProducts(req, res) {
+    console.log('🎯 Controller: getAllProducts called');
+    console.log('🎯 Request URL:', req.url);
+    console.log('🎯 Request method:', req.method);
     try{
         const products = await productService.getAllProducts();
+        console.log('✅ Sending response with', products.length, 'products');
         res.status(200).json(products);
     }catch(error){
+        console.error('❌ Error in getAllProducts:', error);
         const status = error.status || 500;
         res.status(status).json({message: error.message});
     }

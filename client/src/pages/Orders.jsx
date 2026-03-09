@@ -43,10 +43,10 @@ const Orders = () => {
     const orderStatus = order.status.toLowerCase();
     const orderItems = order.items.map(item => item.product_id?.name || '').join(' ').toLowerCase();
     const search = searchQuery.toLowerCase();
-    
-    return orderId.includes(search) || 
-           orderStatus.includes(search) || 
-           orderItems.includes(search);
+
+    return orderId.includes(search) ||
+      orderStatus.includes(search) ||
+      orderItems.includes(search);
   });
 
   if (loading) return <div className="loading">Loading orders...</div>;
@@ -90,7 +90,7 @@ const Orders = () => {
             )}
           </div>
           <button
-            onClick={() => {/* Search is already real-time */}}
+            onClick={() => {/* Search is already real-time */ }}
             className="btn btn-primary"
             style={{ whiteSpace: 'nowrap' }}
           >
@@ -112,49 +112,49 @@ const Orders = () => {
             </div>
           ) : (
             filteredOrders.map(order => (
-          <div key={order._id} className="order-card">
-            <div className="order-header">
-              <div>
-                <h3>Order #{order._id.slice(-6)}</h3>
-                <p style={{ color: '#666', fontSize: '0.9rem' }}>{formatDate(order.createdAt)}</p>
-              </div>
-              <span className={`order-status ${order.status}`}>
-                {order.status.toUpperCase()}
-              </span>
-            </div>
-
-            <div style={{ marginBottom: '15px' }}>
-              {order.items.map((item, index) => (
-                <div key={index} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #eee' }}>
-                  <span>
-                    {item.product_id?.name || 'Product'} × {item.quantity}
+              <div key={order._id} className="order-card">
+                <div className="order-header">
+                  <div>
+                    <h3>Order #{order._id.slice(-6)}</h3>
+                    <p style={{ color: '#666', fontSize: '0.9rem' }}>{formatDate(order.createdAt)}</p>
+                  </div>
+                  <span className={`order-status ${order.status}`}>
+                    {order.status.toUpperCase()}
                   </span>
-                  <span>Rs. {item.unit_price * item.quantity}</span>
                 </div>
-              ))}
-            </div>
 
-            {order.notes && (
-              <div style={{ background: '#f5f5f5', padding: '10px', borderRadius: '5px', marginBottom: '15px' }}>
-                <strong>Notes:</strong> {order.notes}
-              </div>
-            )}
+                <div style={{ marginBottom: '15px' }}>
+                  {order.items.map((item, index) => (
+                    <div key={index} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #eee' }}>
+                      <span>
+                        {item.product_id?.name || 'Product'} × {item.quantity}
+                      </span>
+                      <span>Rs. {item.unit_price?.toLocaleString()}</span>
+                    </div>
+                  ))}
+                </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ fontSize: '1.3rem', fontWeight: 'bold' }}>
-                Total: Rs. {order.total_price}
+                {order.notes && (
+                  <div style={{ background: '#f5f5f5', padding: '10px', borderRadius: '5px', marginBottom: '15px' }}>
+                    <strong>Notes:</strong> {order.notes}
+                  </div>
+                )}
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ fontSize: '1.3rem', fontWeight: 'bold' }}>
+                    Total: Rs. {order.total_price}
+                  </div>
+                  {order.status === 'pending' && (
+                    <button
+                      onClick={() => cancelOrder(order._id)}
+                      className="btn btn-danger"
+                    >
+                      Cancel Order
+                    </button>
+                  )}
+                </div>
               </div>
-              {order.status === 'pending' && (
-                <button
-                  onClick={() => cancelOrder(order._id)}
-                  className="btn btn-danger"
-                >
-                  Cancel Order
-                </button>
-              )}
-            </div>
-          </div>
-        ))
+            ))
           )}
         </>
       )}

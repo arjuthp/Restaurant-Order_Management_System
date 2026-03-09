@@ -23,8 +23,19 @@ async function getMyOrders(req, res) {
     }
 }
 
+async function getAvailableProducts(req, res){
+    try{
+        const products = await ProductService.getAvailableProducts();
+        res.status(200).json(products);
+    }catch(error){
+        const status = error.status || 500;
+        res.status(status).json({message: error.message});
+    }
+}
+
 async function getOrderById(req, res) {
     try{
+        console.log("User Role", req.user.role);
         const order = await orderService.getOrderById(req.user.id, req.params.id, req.user.role);
         res.status(200).json(order);
     }catch(error){
@@ -67,11 +78,41 @@ async function cancelOrder(req, res) {
     }
 }
 
+async function createPreOrderForReservation(req, res) {
+    try {
+        //extract reservationID from URL parametes
+        const { reservationId } = req.params;
+        
+        //extract notes from req body
+        const { notes } = req.body;
+        //call service to create pre-order
+        const order = await orderService.createPreOrderForReservation(
+            req.user.id,
+            reservationId,
+            notes
+        );
+        //send success response
+        res.status(201).json({
+            success: true,
+            message: 'Pre-order created successfully',
+            data: order
+        });
+    } catch (error) {
+        const status = error.status || 500;
+        res.status(status).json({
+            success: false,
+            message: error.message
+        });
+    }
+}
+
 module.exports = {
     createOrder,
     getMyOrders,
+    getAvailableProducts,
     getOrderById,
     getAllOrders,
     updateOrderStatus,
-    cancelOrder
+    cancelOrder,
+    createPreOrderForReservation
 }

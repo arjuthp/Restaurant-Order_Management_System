@@ -1,9 +1,25 @@
 const Product = require('../models/product.model');
+const mongoose = require('mongoose');
 
 class ProductService {
 
     async getAllProducts(){
-        const products = await Product.find({is_available: true});
+        console.log('🔍 getAllProducts called');
+        console.log('🔍 Database:', mongoose.connection.name);
+        console.log('🔍 Connection state:', mongoose.connection.readyState);
+        
+        const products = await Product.find({});
+        console.log('📦 Products found:', products.length);
+        console.log('📦 First product:', products[0]);
+        
+        return products;
+    }
+
+    async getAvailableProducts(){
+        const products = await Product.find({
+            is_deleted: false,
+            is_availble: true
+        });
         return products;
     }
 
@@ -39,7 +55,14 @@ class ProductService {
     }
 
     async deleteProduct(productId){
-        const product = await Product.findByIdAndDelete(productId);
+        const product = await Product.findByIdAndUpdate(productId,
+            {
+                is_deleted: true,
+                is_available: false,
+                deleted_at: new Date()
+            },
+            {new: true}
+        );
         if(!product){
              throw {status: 404, message: 'Product not Found'};
         }

@@ -6,12 +6,14 @@ const {
     getOrderById,
     getAllOrders,
     updateOrderStatus,
-    cancelOrder
+    cancelOrder,
+    createPreOrderForReservation
 } = require('../controllers/order.controller');
 const { authorize } = require('../auth/auth.middlewares');
 
 //customer routes
 router.post('/', authorize('customer'), createOrder);
+router.post('/pre-order/:reservationId', authorize('customer'), createPreOrderForReservation);
 router.get('/', authorize('customer'), getMyOrders);
 router.get('/:id', authorize('customer'), getOrderById);
 router.delete('/:id', authorize('customer'), cancelOrder);

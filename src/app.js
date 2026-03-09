@@ -9,6 +9,8 @@ const userRoutes = require('./routes/user.routes');
 const productRoutes = require('./routes/product.routes');
 const cartRoutes = require('./routes/cart.routes');
 const orderRoutes = require('./routes/order.routes');
+const tableRoutes = require('./routes/table.routes');
+const reservationRoutes = require('./routes/reservation.routes');
 
 
 const app = express();
@@ -21,6 +23,12 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({extended:false}));
 
+// Request logging middleware
+app.use((req, res, next) => {
+    console.log(`📥 Incoming: ${req.method} ${req.url}`);
+    next();
+});
+
 // API Routes
 app.use('/api/restaurant', restaurantRoutes);
 app.use('/api/auth', authRoutes);
@@ -28,6 +36,8 @@ app.use("/api/users", userRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/tables', tableRoutes);
+app.use('/api/reservations', reservationRoutes);
 
 // Serve static files
 app.use(express.static(path.join(__dirname, '../client/dist')));
