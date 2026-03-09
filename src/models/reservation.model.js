@@ -36,6 +36,32 @@ const reservationSchema = new mongoose.Schema({
     min: 1,
     max: 20
   },
+  
+  //duration
+  duration: {
+    type: Number,
+    required: true,
+    min: 60,
+    max: 240,
+    default: 120
+  },
+
+endTime:{
+  type: Date,
+  required: true
+},
+  //pre-order
+  preOrder: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Order',
+    default: null
+  },
+  //has customer pre-ordered?
+  hasPreOrder: {
+    type: Boolean,
+    default: false
+  },
+
   status: {
     type: String,
     required: true,
@@ -51,6 +77,17 @@ const reservationSchema = new mongoose.Schema({
   }
 }, {
   timestamps: true
+});
+
+//auto calculatie endtime
+reservationSchema.pre('save', function(next){
+  if(this.date && this.timeSlot && this.duration){
+    const [hours, minutes] = this.timeSlot.split(':');
+    const startTime = new Date(this.date);
+    startTime.setHours(parseInt(hours), parseInt(minutes || 0), 0, 0);
+    this.endTime = new Date(startTime.getTime() + this.duration * 60000);
+  }
+  next();
 });
 
 module.exports = mongoose.model('Reservation', reservationSchema);

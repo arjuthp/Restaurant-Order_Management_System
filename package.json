@@ -9,7 +9,9 @@
     "build": "cd client && npm run build",
     "prod": "npm run build && cd src && npm start",
     "install-all": "cd src && npm install && cd ../client && npm install",
-    "seed": "cd src && node seedProducts.js"
+    "seed": "cd src && node seedProducts.js",
+    "kill-port": "bash kill-port.sh",
+    "clean-start": "bash kill-port.sh && npm start"
   },
   "keywords": [
     "restaurant",

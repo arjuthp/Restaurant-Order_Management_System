@@ -26,7 +26,18 @@ const productSchema = new mongoose.Schema({
   is_available: {
     type: Boolean,
     default: true
+  },
+  is_deleted: {
+    type: Boolean,
+    default: false
+  },
+  deleted_at: {
+    type: Date,
+    default: null
   }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Product', productSchema);
+
+//isdeleted 
+// /deleted_at 

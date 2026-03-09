@@ -2,30 +2,14 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import cartService from '../services/cartService';
 import orderService from '../services/orderService';
+import { useCart } from '../context/CartContext';
 
 const Cart = () => {
-  const [cart, setCart] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { cart, fetchCart, loading: cartLoading, setCart } = useCart();
   const [error, setError] = useState('');
   const [orderNotes, setOrderNotes] = useState('');
   const [placing, setPlacing] = useState(false);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    fetchCart();
-  }, []);
-
-  const fetchCart = async () => {
-    try {
-      setLoading(true);
-      const data = await cartService.getCart();
-      setCart(data);
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to load cart');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const updateQuantity = async (productId, newQuantity) => {
     try {
@@ -64,10 +48,10 @@ const Cart = () => {
 
   const calculateTotal = () => {
     if (!cart || !cart.items) return 0;
-    return cart.items.reduce((total, item) => total + (item.unit_price * item.quantity), 0);
+    return cart.items.reduce((total, item) => total + (item.unit_price || 0), 0);
   };
 
-  if (loading) return <div className="loading">Loading cart...</div>;
+  if (cartLoading) return <div className="loading">Loading cart...</div>;
   if (error) return <div className="error">{error}</div>;
 
   return (
@@ -91,7 +75,7 @@ const Cart = () => {
                 <h3>{item.product_id.name}</h3>
                 <p style={{ color: '#666' }}>{item.product_id.category}</p>
                 <p style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#2c3e50' }}>
-                  Rs. {item.unit_price} × {item.quantity} = Rs. {item.unit_price * item.quantity}
+                  Rs. {item.unit_price?.toLocaleString()}
                 </p>
               </div>
               <div className="cart-item-actions">
