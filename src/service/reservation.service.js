@@ -5,6 +5,20 @@ const Table = require('../models/table.model');
 class ReservationService {
     //method 1: create reservation (without transaction for standalone MongoDB)
     async createReservation(reservationData){
+        const table = await Table.findById(reservationData.table);
+        
+        if(!table){
+            throw new Error('Table not found');
+        }
+        
+        if(table.status !== 'active'){
+            throw new Error('Table is not available for reservations');
+        }
+        
+        if(table.capacity < reservationData.numberOfGuests){
+            throw new Error(`Table capacity (${table.capacity}) is insufficient for ${reservationData.numberOfGuests} guests`);
+        }
+        
         //check if table is already booked at this time
         const existingReservation = await Reservation.findOne({
             table: reservationData.table,
@@ -34,7 +48,7 @@ class ReservationService {
     }
 
     //Method 3: Get single reservation by ID
-   async getReservationById(reservationId){
+    async getReservationById(reservationId){
         const reservation = await Reservation.findById(reservationId)
         .populate('user', 'name email phone') //include user details
         .populate('table', 'tableNumber capacity location'); //include table details
@@ -99,7 +113,7 @@ class ReservationService {
         //apply filters if provided
         if(filters.date){
             query.date = filters.date;
-            }
+        }
         if(filters.status){
             query.status = filters.status;
         }

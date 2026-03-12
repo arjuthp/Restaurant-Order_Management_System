@@ -3,17 +3,34 @@ const Cart = require('../models/cart.model');
 const Reservation = require('../models/reservation.model');
 
 class OrderService {
-    async createOrder(userId, notes = null){
+    async createOrder(userId,itemsToOrder = null, notes = null){
         const cart = await Cart.findOne({user_id: userId}).populate('items.product_id');
-
-        if(!cart || cart.items.length === 0){
-            throw {status: 400, message: 'Cart is empty. Add items before placing order.'};
+        //check cart exists 
+        if(!cart || cart.length === 0){
+            throw { status: 400,
+                message: 'Cart is empty. Add items before placing order'
+            }
         }
+        let itemsForOrder;
+        //filter => if specific items provided
+        if(itemsToOrder && itemsToOrder.length > 0){
+            itemsForOrder = cart.items.filter(items =>
+                itemsToOrder.includes(items.product_id._id.toString())
+        );
 
+        if(itemsToOrder.length === 0){
+            throw {status: 400,
+                message: 'None of the specified items found in the cart'
+             }
+        }
+    }else {
+            //order all items
+            itemsForOrder = cart.items;
+        }
         let totalPrice = 0;
-        const orderItems = cart.items.map(item => {
+        const orderItems = itemsForOrder.map(item => {
             totalPrice += item.unit_price * item.quantity;
-             return{
+            return{
                 product_id: item.product_id._id,
                 product_name: item.product_id.name,
                 quantity: item.quantity,
@@ -29,7 +46,14 @@ class OrderService {
             status: 'pending'
         });
 
-        cart.items = [];
+        //remove only ordered items from cart
+        if(itemsToOrder && itemsToOrder.length > 0){
+            cart.items = cart.items.filter(item => 
+                !itemsForOrder.includes(item.product_id._id.toString())
+            );
+        }else{
+            cart.items = [];
+        }
         await cart.save();
 
         return await Order.findById(order._id).populate('items.product_id');
@@ -202,6 +226,6 @@ class OrderService {
 
     } 
 
-
+}
 
 module.exports = OrderService;

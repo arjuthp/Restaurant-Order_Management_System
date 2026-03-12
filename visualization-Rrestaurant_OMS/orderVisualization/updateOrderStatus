@@ -1,0 +1,55 @@
+// CLIENT REQUEST
+//     ↓
+// PATCH /api/orders/65f8a1b2c3d4e5f6g7h8i9j0/status
+// Body: { "status": "confirmed" }
+//     ↓
+// AUTH MIDDLEWARE (authenticate)
+//     → Verifies JWT token
+//     → Extracts: req.user = { id: "admin123", role: "admin" }
+//     ↓
+// AUTHORIZE MIDDLEWARE (authorize('admin'))
+//     → Checks if req.user.role === 'admin'
+//     → ✅ IS ADMIN → Passes to controller
+//     ↓
+// ROUTE HANDLER
+//     → Matches route pattern
+//     → Extracts: req.params.id = "65f8a1b2c3d4e5f6g7h8i9j0"
+//     ↓
+// CONTROLLER (updateOrderStatus)
+//     → Extracts status from req.body.status = "confirmed"
+//     → Checks if status exists (400 if missing)
+//     → Extracts orderId from req.params.id
+//     → Calls service function ↓
+//     ↓
+// SERVICE (updateOrderStatus)
+//     → Validates status is in validStatuses array
+//     → Throws 400 if invalid status
+//     → Calls Order.findByIdAndUpdate()
+//     → Updates status field in database
+//     → Populates items.product_id
+//     → Checks if order exists (404 if not found)
+//     → Returns updated order ↑
+//     ↓
+// CONTROLLER
+//     → Receives updated order from service
+//     → Sends JSON response with status 200 ↓
+//     ↓
+// CLIENT RECEIVES
+// {
+//   _id: "65f8a1b2c3d4e5f6g7h8i9j0",
+//   status: "confirmed",
+//   // ... rest of order data
+// }
+
+
+// ## updateOrderStatus BREAKDOWN
+
+// **PURPOSE:** Update the status of an order (pending → confirmed → preparing → delivered). Admin-only feature to manage order lifecycle.
+
+// **INPUTS:** `orderId` comes from URL params (`req.params.id`), `status` comes from request body (`req.body.status`), and `userRole` comes from JWT token (`req.user.role`) validated by `authorize('admin')` middleware. The API request looks like `PATCH /api/orders/65f8a1b2c3d4e5f6g7h8i9j0/status` with body `{ "status": "confirmed" }`.
+
+// **CHECKS:** The `authorize('admin')` middleware validates admin role and blocks non-admins with 403. Controller checks if status field exists in body (400 if missing). Service validates the status value is in the allowed list `['pending', 'confirmed', 'preparing', 'delivered', 'cancelled']` (400 if invalid). After the database update, service checks if order was found (404 if not).
+
+// **ACTIONS:** Middleware verifies JWT and validates admin role. Route handler extracts orderId from URL params. Controller extracts status from body, validates it exists, then calls service. Service validates status is in allowed list, calls `Order.findByIdAndUpdate()` with `{new: true, runValidators: true}` to update the status field, populates product details, checks if order exists, and returns the updated order. Controller sends the response.
+
+// **OUTPUTS:** Success returns 200 with the updated order object including the new status and updated timestamp. Errors include 400 for missing/invalid status ("Status is required" or "Invalid status. Must be one of: pending, confirmed, preparing, delivered, cancelled"), 403 from middleware if not admin, 404 if order not found, or 500 for database errors.

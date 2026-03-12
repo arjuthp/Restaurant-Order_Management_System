@@ -4,8 +4,22 @@ const orderService = new OrderService();
 
 async function createOrder(req, res) {
     try{
-        const { notes } = req.body;
-        const order = await orderService.createOrder(req.user.id, notes);
+        const {itemsToOrder, notes } = req.body;
+
+        if(itemsToOrder !== undefined && itemsToOrder !== null){
+            if(!Array.isArray(itemsToOrder)){
+                return res.status(400).json({
+                    message: 'itemsToOrder must be an array'
+                });
+            }
+            if(itemsToOrder.length === 0){
+                return res.status(400).json({
+                    message: 'itemsToOrder cannot be an empty array'
+                });
+            }
+        }
+
+        const order = await orderService.createOrder(req.user.id,itemsToOrder, notes);
         res.status(201).json(order);
     }catch(error){
         const status = error.status || 500;
