@@ -6,7 +6,7 @@ class OrderService {
     async createOrder(userId,itemsToOrder = null, notes = null){
         const cart = await Cart.findOne({user_id: userId}).populate('items.product_id');
         //check cart exists 
-        if(!cart || cart.length === 0){
+        if(!cart || cart.items.length === 0){
             throw { status: 400,
                 message: 'Cart is empty. Add items before placing order'
             }
@@ -29,7 +29,7 @@ class OrderService {
         }
         let totalPrice = 0;
         const orderItems = itemsForOrder.map(item => {
-            totalPrice += item.unit_price * item.quantity;
+            totalPrice += item.unit_price;
             return{
                 product_id: item.product_id._id,
                 product_name: item.product_id.name,
@@ -49,7 +49,7 @@ class OrderService {
         //remove only ordered items from cart
         if(itemsToOrder && itemsToOrder.length > 0){
             cart.items = cart.items.filter(item => 
-                !itemsForOrder.includes(item.product_id._id.toString())
+                !itemsToOrder.includes(item.product_id._id.toString())
             );
         }else{
             cart.items = [];

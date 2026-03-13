@@ -18,7 +18,7 @@ class ProductService {
     async getAvailableProducts(){
         const products = await Product.find({
             is_deleted: false,
-            is_availble: true
+            is_available: true
         });
         return products;
     }
