@@ -1,14 +1,10 @@
 {
   "name": "restaurant-order-management-system",
   "version": "1.0.0",
-  "description": "Restaurant Order Management System - Full Stack",
+  "description": "Restaurant Order Management System - Backend API",
   "scripts": {
-    "start": "concurrently \"npm run server\" \"npm run client\"",
-    "server": "cd src && npm start",
-    "client": "cd client && npm run dev",
-    "build": "cd client && npm run build",
-    "prod": "npm run build && cd src && npm start",
-    "install-all": "cd src && npm install && cd ../client && npm install",
+    "start": "cd src && npm start",
+    "dev": "cd src && npm run dev",
     "seed": "cd src && node seedProducts.js",
     "kill-port": "bash kill-port.sh",
     "clean-start": "bash kill-port.sh && npm start"
@@ -16,17 +12,11 @@
   "keywords": [
     "restaurant",
     "order-management",
-    "react",
+    "api",
     "nodejs",
     "express",
     "mongodb"
   ],
   "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "concurrently": "^8.2.2"
-  },
-  "dependencies": {
-    "axios": "^1.13.6"
-  }
+  "license": "ISC"
 }

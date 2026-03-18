@@ -61,6 +61,22 @@ const orderSchema = new mongoose.Schema({
         default: 0
     },
 
+    ///////promocodes ////////////////////
+    subtotal: {
+        type: Number,
+        default: 0,
+        min: 0
+    },
+    promoCode: {
+        type: String,
+        default: null
+    },
+    discountAmount: {
+        type: Number, default: 0,
+        min: 0
+    }, 
+
+/////promocodes ends/////////////////////////////
     //Pickup time (for takeout)
     pickupTime: {
         type: Date,

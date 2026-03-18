@@ -1,49 +1,55 @@
-# 🍽️ Restaurant Order Management System
+# 🍽️ Restaurant Order Management System - Backend API
 
-Full-stack restaurant order management system with React frontend and Node.js backend.
-
-> ✨ **New:** Single-port production mode! Run everything on `http://localhost:5000` with `npm run prod`
+RESTful API for restaurant order management system built with Node.js, Express, and MongoDB.
 
 ## 📚 Documentation
 
-- 📖 **[HOW_TO_USE.md](HOW_TO_USE.md)** - Quick usage guide
-- 🚀 **[QUICK_START.md](QUICK_START.md)** - Fast setup reference
-- 🏗️ **[ARCHITECTURE.md](ARCHITECTURE.md)** - System architecture & flow diagrams
-- 📦 **[DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)** - Deployment details
-- 🔄 **[DEVELOPER_FLOW_COMPLETE.md](DEVELOPER_FLOW_COMPLETE.md)** - Complete client-to-server flow for all scenarios
-- 📦 **[SPA_STATIC_SERVING_EXPLAINED.md](SPA_STATIC_SERVING_EXPLAINED.md)** - Static serving & SPA fallback explained
+- 📖 **[API Documentation](docs/HOW_TO_USE.md)** - API usage guide
+- 🚀 **[Quick Start](docs/QUICK_START.md)** - Fast setup reference
+- 🏗️ **[Architecture](docs/ARCHITECTURE.md)** - System architecture
+- 🧪 **[API Testing](api-tests/README.md)** - Test your endpoints
 
 ## 📋 Features
 
-### Customer Features
-- ✅ User registration and authentication
-- ✅ Browse menu by categories (Nepali, Fusion, Western, Snacks, Desserts, Drinks)
-- ✅ Add items to cart with quantity selection
-- ✅ View and manage shopping cart
-- ✅ Place orders with optional notes
-- ✅ View order history
-- ✅ Cancel pending orders
-
-### Admin Features
+### Authentication & Authorization
+- ✅ User registration and login
 - ✅ Admin authentication
-- ✅ Dashboard with statistics (orders, revenue, products)
-- ✅ Product management (Create, Read, Update, Delete)
-- ✅ Order management (View all orders, update status)
-- ✅ Filter orders by status
+- ✅ JWT access & refresh tokens
+- ✅ Role-based access control
+
+### Product Management
+- ✅ CRUD operations for menu items
+- ✅ Category-based organization (Nepali, Fusion, Western, Snacks, Desserts, Drinks)
+- ✅ Public product browsing
+
+### Cart Management
+- ✅ Add/update/remove items
+- ✅ Quantity management
+- ✅ User-specific carts
+
+### Order Management
+- ✅ Place orders with notes
+- ✅ Order history tracking
+- ✅ Status updates (pending → confirmed → preparing → delivered)
+- ✅ Cancel pending orders
+- ✅ Admin order management
+
+### Table & Reservation System
+- ✅ Table management (CRUD)
+- ✅ Availability checking
+- ✅ Reservation booking
+- ✅ Reservation status management
+
+### User Management
+- ✅ Profile management
+- ✅ Admin user overview
+- ✅ Account deletion
 
 ---
 
 ## 🏗️ Tech Stack
 
-### Frontend
-- **React 18** - UI library
-- **React Router v6** - Client-side routing
-- **Axios** - HTTP client
-- **Vite** - Build tool
-- **Context API** - State management
-
-### Backend
-- **Node.js** - Runtime
+- **Node.js** - Runtime environment
 - **Express.js** - Web framework
 - **MongoDB** - Database
 - **Mongoose** - ODM
@@ -65,12 +71,11 @@ git clone <your-repo-url>
 cd Restaurant_Order_Management_System
 ```
 
-### 2. Install All Dependencies
+### 2. Install Dependencies
 ```bash
-npm run install-all
+cd src
+npm install
 ```
-
-This installs dependencies for both backend and frontend.
 
 ### 3. Configure Environment Variables
 
@@ -87,24 +92,15 @@ JWT_REFRESH_SECRET=your_refresh_secret_key
 npm run seed
 ```
 
-This adds 47 menu items to your database.
+This adds 48 menu items to your database.
 
-### 5. Run the Application
+### 5. Start the Server
 
-**Option A: Production Mode (Single Port - Recommended)**
-```bash
-npm run prod
-```
-Access everything at: `http://localhost:5000`
-
-**Option B: Development Mode (Hot Reload)**
 ```bash
 npm start
 ```
-- Backend: `http://localhost:5000`
-- Frontend: `http://localhost:3001` (with hot reload)
 
-> 💡 **Tip:** Use production mode to access everything on one URL. Use development mode when actively coding for instant updates.
+API will be available at: `http://localhost:5000/api`
 
 ---
 
@@ -118,25 +114,34 @@ Restaurant_Order_Management_System/
 │   │   ├── product.model.js
 │   │   ├── cart.model.js
 │   │   ├── order.model.js
+│   │   ├── table.model.js
+│   │   ├── reservation.model.js
+│   │   ├── promoCode.model.js
 │   │   └── refreshToken.js
 │   ├── controllers/              # Request handlers
 │   │   ├── auth.controller.js
 │   │   ├── user.controller.js
 │   │   ├── product.controller.js
 │   │   ├── cart.controller.js
-│   │   └── order.controller.js
+│   │   ├── order.controller.js
+│   │   ├── table.controller.js
+│   │   └── reservation.controller.js
 │   ├── services/                 # Business logic
 │   │   ├── auth.service.js
 │   │   ├── user.service.js
 │   │   ├── product.service.js
 │   │   ├── cart.service.js
-│   │   └── order.service.js
+│   │   ├── order.service.js
+│   │   ├── table.service.js
+│   │   └── reservation.service.js
 │   ├── routes/                   # API routes
 │   │   ├── auth.routes.js
 │   │   ├── user.routes.js
 │   │   ├── product.routes.js
 │   │   ├── cart.routes.js
-│   │   └── order.routes.js
+│   │   ├── order.routes.js
+│   │   ├── table.routes.js
+│   │   └── reservation.routes.js
 │   ├── auth/                     # Authentication middleware
 │   │   └── auth.middlewares.js
 │   ├── utils/                    # Utilities
@@ -145,18 +150,8 @@ Restaurant_Order_Management_System/
 │   ├── server.js                 # Server entry point
 │   └── seedProducts.js           # Database seeder
 │
-├── client/                       # Frontend (React)
-│   ├── src/
-│   │   ├── components/           # Reusable components
-│   │   ├── pages/                # Page components
-│   │   ├── services/             # API services
-│   │   ├── context/              # React Context
-│   │   ├── App.jsx
-│   │   └── main.jsx
-│   ├── public/
-│   └── package.json
-│
-├── package.json                  # Root package.json
+├── api-tests/                    # REST API test files
+├── docs/                         # Documentation
 └── README.md
 ```
 
@@ -209,35 +204,42 @@ GET    /api/orders/admin/all     - Get all orders (Admin)
 PATCH  /api/orders/:id/status    - Update order status (Admin)
 ```
 
+### Tables
+```
+GET    /api/tables               - Get all tables (Public)
+GET    /api/tables/:id           - Get single table (Public)
+POST   /api/tables               - Create table (Admin)
+PUT    /api/tables/:id           - Update table (Admin)
+DELETE /api/tables/:id           - Delete table (Admin)
+```
+
+### Reservations
+```
+GET    /api/reservations/availability           - Check availability (Public)
+POST   /api/reservations                        - Create reservation (Customer)
+GET    /api/reservations/my-reservations        - Get my reservations (Customer)
+GET    /api/reservations/:id                    - Get single reservation (Customer)
+PATCH  /api/reservations/:id/cancel             - Cancel reservation (Customer)
+GET    /api/reservations/admin/all              - Get all reservations (Admin)
+PATCH  /api/reservations/admin/:id/status       - Update status (Admin)
+```
+
+### Restaurant
+```
+GET    /api/restaurant           - Get restaurant info (Public)
+PATCH  /api/restaurant           - Update restaurant info (Admin)
+```
+
 ---
 
 ## 🎯 Available Scripts
 
-### Root Level
-```bash
-npm start           # Run both backend and frontend (dev mode)
-npm run prod        # Build React + run on single port (production)
-npm run build       # Build React app for production
-npm run server      # Run only backend
-npm run client      # Run only frontend
-npm run install-all # Install all dependencies
-npm run seed        # Seed database with products
-```
-
-> 📖 **More Info:** See `HOW_TO_USE.md` for detailed usage guide
-
-### Backend (src/)
 ```bash
 npm start           # Start backend server
 npm run dev         # Start with nodemon (auto-reload)
-node seedProducts.js # Seed products
-```
-
-### Frontend (client/)
-```bash
-npm run dev         # Start development server
-npm run build       # Build for production
-npm run preview     # Preview production build
+npm run seed        # Seed database with products
+npm run kill-port   # Kill process on port 5000
+npm run clean-start # Kill port and start fresh
 ```
 
 ---
@@ -258,7 +260,7 @@ You need to manually create an admin user in MongoDB:
 ```
 
 ### Customer Users
-Register through the app at `/register`
+Register through the API at `POST /api/auth/register`
 
 ---
 
@@ -268,6 +270,9 @@ Register through the app at `/register`
 - **products** - Menu items
 - **carts** - Shopping carts (one per user)
 - **orders** - Order history
+- **tables** - Restaurant tables
+- **reservations** - Table reservations
+- **promocodes** - Promotional codes
 - **refreshtokens** - JWT refresh tokens
 
 ---
@@ -276,8 +281,8 @@ Register through the app at `/register`
 
 1. User registers/logs in
 2. Backend returns access token (15min) and refresh token (7 days)
-3. Frontend stores tokens in localStorage
-4. Access token sent with every request
+3. Client stores tokens
+4. Access token sent with every request in Authorization header
 5. On token expiry, use refresh token to get new access token
 
 ---
@@ -303,22 +308,35 @@ cancelled (can only cancel if pending)
 
 ---
 
+## 🧪 Testing the API
+
+Use the provided REST files in `api-tests/` directory with VS Code REST Client extension:
+
+1. Install REST Client extension
+2. Open any `.rest` file in `api-tests/`
+3. Click "Send Request" above each endpoint
+4. View responses in the right panel
+
+See [api-tests/README.md](api-tests/README.md) for detailed testing guide.
+
+---
+
 ## 🐛 Troubleshooting
 
 ### Backend won't start
 - Check MongoDB connection string in `.env`
 - Ensure MongoDB is running
-- Check if port 5000 is available
-
-### Frontend won't start
-- Run `cd client && npm install`
-- Check if port 3000 is available
-- Ensure backend is running on port 5000
+- Check if port 5000 is available: `lsof -ti:5000`
 
 ### Can't login
 - Check if user exists in database
 - Verify JWT secrets in `.env`
-- Check browser console for errors
+- Check server logs for errors
+
+### Database connection error
+- Verify MONGO_URI in `.env`
+- Check MongoDB service is running
+- Ensure network access if using MongoDB Atlas
 
 ---
 
@@ -334,10 +352,4 @@ Feel free to submit issues and pull requests!
 
 ---
 
-## 📧 Contact
-
-For questions or support, please open an issue.
-
----
-
-**Enjoy your restaurant management system! 🎉**
+**Enjoy your restaurant API! 🎉**

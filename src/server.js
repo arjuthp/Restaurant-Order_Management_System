@@ -39,8 +39,7 @@ mongoose.connect(process.env.MONGO_URI)
     console.log('✅ MongoDB connected');
     server = app.listen(PORT, () => {
         console.log(`🚀 Server Started: http://localhost:${PORT}`);
-        console.log(`📱 Frontend: http://localhost:3002`);
-        console.log(`📚 API Docs: http://localhost:${PORT}/api`);
+        console.log(`📚 API Base: http://localhost:${PORT}/api`);
     });
     
     // Handle server errors

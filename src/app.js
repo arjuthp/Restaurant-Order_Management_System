@@ -1,7 +1,5 @@
 const express = require('express');
-const path = require('path');
 const cors = require('cors');
-
 
 const restaurantRoutes = require('./routes/restaurant.routes');
 const authRoutes = require('./routes/auth.routes');
@@ -11,7 +9,6 @@ const cartRoutes = require('./routes/cart.routes');
 const orderRoutes = require('./routes/order.routes');
 const tableRoutes = require('./routes/table.routes');
 const reservationRoutes = require('./routes/reservation.routes');
-
 
 const app = express();
 
@@ -39,30 +36,12 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/tables', tableRoutes);
 app.use('/api/reservations', reservationRoutes);
 
-// Serve static files
-app.use(express.static(path.join(__dirname, '../client/dist')));
-app.use(express.static(path.join(__dirname, '../frontend')));
-
-// SPA fallback
+// 404 handler for undefined routes
 app.use((req, res) => {
-    if (req.path.startsWith('/api')) {
-        return res.status(404).json({ 
-            success: false, 
-            message: 'API endpoint not found' 
-        });
-    }
-    
-    const fs = require('fs');
-    const reactIndexPath = path.join(__dirname, '../client/dist', 'index.html');
-    const vanillaIndexPath = path.join(__dirname, '../frontend', 'index.html');
-    
-    if (fs.existsSync(reactIndexPath)) {
-        res.sendFile(reactIndexPath);
-    } else if (fs.existsSync(vanillaIndexPath)) {
-        res.sendFile(vanillaIndexPath);
-    } else {
-        res.status(404).send('Frontend not found. Please run: npm run build');
-    }
+    res.status(404).json({ 
+        success: false, 
+        message: 'API endpoint not found' 
+    });
 });
 
 module.exports = app;
