@@ -247,20 +247,42 @@ npm run clean-start # Kill port and start fresh
 ## 👤 Default Users
 
 ### Create Admin User
-You need to manually create an admin user in MongoDB:
 
+**Quick Setup (Recommended):**
+```bash
+cd src
+npm run seed:admin
+```
+
+This creates an admin account with:
+- **Email:** `admin@restaurant.com`
+- **Password:** `admin123`
+- **Role:** `admin`
+
+**Admin Login:**
+- Frontend: `http://localhost:3000/admin/login`
+- Use the credentials above to login
+
+**⚠️ IMPORTANT:** Change the password after first login in production!
+
+**Custom Admin Credentials:**
+```bash
+ADMIN_EMAIL=your@email.com ADMIN_PASSWORD=YourPassword123 npm run seed:admin
+```
+
+**Manual Database Creation:**
 ```javascript
-// In MongoDB or using register endpoint, set role to 'admin'
+// In MongoDB, insert into users collection:
 {
   "name": "Admin",
   "email": "admin@restaurant.com",
-  "password": "admin123",
+  "password": "$2a$10$...", // Hashed password
   "role": "admin"
 }
 ```
 
 ### Customer Users
-Register through the API at `POST /api/auth/register`
+Register through the API at `POST /api/auth/register` or via the frontend at `http://localhost:3000/auth`
 
 ---
 

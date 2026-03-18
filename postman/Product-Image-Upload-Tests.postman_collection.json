@@ -1,0 +1,633 @@
+{
+	"info": {
+		"_postman_id": "product-image-upload-2024",
+		"name": "🖼️ Product Image Upload Tests",
+		"description": "Automated tests for product image upload functionality (JPEG, PNG, WebP up to 5MB)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{adminToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:5000/api",
+			"type": "string"
+		},
+		{
+			"key": "adminToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "productId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "imageUrl",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "🔐 Setup - Login as Admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (pm.response.code === 200) {",
+							"    const response = pm.response.json();",
+							"    pm.collectionVariables.set('adminToken', response.accessToken);",
+							"    pm.test('✅ Admin login successful', () => {",
+							"        pm.expect(response.accessToken).to.exist;",
+							"    });",
+							"    console.log('🔑 Admin token saved:', response.accessToken.substring(0, 20) + '...');",
+							"} else {",
+							"    pm.test('❌ Login failed', () => {",
+							"        pm.expect.fail('Could not login as admin');",
+							"    });",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"admin123\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/auth/login",
+					"host": ["{{baseUrl}}"],
+					"path": ["auth", "login"]
+				},
+				"description": "Login as admin to get authentication token for subsequent requests"
+			}
+		},
+		{
+			"name": "✅ Test 1: Create Product WITH Image (JPEG)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('✅ Status code is 201', () => {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"if (pm.response.code === 201) {",
+							"    const response = pm.response.json();",
+							"    ",
+							"    pm.test('✅ Product created with image', () => {",
+							"        pm.expect(response).to.have.property('_id');",
+							"        pm.expect(response).to.have.property('name');",
+							"        pm.expect(response).to.have.property('image_url');",
+							"        pm.expect(response.image_url).to.include('/uploads/products/');",
+							"    });",
+							"    ",
+							"    pm.test('✅ Image URL format is correct', () => {",
+							"        pm.expect(response.image_url).to.match(/\\/uploads\\/products\\/.+\\.(jpg|jpeg|png|webp)$/);",
+							"    });",
+							"    ",
+							"    // Save for later tests",
+							"    pm.collectionVariables.set('productId', response._id);",
+							"    pm.collectionVariables.set('imageUrl', response.image_url);",
+							"    ",
+							"    console.log('📦 Product created:', response._id);",
+							"    console.log('🖼️ Image URL:', response.image_url);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "name",
+							"value": "Test Pizza with Image",
+							"type": "text"
+						},
+						{
+							"key": "price",
+							"value": "15.99",
+							"type": "text"
+						},
+						{
+							"key": "category",
+							"value": "Pizza",
+							"type": "text"
+						},
+						{
+							"key": "description",
+							"value": "Delicious test pizza with uploaded image",
+							"type": "text"
+						},
+						{
+							"key": "image",
+							"type": "file",
+							"src": [],
+							"description": "⚠️ SELECT A JPEG/PNG/WEBP IMAGE FILE HERE (< 5MB)"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/products",
+					"host": ["{{baseUrl}}"],
+					"path": ["products"]
+				},
+				"description": "**INSTRUCTIONS:**\n1. Click on 'Body' tab\n2. Find the 'image' field\n3. Click 'Select Files' button\n4. Choose a JPEG, PNG, or WebP image (< 5MB)\n5. Click 'Send'\n\n**Expected Result:**\n- Status: 201 Created\n- Response includes `image_url` field\n- Image URL format: `/uploads/products/filename-timestamp.jpg`"
+			}
+		},
+		{
+			"name": "✅ Test 2: Create Product WITHOUT Image",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('✅ Status code is 201', () => {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"if (pm.response.code === 201) {",
+							"    const response = pm.response.json();",
+							"    ",
+							"    pm.test('✅ Product created without image', () => {",
+							"        pm.expect(response).to.have.property('_id');",
+							"        pm.expect(response).to.have.property('name');",
+							"        pm.expect(response.name).to.equal('Test Pasta No Image');",
+							"    });",
+							"    ",
+							"    pm.test('✅ Image URL is null or undefined', () => {",
+							"        pm.expect(response.image_url).to.satisfy((val) => {",
+							"            return val === null || val === undefined;",
+							"        });",
+							"    });",
+							"    ",
+							"    console.log('📦 Product created without image:', response._id);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Test Pasta No Image\",\n  \"price\": 12.99,\n  \"category\": \"Pasta\",\n  \"description\": \"Test product without image upload\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/products",
+					"host": ["{{baseUrl}}"],
+					"path": ["products"]
+				},
+				"description": "**Test:** Create product without uploading an image\n\n**Expected Result:**\n- Status: 201 Created\n- `image_url` field is null or not present\n- Product is created successfully"
+			}
+		},
+		{
+			"name": "✅ Test 3: Update Product - Add Image",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('✅ Status code is 200', () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"if (pm.response.code === 200) {",
+							"    const response = pm.response.json();",
+							"    ",
+							"    pm.test('✅ Product updated with new image', () => {",
+							"        pm.expect(response).to.have.property('image_url');",
+							"        pm.expect(response.image_url).to.include('/uploads/products/');",
+							"    });",
+							"    ",
+							"    pm.test('✅ Image URL changed', () => {",
+							"        const oldImageUrl = pm.collectionVariables.get('imageUrl');",
+							"        pm.expect(response.image_url).to.not.equal(oldImageUrl);",
+							"    });",
+							"    ",
+							"    console.log('🔄 Product updated with new image');",
+							"    console.log('🖼️ New image URL:', response.image_url);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Check if we have a productId from previous test",
+							"const productId = pm.collectionVariables.get('productId');",
+							"if (!productId) {",
+							"    console.error('❌ No productId found. Run Test 1 first!');",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "name",
+							"value": "Updated Pizza with New Image",
+							"type": "text"
+						},
+						{
+							"key": "price",
+							"value": "17.99",
+							"type": "text"
+						},
+						{
+							"key": "image",
+							"type": "file",
+							"src": [],
+							"description": "⚠️ SELECT A DIFFERENT IMAGE FILE HERE"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/products/{{productId}}",
+					"host": ["{{baseUrl}}"],
+					"path": ["products", "{{productId}}"]
+				},
+				"description": "**Test:** Update existing product with a new image\n\n**INSTRUCTIONS:**\n1. Run Test 1 first to create a product\n2. Select a DIFFERENT image file\n3. Click 'Send'\n\n**Expected Result:**\n- Status: 200 OK\n- New `image_url` is different from the old one\n- Old image file still exists on server"
+			}
+		},
+		{
+			"name": "✅ Test 4: Access Uploaded Image",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('✅ Image is accessible', () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test('✅ Content-Type is image', () => {",
+							"    const contentType = pm.response.headers.get('Content-Type');",
+							"    pm.expect(contentType).to.match(/^image\\/(jpeg|png|webp)/);",
+							"});",
+							"",
+							"pm.test('✅ Image has content', () => {",
+							"    pm.expect(pm.response.size().body).to.be.above(0);",
+							"});",
+							"",
+							"console.log('✅ Image successfully served from:', pm.request.url.toString());"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const imageUrl = pm.collectionVariables.get('imageUrl');",
+							"if (!imageUrl) {",
+							"    console.error('❌ No imageUrl found. Run Test 1 first!');",
+							"} else {",
+							"    console.log('🔍 Testing image access:', imageUrl);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000{{imageUrl}}",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "5000",
+					"path": ["{{imageUrl}}"]
+				},
+				"description": "**Test:** Verify uploaded image is accessible via URL\n\n**Expected Result:**\n- Status: 200 OK\n- Content-Type: image/jpeg, image/png, or image/webp\n- Image file is returned\n- No authentication required (public access)"
+			}
+		},
+		{
+			"name": "❌ Test 5: Upload Invalid File Type (PDF)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('❌ Status code is 400', () => {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"if (pm.response.code === 400) {",
+							"    const response = pm.response.json();",
+							"    ",
+							"    pm.test('❌ Error message about file type', () => {",
+							"        pm.expect(response.success).to.be.false;",
+							"        pm.expect(response.error.message).to.include('Invalid file type');",
+							"    });",
+							"    ",
+							"    console.log('✅ Correctly rejected invalid file type');",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "name",
+							"value": "Test Product",
+							"type": "text"
+						},
+						{
+							"key": "price",
+							"value": "10.00",
+							"type": "text"
+						},
+						{
+							"key": "category",
+							"value": "Pizza",
+							"type": "text"
+						},
+						{
+							"key": "image",
+							"type": "file",
+							"src": [],
+							"description": "⚠️ SELECT A PDF OR OTHER NON-IMAGE FILE"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/products",
+					"host": ["{{baseUrl}}"],
+					"path": ["products"]
+				},
+				"description": "**Test:** Try to upload an invalid file type (PDF, TXT, etc.)\n\n**INSTRUCTIONS:**\n1. Select a PDF, TXT, or any non-image file\n2. Click 'Send'\n\n**Expected Result:**\n- Status: 400 Bad Request\n- Error message: \"Invalid file type. Only JPEG, PNG, and WebP images are allowed.\""
+			}
+		},
+		{
+			"name": "❌ Test 6: Upload File Too Large (>5MB)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('❌ Status code is 400', () => {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"if (pm.response.code === 400) {",
+							"    const response = pm.response.json();",
+							"    ",
+							"    pm.test('❌ Error message about file size', () => {",
+							"        pm.expect(response.success).to.be.false;",
+							"        pm.expect(response.error.message).to.include('5MB');",
+							"    });",
+							"    ",
+							"    console.log('✅ Correctly rejected oversized file');",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "name",
+							"value": "Test Product",
+							"type": "text"
+						},
+						{
+							"key": "price",
+							"value": "10.00",
+							"type": "text"
+						},
+						{
+							"key": "category",
+							"value": "Pizza",
+							"type": "text"
+						},
+						{
+							"key": "image",
+							"type": "file",
+							"src": [],
+							"description": "⚠️ SELECT AN IMAGE FILE LARGER THAN 5MB"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/products",
+					"host": ["{{baseUrl}}"],
+					"path": ["products"]
+				},
+				"description": "**Test:** Try to upload a file larger than 5MB\n\n**INSTRUCTIONS:**\n1. Find or create an image file > 5MB\n2. Select it in the 'image' field\n3. Click 'Send'\n\n**Expected Result:**\n- Status: 400 Bad Request\n- Error message: \"File size exceeds 5MB limit\"\n\n**Note:** If you don't have a large image, you can skip this test or use an online tool to create one."
+			}
+		},
+		{
+			"name": "✅ Test 7: Multiple Image Formats (PNG)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('✅ PNG upload successful', () => {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"if (pm.response.code === 201) {",
+							"    const response = pm.response.json();",
+							"    pm.test('✅ Image URL ends with .png', () => {",
+							"        pm.expect(response.image_url).to.match(/\\.png$/);",
+							"    });",
+							"    console.log('✅ PNG image uploaded successfully');",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "name",
+							"value": "Test PNG Image",
+							"type": "text"
+						},
+						{
+							"key": "price",
+							"value": "14.99",
+							"type": "text"
+						},
+						{
+							"key": "category",
+							"value": "Dessert",
+							"type": "text"
+						},
+						{
+							"key": "image",
+							"type": "file",
+							"src": [],
+							"description": "⚠️ SELECT A PNG IMAGE FILE"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/products",
+					"host": ["{{baseUrl}}"],
+					"path": ["products"]
+				},
+				"description": "**Test:** Upload PNG format image\n\n**Expected Result:**\n- Status: 201 Created\n- Image URL ends with .png"
+			}
+		},
+		{
+			"name": "✅ Test 8: Multiple Image Formats (WebP)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('✅ WebP upload successful', () => {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"if (pm.response.code === 201) {",
+							"    const response = pm.response.json();",
+							"    pm.test('✅ Image URL ends with .webp', () => {",
+							"        pm.expect(response.image_url).to.match(/\\.webp$/);",
+							"    });",
+							"    console.log('✅ WebP image uploaded successfully');",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "name",
+							"value": "Test WebP Image",
+							"type": "text"
+						},
+						{
+							"key": "price",
+							"value": "16.99",
+							"type": "text"
+						},
+						{
+							"key": "category",
+							"value": "Beverage",
+							"type": "text"
+						},
+						{
+							"key": "image",
+							"type": "file",
+							"src": [],
+							"description": "⚠️ SELECT A WEBP IMAGE FILE"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/products",
+					"host": ["{{baseUrl}}"],
+					"path": ["products"]
+				},
+				"description": "**Test:** Upload WebP format image\n\n**Expected Result:**\n- Status: 201 Created\n- Image URL ends with .webp"
+			}
+		},
+		{
+			"name": "🧹 Cleanup: Delete Test Product",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('✅ Product deleted', () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"console.log('🧹 Test product cleaned up');"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/products/{{productId}}",
+					"host": ["{{baseUrl}}"],
+					"path": ["products", "{{productId}}"]
+				},
+				"description": "**Cleanup:** Delete the test product created in Test 1\n\n**Note:** This performs a soft delete (sets is_deleted flag)"
+			}
+		}
+	]
+}
