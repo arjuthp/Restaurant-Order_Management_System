@@ -13,6 +13,7 @@ const AuthPage = lazy(() => import('@/features/auth/pages/AuthPage'));
 const AdminLoginPage = lazy(() => import('@/features/auth/pages/AdminLoginPage'));
 const AdminDashboardPage = lazy(() => import('@/features/admin/pages/AdminDashboardPage'));
 const AdminProductsPage = lazy(() => import('@/features/admin/pages/AdminProductsPage'));
+const AdminProductDetailPage = lazy(() => import('@/features/admin/pages/AdminProductDetailPage'));
 const AdminOrdersPage = lazy(() => import('@/features/admin/pages/AdminOrdersPage'));
 const AdminOrderDetailPage = lazy(() => import('@/features/admin/pages/AdminOrderDetailPage'));
 const AdminTablesPage = lazy(() => import('@/features/admin/pages/AdminTablesPage'));
@@ -55,6 +56,15 @@ export const AppRouter = () => {
             element={
               <AdminRoute>
                 <AdminProductsPage />
+              </AdminRoute>
+            }
+          />
+          
+          <Route
+            path="/admin/products/:id"
+            element={
+              <AdminRoute>
+                <AdminProductDetailPage />
               </AdminRoute>
             }
           />

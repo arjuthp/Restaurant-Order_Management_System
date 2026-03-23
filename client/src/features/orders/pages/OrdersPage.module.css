@@ -44,7 +44,7 @@
 .filterDropdown:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 3px rgba(201, 169, 97, 0.1);
 }
 
 .error {
@@ -162,8 +162,9 @@
 }
 
 .statusConfirmed {
-  background-color: #dbeafe;
-  color: #1e40af;
+  background: linear-gradient(135deg, #E8DCC4 0%, #D4C5A9 100%);
+  color: #6B5D47;
+  box-shadow: 0 2px 4px rgba(107, 93, 71, 0.15);
 }
 
 .statusPreparing {

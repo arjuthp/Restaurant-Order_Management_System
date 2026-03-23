@@ -17,56 +17,88 @@
 
 /* Variants */
 .primary {
-  background-color: var(--color-primary);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
   color: white;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(166, 139, 78, 0.3);
 }
 
 .primary:hover:not(:disabled) {
-  background-color: var(--color-primary-dark);
+  background: linear-gradient(135deg, var(--color-primary-dark) 0%, #8B7042 100%);
+  box-shadow: var(--shadow-gold);
+  transform: translateY(-1px);
+}
+
+.primary:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .secondary {
-  background-color: var(--color-secondary);
-  color: white;
+  background: linear-gradient(135deg, var(--color-secondary) 0%, #3D3220 100%);
+  color: #E0C589;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(201, 169, 97, 0.3);
 }
 
 .secondary:hover:not(:disabled) {
-  opacity: 0.9;
+  background: linear-gradient(135deg, #3D3220 0%, #4A3E28 100%);
+  color: #D4AF37;
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.secondary:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .danger {
-  background-color: var(--color-danger);
+  background: linear-gradient(135deg, var(--color-danger) 0%, #C62828 100%);
   color: white;
+  box-shadow: var(--shadow-sm);
 }
 
 .danger:hover:not(:disabled) {
-  opacity: 0.9;
+  background: linear-gradient(135deg, #C62828 0%, #B71C1C 100%);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.danger:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .ghost {
   background-color: transparent;
   color: var(--color-primary);
-  border: 1px solid var(--color-border);
+  border: 2px solid var(--color-border-gold);
 }
 
 .ghost:hover:not(:disabled) {
-  background-color: var(--color-bg-secondary);
+  background: linear-gradient(135deg, rgba(201, 169, 97, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%);
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-xs);
 }
 
 /* Sizes */
 .sm {
-  padding: 0.5rem 1rem;
+  padding: 0.625rem 1.125rem;
   font-size: 0.875rem;
+  min-width: 80px;
+  height: 36px;
 }
 
 .md {
   padding: 0.75rem 1.5rem;
   font-size: 1rem;
+  min-width: 100px;
+  height: 42px;
 }
 
 .lg {
   padding: 1rem 2rem;
   font-size: 1.125rem;
+  min-width: 120px;
+  height: 48px;
 }
 
 .fullWidth {

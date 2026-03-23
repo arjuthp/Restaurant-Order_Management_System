@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { productsApi, Product } from '@/services/api/productsApi';
 import { Button } from '@/shared/components/Button';
 import { LoadingSpinner } from '@/shared/components/LoadingSpinner';
@@ -8,6 +9,7 @@ import { ProductForm, ProductFormData } from '../components/ProductForm';
 import styles from './AdminProductsPage.module.css';
 
 const AdminProductsPage = () => {
+  const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -71,6 +73,10 @@ const AdminProductsPage = () => {
   const handleOpenEditModal = (product: Product) => {
     setEditingProduct(product);
     setIsModalOpen(true);
+  };
+
+  const handleViewDetails = (productId: string) => {
+    navigate(`/admin/products/${productId}`);
   };
 
   const handleCloseModal = () => {
@@ -283,6 +289,13 @@ const AdminProductsPage = () => {
                   <td>{getAvailabilityBadge(product.is_available)}</td>
                   <td>
                     <div className={styles.actions}>
+                      <Button 
+                        variant="primary" 
+                        size="sm"
+                        onClick={() => handleViewDetails(product._id)}
+                      >
+                        View
+                      </Button>
                       <Button 
                         variant="secondary" 
                         size="sm"
