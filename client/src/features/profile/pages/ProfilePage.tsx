@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { usersApi, User, UpdateProfileData } from '@/services/api/usersApi';
 import { LoadingSpinner } from '@/shared/components/LoadingSpinner';
 import { Button } from '@/shared/components/Button';
 import { Input } from '@/shared/components/Input';
+import { Modal } from '@/shared/components/Modal';
 import { useAuthStore } from '@/store/authStore';
 import styles from './ProfilePage.module.css';
 
 const ProfilePage = () => {
+  const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -19,7 +22,9 @@ const ProfilePage = () => {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [updateLoading, setUpdateLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const { setAuth, user: authUser, accessToken, refreshToken } = useAuthStore();
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const { setAuth, user: authUser, accessToken, refreshToken, clearAuth } = useAuthStore();
 
   useEffect(() => {
     fetchUserProfile();
@@ -158,6 +163,24 @@ const ProfilePage = () => {
       setError(err.response?.data?.message || 'Failed to update profile');
     } finally {
       setUpdateLoading(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    try {
+      setDeleteLoading(true);
+      setError(null);
+      
+      await usersApi.deleteMyAccount();
+      
+      // Clear auth and redirect to auth page
+      clearAuth();
+      navigate('/auth', { replace: true });
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to delete account');
+      setShowDeleteModal(false);
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -331,6 +354,66 @@ const ProfilePage = () => {
           </div>
         </div>
       )}
+
+      {/* Danger Zone - Delete Account */}
+      {!isEditing && (
+        <div className={`${styles.card} ${styles.dangerZone}`}>
+          <div className={styles.section}>
+            <h2 className={styles.dangerTitle}>Danger Zone</h2>
+            <p className={styles.dangerDescription}>
+              Once you delete your account, there is no going back. This action cannot be undone.
+            </p>
+            <Button 
+              variant="danger" 
+              onClick={() => setShowDeleteModal(true)}
+            >
+              Delete My Account
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={showDeleteModal}
+        onClose={() => !deleteLoading && setShowDeleteModal(false)}
+        title="Delete Account"
+      >
+        <div className={styles.modalContent}>
+          <p className={styles.modalWarning}>
+            ⚠️ This action is permanent and cannot be undone!
+          </p>
+          <p className={styles.modalText}>
+            Are you sure you want to delete your account? All your data including:
+          </p>
+          <ul className={styles.modalList}>
+            <li>Personal information</li>
+            <li>Order history</li>
+            <li>Reservations</li>
+            <li>Cart items</li>
+          </ul>
+          <p className={styles.modalText}>
+            will be permanently deleted.
+          </p>
+          
+          <div className={styles.modalActions}>
+            <Button
+              variant="secondary"
+              onClick={() => setShowDeleteModal(false)}
+              disabled={deleteLoading}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="danger"
+              onClick={handleDeleteAccount}
+              isLoading={deleteLoading}
+            >
+              {deleteLoading ? 'Deleting...' : 'Yes, Delete My Account'}
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

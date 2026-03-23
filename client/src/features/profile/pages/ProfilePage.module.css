@@ -161,3 +161,72 @@
     width: 100%;
   }
 }
+
+/* Danger Zone */
+.dangerZone {
+  border: 2px solid #ffebee;
+  margin-top: 2rem;
+}
+
+.dangerTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #d32f2f;
+  margin: 0 0 1rem 0;
+}
+
+.dangerDescription {
+  color: #666;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+/* Modal Content */
+.modalContent {
+  padding: 1rem 0;
+}
+
+.modalWarning {
+  background-color: #fff3e0;
+  color: #e65100;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+.modalText {
+  color: #333;
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.modalList {
+  margin: 1rem 0 1.5rem 1.5rem;
+  color: #666;
+}
+
+.modalList li {
+  margin-bottom: 0.5rem;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+@media (max-width: 768px) {
+  .modalActions {
+    flex-direction: column-reverse;
+  }
+
+  .modalActions button {
+    width: 100%;
+  }
+}

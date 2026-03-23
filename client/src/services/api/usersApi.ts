@@ -61,6 +61,17 @@ export const usersApi = {
     }
   },
 
+  deleteMyAccount: async (): Promise<void> => {
+    console.log('🗑️  [USERS API] Deleting account');
+    try {
+      await apiClient.delete<ApiResponse<any>>('/users/me');
+      console.log('✅ [USERS API] Account deleted successfully');
+    } catch (error) {
+      console.error('❌ [USERS API] Failed to delete account');
+      throw error;
+    }
+  },
+
   /**
    * Get all users (admin only)
    */
