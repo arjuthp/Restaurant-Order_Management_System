@@ -34,6 +34,17 @@ This spec defines the complete integration of a React frontend with the existing
 
 ---
 
+## 🔧 PROJECT CONFIGURATION
+
+### Development Ports
+- **Frontend (Vite):** http://localhost:3000 (configured in `client/vite.config.ts`)
+- **Backend (Express):** http://localhost:5000 (configured in `src/server.js`)
+- **MongoDB:** mongodb://localhost:27017
+
+**⚠️ IMPORTANT:** Frontend runs on port **3000**, NOT Vite's default port 5173. Always use `http://localhost:3000` for CORS and frontend URL configurations.
+
+---
+
 ## 🎯 BUSINESS GOALS
 
 ### Primary Goals

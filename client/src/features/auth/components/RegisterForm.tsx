@@ -120,10 +120,16 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
         phone: phone.replace(/[\s\-\(\)]/g, '') || undefined,
         address: address.trim() || undefined
       });
-      setAuth(response.user, response.accessToken, response.refreshToken);
-      onSuccess(response.user.role);
+      setAuth(response.data.user, response.data.accessToken, response.data.refreshToken);
+      onSuccess(response.data.user.role);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Registration failed. Please try again.';
+      console.log('Registration error:', err);
+      console.log('Error response:', err.response);
+      console.log('Error data:', err.response?.data);
+      
+      const errorMessage = err.response?.data?.error?.message || err.response?.data?.message || 'Registration failed. Please try again.';
+      console.log('Extracted error message:', errorMessage);
+      
       // Check for duplicate email error
       if (errorMessage.toLowerCase().includes('email') && errorMessage.toLowerCase().includes('exist')) {
         setError('An account with this email already exists. Please use a different email or sign in.');

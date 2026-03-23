@@ -45,12 +45,26 @@ class AuthService {
     }
 
     async _storeRefreshToken(userId, refreshToken) {
-        await RefreshToken.create({
-            user_id: userId,
-            token: refreshToken,
-            expiresAt: new Date(Date.now() + this.tokenExpire)
-
-        });
+        try {
+            // Try to create the refresh token
+            await RefreshToken.create({
+                user_id: userId,
+                token: refreshToken,
+                expiresAt: new Date(Date.now() + this.tokenExpire)
+            });
+        } catch (error) {
+            // If duplicate key error, delete old tokens and retry
+            if (error.code === 11000) {
+                await RefreshToken.deleteMany({ user_id: userId });
+                await RefreshToken.create({
+                    user_id: userId,
+                    token: refreshToken,
+                    expiresAt: new Date(Date.now() + this.tokenExpire)
+                });
+            } else {
+                throw error;
+            }
+        }
     }
 
     _formatUserResponse(user) {

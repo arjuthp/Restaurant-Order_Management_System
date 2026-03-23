@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { productsApi, Product } from '@/services/api/productsApi';
+import { productsApi, Product, PaginationMetadata } from '@/services/api/productsApi';
 import { useCartStore } from '@/store/cartStore';
 import { LoadingSpinner } from '@/shared/components/LoadingSpinner';
 import { Button } from '@/shared/components/Button';
+import { Pagination } from '@/shared/components/Pagination';
 import styles from './ProductsPage.module.css';
 
 const ProductsPage = () => {
@@ -11,19 +12,79 @@ const ProductsPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [showOnlyAvailable, setShowOnlyAvailable] = useState(false);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState<PaginationMetadata>({
+    currentPage: 1,
+    totalPages: 1,
+    totalItems: 0,
+    itemsPerPage: 12,
+  });
   const addItem = useCartStore((state) => state.addItem);
+
+  // Debounce search query
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearchQuery, selectedCategory, showOnlyAvailable]);
 
   useEffect(() => {
     loadProducts();
-  }, []);
+  }, [debouncedSearchQuery, selectedCategory, showOnlyAvailable, currentPage]);
 
   const loadProducts = async () => {
     try {
       setIsLoading(true);
-      const response = await productsApi.getAll();
+      const params: { 
+        search?: string; 
+        category?: string; 
+        available?: boolean;
+        page?: number;
+        limit?: number;
+      } = {
+        page: currentPage,
+        limit: 12,
+      };
+      
+      if (debouncedSearchQuery) {
+        params.search = debouncedSearchQuery;
+      }
+      
+      if (selectedCategory && selectedCategory !== 'all') {
+        params.category = selectedCategory;
+      }
+      
+      if (showOnlyAvailable) {
+        params.available = true;
+      }
+      
+      const response = await productsApi.getAll(params);
+      
       // Filter out deleted products
-      const activeProducts = response.filter((product) => !product.is_deleted);
+      const activeProducts = response.products.filter((product) => !product.is_deleted);
       setProducts(activeProducts);
+      setPagination(response.pagination);
+      
+      // Extract unique categories from all products (only on first load or when filters change)
+      if (currentPage === 1) {
+        const uniqueCategories = Array.from(
+          new Set(activeProducts.map((product) => product.category))
+        ).sort();
+        setCategories(uniqueCategories);
+      }
+      
       setError('');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to load products');
@@ -32,18 +93,29 @@ const ProductsPage = () => {
     }
   };
 
-  const handleAddToCart = (product: Product) => {
-    addItem({
-      productId: product._id,
-      name: product.name,
-      price: product.price,
-      quantity: 1,
-      image_url: product.image_url,
-    });
+  const handleAddToCart = async (product: Product) => {
+    try {
+      await addItem({
+        productId: product._id,
+        name: product.name,
+        price: product.price,
+        quantity: 1,
+        image_url: product.image_url,
+      });
+      // Success - item added to cart (both local and backend)
+    } catch (err) {
+      console.error('Failed to add item to cart:', err);
+      // Item is still added locally, sync will happen on checkout
+    }
   };
 
   const handleProductClick = (productId: string) => {
     navigate(`/products/${productId}`);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   if (isLoading) {
@@ -61,12 +133,92 @@ const ProductsPage = () => {
   if (products.length === 0) {
     return (
       <div className={styles.container}>
+        <h1 className={styles.title}>Our Menu</h1>
+        
+        {/* Search and Filter Bar */}
+        <div className={styles.filtersContainer}>
+          <div className={styles.searchContainer}>
+            <div className={styles.searchWrapper}>
+              <span className={styles.searchIcon}>🔍</span>
+              <input
+                type="text"
+                placeholder="Search for dishes..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className={styles.searchInput}
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className={styles.clearButton}
+                  aria-label="Clear search"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+          </div>
+          
+          {/* Category Filter */}
+          {categories.length > 0 && (
+            <div className={styles.categoryFilter}>
+              <label htmlFor="category-select" className={styles.filterLabel}>
+                Category:
+              </label>
+              <select
+                id="category-select"
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className={`${styles.categorySelect} ${selectedCategory !== 'all' ? styles.activeFilter : ''}`}
+              >
+                <option value="all">All Categories</option>
+                {categories.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+          
+          {/* Availability Filter */}
+          <div className={styles.availabilityFilter}>
+            <label className={styles.checkboxLabel}>
+              <input
+                type="checkbox"
+                checked={showOnlyAvailable}
+                onChange={(e) => setShowOnlyAvailable(e.target.checked)}
+                className={styles.checkbox}
+              />
+              <span>Show only available</span>
+            </label>
+          </div>
+        </div>
+        
         <div className={styles.emptyState}>
-          <div className={styles.emptyIcon}>🍽️</div>
-          <h2 className={styles.emptyTitle}>No Products Available</h2>
+          <div className={styles.emptyIcon}>
+            {debouncedSearchQuery || selectedCategory !== 'all' || showOnlyAvailable ? '🔍' : '🍽️'}
+          </div>
+          <h2 className={styles.emptyTitle}>
+            {debouncedSearchQuery || selectedCategory !== 'all' || showOnlyAvailable ? 'No Results Found' : 'No Products Available'}
+          </h2>
           <p className={styles.emptyText}>
-            Check back later for delicious menu items!
+            {debouncedSearchQuery || selectedCategory !== 'all' || showOnlyAvailable
+              ? `No products match your filters. Try adjusting your search or category.`
+              : 'Check back later for delicious menu items!'}
           </p>
+          {(debouncedSearchQuery || selectedCategory !== 'all' || showOnlyAvailable) && (
+            <Button 
+              onClick={() => {
+                setSearchQuery('');
+                setSelectedCategory('all');
+                setShowOnlyAvailable(false);
+              }} 
+              style={{ marginTop: '1rem' }}
+            >
+              Clear Filters
+            </Button>
+          )}
         </div>
       </div>
     );
@@ -75,6 +227,66 @@ const ProductsPage = () => {
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>Our Menu</h1>
+      
+      {/* Search and Filter Bar */}
+      <div className={styles.filtersContainer}>
+        <div className={styles.searchContainer}>
+          <div className={styles.searchWrapper}>
+            <span className={styles.searchIcon}>🔍</span>
+            <input
+              type="text"
+              placeholder="Search for dishes..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className={styles.searchInput}
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className={styles.clearButton}
+                aria-label="Clear search"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+        </div>
+        
+        {/* Category Filter */}
+        {categories.length > 0 && (
+          <div className={styles.categoryFilter}>
+            <label htmlFor="category-select" className={styles.filterLabel}>
+              Category:
+            </label>
+            <select
+              id="category-select"
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className={`${styles.categorySelect} ${selectedCategory !== 'all' ? styles.activeFilter : ''}`}
+            >
+              <option value="all">All Categories</option>
+              {categories.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+        
+        {/* Availability Filter */}
+        <div className={styles.availabilityFilter}>
+          <label className={styles.checkboxLabel}>
+            <input
+              type="checkbox"
+              checked={showOnlyAvailable}
+              onChange={(e) => setShowOnlyAvailable(e.target.checked)}
+              className={styles.checkbox}
+            />
+            <span>Show only available</span>
+          </label>
+        </div>
+      </div>
       
       <div className={styles.grid}>
         {products.map((product) => (
@@ -131,6 +343,14 @@ const ProductsPage = () => {
           </div>
         ))}
       </div>
+
+      {/* Pagination */}
+      <Pagination
+        currentPage={pagination.currentPage}
+        totalPages={pagination.totalPages}
+        totalItems={pagination.totalItems}
+        onPageChange={handlePageChange}
+      />
     </div>
   );
 };

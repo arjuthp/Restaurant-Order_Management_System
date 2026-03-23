@@ -1,4 +1,5 @@
 const tableService = require('../service/table.service');
+const { successResponse, errorResponse } = require('../utils/responseFormatter');
 
 class TableController {
 
@@ -7,16 +8,10 @@ class TableController {
     try{
       const tableData = req.body;
       const table = await tableService.createTable(tableData);
-      res.status(201).json({
-        success: true,
-        message: 'Table created successfully',
-        data: table
-      });
+      res.status(201).json(successResponse(table, 'Table created successfully'));
     }catch(error){
-      res.status(400).json({
-        success: false,
-        message: error.message
-      });
+      const status = error.status || 400;
+      res.status(status).json(errorResponse(error.message, status));
     }
   }
 
@@ -24,16 +19,10 @@ class TableController {
   async getAllTables(req, res){
     try{
       const tables = await tableService.getAllTables();
-      res.status(200).json({
-        success: true,
-        count: tables.length,
-        data: tables
-      });
+      res.status(200).json(successResponse(tables));
     }catch(error){
-        res.status(500).json({
-            success: false,
-            message: error.message
-        });
+      const status = error.status || 500;
+      res.status(status).json(errorResponse(error.message, status));
     }
   }
 
@@ -42,15 +31,10 @@ class TableController {
     try{
         const { id } = req.params;
         const table = await tableService.getTableById(id);
-        res.status(200).json({
-            success: true,
-            data: table
-        });
+        res.status(200).json(successResponse(table));
     }catch(error){
-        res.status(404).json({
-            success: false,
-            message: error.message
-        });
+        const status = error.status || 404;
+        res.status(status).json(errorResponse(error.message, status));
     }
   }
 
@@ -60,16 +44,10 @@ class TableController {
         const {id} = req.params;
         const updateData = req.body;
         const table = await tableService.updateTable(id, updateData);
-        res.status(200).json({
-            success: true,
-            message: 'Table updated successfully',
-            data: table
-        });
+        res.status(200).json(successResponse(table, 'Table updated successfully'));
     }catch(error){
-        res.status(400).json({
-            success: false,
-            message: error.message
-        });
+        const status = error.status || 400;
+        res.status(status).json(errorResponse(error.message, status));
     }
   }
 
@@ -78,15 +56,10 @@ class TableController {
     try{
         const { id } = req.params;
         const result = await tableService.deleteTable(id);
-        res.status(200).json({
-            success: true,
-            message: result.message
-        });
+        res.status(200).json(successResponse(result, result.message || 'Table deleted successfully'));
     }catch(error){
-        res.status(404).json({
-            success: false,
-            message: error.message
-        });
+        const status = error.status || 404;
+        res.status(status).json(errorResponse(error.message, status));
     }
   }
 

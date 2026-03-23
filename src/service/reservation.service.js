@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const Reservation = require('../models/reservation.model');
 const Table = require('../models/table.model');
+const { calculatePagination } = require('../utils/paginationHelper');
+const { buildReservationFilters } = require('../utils/searchFilterHelper');
 
 class ReservationService {
     //method 1: create reservation (without transaction for standalone MongoDB)
@@ -40,11 +42,33 @@ class ReservationService {
     }
 
     //Method 2: Get users reservation
-    async getMyReservations(userId){
-        const reservations = await Reservation.find({user: userId})
-        .populate('table', 'tableNumber capacity location')
-        .sort({date: -1, timeSlot: -1}); //newest first
-        return reservations;
+    async getMyReservations(userId, queryParams = {}){
+        // STEP 1: Build base filter with userId
+        const filter = { user: userId };
+        
+        // STEP 2: Add additional filters (date, status)
+        const additionalFilters = buildReservationFilters(queryParams);
+        Object.assign(filter, additionalFilters);
+        
+        // STEP 3: Count matching reservations
+        const totalItems = await Reservation.countDocuments(filter);
+        
+        // STEP 4: Calculate pagination
+        const page = queryParams.page || 1;
+        const limit = queryParams.limit || 10;
+        const { skip, pagination } = calculatePagination(page, limit, totalItems);
+        
+        // STEP 5: Query with filter + pagination
+        const reservations = await Reservation.find(filter)
+            .populate('table', 'tableNumber capacity location')
+            .sort({ date: -1, timeSlot: -1 })
+            .skip(skip)
+            .limit(pagination.itemsPerPage);
+        
+        return {
+            reservations,
+            pagination
+        };
     }
 
     //Method 3: Get single reservation by ID
@@ -107,23 +131,31 @@ class ReservationService {
     }
 
     //Method 6: Get all reservations(Admins only)
-    async getAllReservations(filters = {}){
-        const query = {};
+    async getAllReservations(queryParams = {}){
+        // STEP 1: Build filter
+        const filter = buildReservationFilters(queryParams);
+        console.log('Reservation filter:', filter);
 
-        //apply filters if provided
-        if(filters.date){
-            query.date = filters.date;
-        }
-        if(filters.status){
-            query.status = filters.status;
-        }
+        // STEP 2: Count matching reservations
+        const totalItems = await Reservation.countDocuments(filter);
+        
+        // STEP 3: Calculate pagination
+        const page = queryParams.page || 1;
+        const limit = queryParams.limit || 10;
+        const { skip, pagination } = calculatePagination(page, limit, totalItems);
 
-        const reservations = await Reservation.find(query)
-        .populate('user', 'name email phone')
-        .populate('table', 'tableNumber capacity location')
-        .sort({date: -1, timeSlot: -1});
+        // STEP 4: Query with filter + pagination
+        const reservations = await Reservation.find(filter)
+            .populate('user', 'name email phone')
+            .populate('table', 'tableNumber capacity location')
+            .sort({ date: -1, timeSlot: -1 })
+            .skip(skip)
+            .limit(pagination.itemsPerPage);
 
-        return reservations;
+        return {
+            reservations,
+            pagination
+        };
     }
 
     //Method 7: Update reservation status(Admin only)

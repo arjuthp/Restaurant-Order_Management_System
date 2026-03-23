@@ -1,4 +1,5 @@
 const reservationService = require('../service/reservation.service');
+const { successResponse, errorResponse } = require('../utils/responseFormatter');
 
 class ReservationController {
 
@@ -18,17 +19,11 @@ class ReservationController {
       // Service will use TRANSACTION to prevent double booking
       const reservation = await reservationService.createReservation(reservationData);
       // Step 3: Send success response with 201 (Created) status
-      res.status(201).json({
-        success: true,
-        message: 'Reservation created successfully',
-        data: reservation
-      });
+      res.status(201).json(successResponse(reservation, 'Reservation created successfully'));
     }catch(error){
       // Step 4: If error (table already booked, validation failed, etc.)
-      res.status(400).json({
-        success: false,
-        message: error.message
-      });
+      const status = error.status || 400;
+      res.status(status).json(errorResponse(error.message, status));
     }
   }
 
@@ -37,27 +32,20 @@ class ReservationController {
 
   async getMyReservations(req, res){
     try{
-
       //1. Get logged-in users ID from auth middleware
       const userId = req.user.id;
+      
+      //2. Pass userId and query params to service
+      const result = await reservationService.getMyReservations(userId, req.query);
 
-      //2. Fetch all reservations for this user
-      //Service will populate table details and sort by date
-      const reservations = await reservationService.getMyReservations(userId);
-
-      //3.Send success response with count and data
-      res.status(200).json({
-        success: true, 
-        count: reservations.length,
-        data: reservations
-      });
+      //3. Send success response with pagination
+      res.status(200).json(
+        successResponse(result.reservations, null, result.pagination)
+      );
     }catch(error){
       //4. if db error, send internal server error
-
-      res.status(500).json({
-        success: false,
-        message: error.message
-      });
+      const status = error.status || 500;
+      res.status(status).json(errorResponse(error.message, status));
     }
   }
 
@@ -75,23 +63,15 @@ class ReservationController {
       //3. AUTHORIZATION CHECK - Ensure user owns this reservation
       //COmpare reservations user ID with logged in users ID
       if(reservation.user._id.toString() !== req.user.id.toString()){
-        return res.status(403).json({
-          success:false,
-          message: 'You can only view your own reservations'
-        });
+        return res.status(403).json(errorResponse('You can only view your own reservations', 403));
       }
 
       //Step4: User owns it , send reservation details
-      res.status(200).json({
-        success: true,
-        data: reservation
-      });
+      res.status(200).json(successResponse(reservation));
     }catch(error){
       //5. if reservation not found 
-      res.status(404).json({
-        success: false,
-        message: error.message
-      });
+      const status = error.status || 404;
+      res.status(status).json(errorResponse(error.message, status));
     }
   }
 
@@ -110,17 +90,11 @@ class ReservationController {
       const reservation = await reservationService.cancelReservation(id, userId);
 
       //3. Send success response
-      res.status(200).json({
-        success: true,
-        message: 'Reservation cancelled successfully',
-        data: reservation
-      });
+      res.status(200).json(successResponse(reservation, 'Reservation cancelled successfully'));
     }catch(error){
       //4. if error 
-      res.status(400).json({
-        success: false,
-        message: error.message
-      });
+      const status = error.status || 400;
+      res.status(status).json(errorResponse(error.message, status));
     }
   }
 
@@ -133,10 +107,7 @@ class ReservationController {
       const  {date, timeSlot, numberOfGuests } = req.query;
       //2. Validation- ensure all required parameters provided
       if(!date || !timeSlot || !numberOfGuests){
-        return res.status(400).json({
-          success: false,
-          message: 'Please provide date, timeSlot, and numberOfGuests'
-        });
+        return res.status(400).json(errorResponse('Please provide date, timeSlot, and numberOfGuests', 400));
       }
 
       //3.call service to find available tables
@@ -152,17 +123,11 @@ class ReservationController {
       );
 
       //step 4: Send List of available tables
-       res.status(200).json({
-        success: true,
-        count: availableTables.length,
-        data: availableTables
-       });
+      res.status(200).json(successResponse(availableTables));
     }catch(error){
       //5. If database error
-      res.status(500).json({
-        success: false,
-        message: error.message
-      });
+      const status = error.status || 500;
+      res.status(status).json(errorResponse(error.message, status));
     }
   }
 
@@ -171,27 +136,17 @@ class ReservationController {
   //Flow: Admin requests all bookings -> Apply filters -> Return List
   async getAllReservations(req, res){
     try {
-      //1.build filters object from query parameters
-      const filters = {
-        date: req.query.date, //filter by date
-        status: req.query.status //filter by status
-      };
-      //2.Fetch all reservations with optional filters
-      //service will populate user and table details
-      const reservations = await reservationService.getAllReservations(filters);
+      //1. Pass entire query object to service
+      const result = await reservationService.getAllReservations(req.query);
 
-      //3. Send complete list to admin
-      res.status(200).json({
-        success: true,
-        count: reservations.length,
-        data: reservations
-      });
+      //2. Send response with pagination
+      res.status(200).json(
+        successResponse(result.reservations, null, result.pagination)
+      );
     } catch (error) {
-      //4. if db error
-      res.status(500).json({
-        success: false,
-        message: error.message
-      });
+      //3. If db error
+      const status = error.status || 500;
+      res.status(status).json(errorResponse(error.message, status));
     }
   }
 
@@ -205,27 +160,18 @@ class ReservationController {
 
       //2.Validation-> Ensure status is provided
       if(!status){
-        return res.status(400).json({
-          success: false,
-          message: 'Status is required'
-        });
+        return res.status(400).json(errorResponse('Status is required', 400));
       }
 
       //3.Call services to update status
       const reservation = await reservationService.updateReservationStatus(id, status);
 
       //4. send updated reservation
-      res.status(200).json({
-        success: true,
-        message: 'Reservation status updated successfully',
-        data: reservation
-      });
+      res.status(200).json(successResponse(reservation, 'Reservation status updated successfully'));
     } catch (error) {
       //5. if error
-      res.status(400).json({
-        success: false,
-        message: error.message
-      });
+      const status = error.status || 400;
+      res.status(status).json(errorResponse(error.message, status));
     }
   }
 

@@ -9,6 +9,16 @@ class CartService {
         if(!cart){
             cart = await Cart.create({ user_id: userId,items: [] });
         }
+        
+        // Filter out items where product no longer exists
+        if(cart.items && cart.items.length > 0){
+            const validItems = cart.items.filter(item => item.product_id !== null);
+            if(validItems.length !== cart.items.length){
+                cart.items = validItems;
+                await cart.save();
+            }
+        }
+        
         return cart;
     }
 
@@ -49,7 +59,7 @@ class CartService {
         const cart = await this.getCart(userId);
 
         const itemIndex = cart.items.findIndex(
-            item => item.product_id._id.toString() === productId
+            item => item.product_id && item.product_id._id.toString() === productId
         );
 
         if(itemIndex === -1){
@@ -59,6 +69,10 @@ class CartService {
         if(quantity <= 0){
             cart.items.splice(itemIndex, 1);
         } else {
+            // Check if product still exists
+            if(!cart.items[itemIndex].product_id){
+                throw {status: 404, message: 'Product no longer exists'};
+            }
             cart.items[itemIndex].quantity = quantity;
             const basePrice = cart.items[itemIndex].product_id.price;
             cart.items[itemIndex].unit_price = basePrice * quantity;
@@ -72,7 +86,7 @@ class CartService {
         const cart = await this.getCart(userId);
 
         cart.items = cart.items.filter(
-            item => item.product_id._id.toString() !== productId
+            item => item.product_id && item.product_id._id.toString() !== productId
         );
         await cart.save();
         return await Cart.findOne({user_id:userId}).populate('items.product_id');

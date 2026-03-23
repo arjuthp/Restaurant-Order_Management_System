@@ -59,16 +59,16 @@ export const AdminLoginForm = ({ onSuccess }: AdminLoginFormProps) => {
       const response = await authApi.adminLogin({ email, password });
       
       // Verify the user has admin role
-      if (response.user.role !== 'admin') {
+      if (response.data.user.role !== 'admin') {
         setError('Access denied. Admin credentials required.');
         setIsLoading(false);
         return;
       }
       
-      setAuth(response.user, response.accessToken, response.refreshToken);
+      setAuth(response.data.user, response.data.accessToken, response.data.refreshToken);
       onSuccess();
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Login failed. Please check your credentials.';
+      const errorMessage = err.response?.data?.error?.message || err.response?.data?.message || 'Login failed. Please check your credentials.';
       setError(errorMessage);
     } finally {
       setIsLoading(false);

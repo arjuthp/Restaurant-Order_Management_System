@@ -1,14 +1,28 @@
 const User = require('../models/user.model');
 const AuthService = require('./auth.service');
+const { calculatePagination } = require('../utils/paginationHelper');
 
 class UserService {
     constructor(){
         this.authService = new AuthService();
     }
 
-    async getAllUsers(){
-        const users = await User.find().select('-password');
-        return users.map(user => this.authService._formatUserResponse(user));
+    async getAllUsers(page = 1, limit = 10){
+        //count toal no of users
+        const totalItems = await User.countDocuments({});
+        //calculate pagination
+        const { skip, pagination } = calculatePagination(page, limit, totalItems);
+        //get paginated users
+        
+        const users = await User.find()
+        .select('-password')
+        .skip(skip)
+        .limit(limit);
+        //format users and return with pagination
+        return {
+            users: users.map(user => this.authService._formatUserResponse(user)),
+            pagination
+        };
     }
 
     async getUserById(userId) {

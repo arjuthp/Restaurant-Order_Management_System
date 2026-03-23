@@ -33,6 +33,12 @@ const DashboardPage = () => {
           <h2>Shopping Cart</h2>
           <p>Review your items</p>
         </Link>
+
+        <Link to="/profile" className={styles.card}>
+          <div className={styles.icon}>👤</div>
+          <h2>My Profile</h2>
+          <p>View and edit your information</p>
+        </Link>
       </div>
     </div>
   );

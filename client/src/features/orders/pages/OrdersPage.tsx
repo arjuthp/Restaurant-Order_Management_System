@@ -2,37 +2,64 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ordersApi } from '@/services/api/ordersApi';
 import { LoadingSpinner } from '@/shared/components/LoadingSpinner';
+import { Pagination } from '@/shared/components/Pagination';
 import { formatDateTime, formatCurrency } from '@/shared/utils/formatters';
 import styles from './OrdersPage.module.css';
 
 // Order type is defined in ordersApi.ts
-type Order = Awaited<ReturnType<typeof ordersApi.getMyOrders>>[number];
+type Order = Awaited<ReturnType<typeof ordersApi.getMyOrders>>['orders'][number];
+
+interface PaginationMetadata {
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+  itemsPerPage: number;
+}
 
 const OrdersPage = () => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [pagination, setPagination] = useState<PaginationMetadata>({
+    currentPage: 1,
+    totalPages: 1,
+    totalItems: 0,
+    itemsPerPage: 10,
+  });
 
   useEffect(() => {
-    loadOrders();
-  }, []);
+    loadOrders(pagination.currentPage, statusFilter);
+  }, [statusFilter]);
 
-  const loadOrders = async () => {
+  const loadOrders = async (page: number = 1, status?: string) => {
     try {
       setIsLoading(true);
-      const response = await ordersApi.getMyOrders();
-      // Sort by date (newest first)
-      const sortedOrders = response.sort((a, b) => 
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
-      setOrders(sortedOrders);
+      const params: { page: number; limit: number; status?: string } = { page, limit: 10 };
+      if (status && status !== 'all') {
+        params.status = status;
+      }
+      const response = await ordersApi.getMyOrders(params);
+      setOrders(response.orders);
+      setPagination(response.pagination);
       setError('');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to load orders');
+      setError(err.response?.data?.error?.message || 'Failed to load orders');
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handlePageChange = (page: number) => {
+    setPagination((prev) => ({ ...prev, currentPage: page }));
+    loadOrders(page, statusFilter);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleStatusFilterChange = (status: string) => {
+    setStatusFilter(status);
+    setPagination((prev) => ({ ...prev, currentPage: 1 }));
   };
 
   const getStatusColor = (status: string): string => {
@@ -88,6 +115,25 @@ const OrdersPage = () => {
     <div className={styles.container}>
       <h1 className={styles.title}>My Orders</h1>
       
+      <div className={styles.filterContainer}>
+        <label htmlFor="status-filter" className={styles.filterLabel}>
+          Filter by Status:
+        </label>
+        <select
+          id="status-filter"
+          className={styles.filterDropdown}
+          value={statusFilter}
+          onChange={(e) => handleStatusFilterChange(e.target.value)}
+        >
+          <option value="all">All Orders</option>
+          <option value="pending">Pending</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="preparing">Preparing</option>
+          <option value="delivered">Delivered</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+
       <div className={styles.ordersList}>
         {orders.map((order) => (
           <div
@@ -120,6 +166,15 @@ const OrdersPage = () => {
           </div>
         ))}
       </div>
+
+      {pagination.totalPages > 1 && (
+        <Pagination
+          currentPage={pagination.currentPage}
+          totalPages={pagination.totalPages}
+          totalItems={pagination.totalItems}
+          onPageChange={handlePageChange}
+        />
+      )}
     </div>
   );
 };

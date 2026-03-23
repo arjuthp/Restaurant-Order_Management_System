@@ -13,6 +13,7 @@ const ProductDetailPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [quantity, setQuantity] = useState(1);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
   const addItem = useCartStore((state) => state.addItem);
 
   useEffect(() => {
@@ -40,17 +41,27 @@ const ProductDetailPage = () => {
     }
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (product && product.is_available) {
-      addItem({
-        productId: product._id,
-        name: product.name,
-        price: product.price,
-        quantity,
-        image_url: product.image_url,
-      });
-      // Optional: Show success message or navigate
-      navigate('/products');
+      setIsAddingToCart(true);
+      try {
+        await addItem({
+          productId: product._id,
+          name: product.name,
+          price: product.price,
+          quantity,
+          image_url: product.image_url,
+        });
+        // Navigate back to products on success
+        navigate('/products');
+      } catch (err) {
+        console.error('Failed to add item to cart:', err);
+        // Item is still added locally, just show a subtle warning
+        // User can still proceed, sync will happen on checkout
+        navigate('/products');
+      } finally {
+        setIsAddingToCart(false);
+      }
     }
   };
 
@@ -139,11 +150,11 @@ const ProductDetailPage = () => {
 
             <Button
               onClick={handleAddToCart}
-              disabled={!product.is_available}
+              disabled={!product.is_available || isAddingToCart}
               size="lg"
               className={styles.addToCartButton}
             >
-              {product.is_available ? 'Add to Cart' : 'Unavailable'}
+              {isAddingToCart ? 'Adding...' : product.is_available ? 'Add to Cart' : 'Unavailable'}
             </Button>
           </div>
         </div>

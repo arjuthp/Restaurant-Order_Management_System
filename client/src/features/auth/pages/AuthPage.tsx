@@ -21,9 +21,9 @@ const AuthPage = () => {
     
     // Otherwise, redirect based on user role
     if (userRole === 'admin') {
-      navigate('/dashboard', { replace: true });
+      navigate('/admin/dashboard', { replace: true }); // Admin goes to admin dashboard
     } else {
-      navigate('/products', { replace: true }); // Home page for customers is the products page
+      navigate('/dashboard', { replace: true }); // Customer goes to customer dashboard
     }
   };
 

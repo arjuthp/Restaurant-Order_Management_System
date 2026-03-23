@@ -22,6 +22,25 @@
   font-weight: 700;
   color: var(--color-primary);
   text-decoration: none;
+  white-space: nowrap;
+}
+
+.mobileMenuButton {
+  display: none;
+  flex-direction: column;
+  gap: 0.25rem;
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+}
+
+.hamburger {
+  display: block;
+  width: 1.5rem;
+  height: 2px;
+  background-color: var(--color-text);
+  transition: var(--transition);
 }
 
 .nav {
@@ -37,6 +56,7 @@
   transition: var(--transition);
   padding: 0.5rem 0;
   border-bottom: 2px solid transparent;
+  white-space: nowrap;
 }
 
 .navLink:hover {
@@ -90,13 +110,67 @@
 @media (max-width: 768px) {
   .container {
     padding: 1rem;
+    flex-wrap: wrap;
+    position: relative;
+  }
+
+  .logo {
+    font-size: 1.25rem;
+  }
+
+  .mobileMenuButton {
+    display: flex;
+    order: 2;
   }
 
   .nav {
-    gap: 1rem;
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: var(--color-bg);
+    flex-direction: column;
+    gap: 0;
+    padding: 1rem;
+    box-shadow: var(--shadow-md);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .navOpen {
+    display: flex;
+  }
+
+  .navLink {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .navLink:last-child {
+    border-bottom: none;
+  }
+
+  .actions {
+    order: 3;
+    gap: 0.5rem;
   }
 
   .userName {
     display: none;
   }
+
+  .cartButton {
+    font-size: 1.25rem;
+  }
 }
+
+@media (max-width: 480px) {
+  .logo {
+    font-size: 1rem;
+  }
+
+  .actions {
+    gap: 0.25rem;
+  }
+}
+

@@ -25,14 +25,22 @@ export const useAuthStore = create<AuthState>()(
       refreshToken: null,
       isAuthenticated: false,
       setAuth: (user, accessToken, refreshToken) => {
+        console.log('🔐 [AUTH] Setting authentication:', {
+          user: { name: user.name, email: user.email, role: user.role },
+          hasAccessToken: !!accessToken,
+          hasRefreshToken: !!refreshToken
+        });
         localStorage.setItem('accessToken', accessToken);
         localStorage.setItem('refreshToken', refreshToken);
         set({ user, accessToken, refreshToken, isAuthenticated: true });
+        console.log('✅ [AUTH] Authentication set successfully');
       },
       clearAuth: () => {
+        console.log('🚪 [AUTH] Clearing authentication');
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         set({ user: null, accessToken: null, refreshToken: null, isAuthenticated: false });
+        console.log('✅ [AUTH] Authentication cleared');
       },
     }),
     {

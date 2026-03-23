@@ -57,10 +57,17 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
 
     try {
       const response = await authApi.login({ email, password });
-      setAuth(response.user, response.accessToken, response.refreshToken);
-      onSuccess(response.user.role);
+      setAuth(response.data.user, response.data.accessToken, response.data.refreshToken);
+      onSuccess(response.data.user.role);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Login failed. Please try again.');
+      console.log('Login error:', err);
+      console.log('Error response:', err.response);
+      console.log('Error data:', err.response?.data);
+      
+      const errorMessage = err.response?.data?.error?.message || err.response?.data?.message || 'Login failed. Please try again.';
+      console.log('Extracted error message:', errorMessage);
+      
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }

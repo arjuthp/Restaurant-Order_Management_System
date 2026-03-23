@@ -48,6 +48,41 @@
   display: flex;
   gap: 1.5rem;
   align-items: center;
+  transition: var(--transition);
+}
+
+.itemUnselected {
+  opacity: 0.6;
+  background-color: var(--color-bg-secondary);
+}
+
+.itemCheckbox {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.selectAllBar {
+  background-color: var(--color-bg);
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 1rem;
+}
+
+.selectAllBar label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.selectAllBar input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
 }
 
 .itemImage {

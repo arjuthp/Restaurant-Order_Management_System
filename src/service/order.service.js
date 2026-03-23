@@ -1,6 +1,7 @@
 const Order = require('../models/order.model');
 const Cart = require('../models/cart.model');
 const Reservation = require('../models/reservation.model');
+const { calculatePagination } = require('../utils/paginationHelper');
 
 class OrderService {
     async createOrder(userId,itemsToOrder = null, notes = null){
@@ -59,10 +60,31 @@ class OrderService {
         return await Order.findById(order._id).populate('items.product_id');
     }
 
-    async getMyOrders(userId){
-        const orders = await Order.find({user_id: userId})
-            .sort({ createdAt: -1});//newest to oldest
-        return orders;
+    async getMyOrders(userId, queryParams = {}){
+        // Build filter
+        const filter = { user_id: userId };
+        
+        // Add status filter if provided
+        if(queryParams.status){
+            filter.status = queryParams.status;
+        }
+        
+        // Get total count for pagination
+        const totalOrders = await Order.countDocuments(filter);
+        
+        // Calculate pagination
+        const page = queryParams.page || 1;
+        const limit = queryParams.limit || 10;
+        const { skip, pagination } = calculatePagination(page, limit, totalOrders);
+        
+        // Fetch orders with pagination
+        const orders = await Order.find(filter)
+            .populate('items.product_id', 'name price')
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(pagination.itemsPerPage);
+        
+        return { orders, pagination };
     }
 
     async getOrderById(userId, orderId, userRole){
@@ -79,12 +101,32 @@ class OrderService {
         return order;
     }
 
-    async getAllOrders(){
-        const orders = await Order.find()
+    async getAllOrders(queryParams = {}){
+        // Build filter
+        const filter = {};
+        
+        // Add status filter if provided
+        if(queryParams.status){
+            filter.status = queryParams.status;
+        }
+        
+        // Get total count for pagination
+        const totalOrders = await Order.countDocuments(filter);
+        
+        // Calculate pagination
+        const page = queryParams.page || 1;
+        const limit = queryParams.limit || 10;
+        const { skip, pagination } = calculatePagination(page, limit, totalOrders);
+        
+        // Fetch orders with pagination
+        const orders = await Order.find(filter)
             .populate('user_id', 'name email phone')
-            .populate('items.product_id')
-            .sort({createdAt: -1});
-        return orders;
+            .populate('items.product_id', 'name price')
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(pagination.itemsPerPage);
+        
+        return { orders, pagination };
     }
 
     async updateOrderStatus(orderId, newStatus){
