@@ -3,6 +3,7 @@ import { authApi } from '@/services/api/authApi';
 import { useAuthStore } from '@/store/authStore';
 import { Button } from '@/shared/components/Button';
 import { Input } from '@/shared/components/Input';
+import { PasswordInput } from '@/shared/components/PasswordInput';
 import styles from './AuthForm.module.css';
 
 interface RegisterFormProps {
@@ -179,8 +180,7 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
         placeholder="you@example.com"
       />
 
-      <Input
-        type="password"
+      <PasswordInput
         label="Password"
         value={password}
         onChange={(e) => {

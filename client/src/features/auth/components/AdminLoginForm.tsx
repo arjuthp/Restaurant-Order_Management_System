@@ -3,6 +3,7 @@ import { authApi } from '@/services/api/authApi';
 import { useAuthStore } from '@/store/authStore';
 import { Button } from '@/shared/components/Button';
 import { Input } from '@/shared/components/Input';
+import { PasswordInput } from '@/shared/components/PasswordInput';
 import styles from './AuthForm.module.css';
 
 interface AdminLoginFormProps {
@@ -98,8 +99,7 @@ export const AdminLoginForm = ({ onSuccess }: AdminLoginFormProps) => {
         placeholder="admin@restaurant.com"
       />
 
-      <Input
-        type="password"
+      <PasswordInput
         label="Password"
         value={password}
         onChange={(e) => {
