@@ -80,7 +80,7 @@ const ProductsPage = () => {
       // Extract unique categories from all products (only on first load or when filters change)
       if (currentPage === 1) {
         const uniqueCategories = Array.from(
-          new Set(activeProducts.map((product) => product.category))
+          new Set(activeProducts.map((product) => product.category?.name).filter(Boolean))
         ).sort();
         setCategories(uniqueCategories);
       }
@@ -322,7 +322,7 @@ const ProductsPage = () => {
                 style={{ cursor: 'pointer' }}
               >
                 <h3 className={styles.name}>{product.name}</h3>
-                <span className={styles.category}>{product.category}</span>
+                <span className={styles.category}>{product.category?.name || 'Unknown'}</span>
               </div>
               
               <p className={styles.description}>

@@ -1,5 +1,6 @@
-import { useState, FormEvent, useRef } from 'react';
+import { useState, FormEvent, useRef, useEffect } from 'react';
 import { Product } from '@/services/api/productsApi';
+import { categoriesApi, Category } from '@/services/api/categoriesApi';
 import { Input } from '@/shared/components/Input';
 import { Button } from '@/shared/components/Button';
 import styles from './ProductForm.module.css';
@@ -9,6 +10,7 @@ interface ProductFormProps {
   onSubmit: (data: ProductFormData) => Promise<void>;
   onCancel: () => void;
   isLoading?: boolean;
+  preSelectedCategoryId?: string | null;
 }
 
 export interface ProductFormData {
@@ -18,28 +20,49 @@ export interface ProductFormData {
   category: string;
   image_url: string;
   is_available: boolean;
+  quantity: number;
+  low_stock_threshold: number;
   image_file?: File;
 }
 
-const CATEGORIES = ['Nepali', 'Fusion', 'Western', 'Snacks', 'Desserts', 'Drinks'];
-
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
-const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-
-export const ProductForm = ({ product, onSubmit, onCancel, isLoading = false }: ProductFormProps) => {
+export const ProductForm = ({ product, onSubmit, onCancel, isLoading = false, preSelectedCategoryId }: ProductFormProps) => {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
   const [formData, setFormData] = useState<ProductFormData>({
     name: product?.name || '',
     description: product?.description || '',
     price: product?.price || 0,
-    category: product?.category || '',
+    category: typeof product?.category === 'object' ? product.category._id : product?.category || preSelectedCategoryId || '',
     image_url: product?.image_url || '',
     is_available: product?.is_available ?? true,
+    quantity: product?.quantity || 0,
+    low_stock_threshold: product?.low_stock_threshold || 10,
   });
 
   const [errors, setErrors] = useState<Partial<Record<keyof ProductFormData, string>>>({});
   const [imagePreview, setImagePreview] = useState<string | null>(product?.image_url || null);
   const [fileError, setFileError] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
+  const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+
+  // Fetch categories on mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setIsCategoriesLoading(true);
+        const data = await categoriesApi.getAll();
+        setCategories(data);
+      } catch (error) {
+        console.error('Failed to fetch categories:', error);
+      } finally {
+        setIsCategoriesLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const validateForm = (): boolean => {
     const newErrors: Partial<Record<keyof ProductFormData, string>> = {};
@@ -187,26 +210,60 @@ export const ProductForm = ({ product, onSubmit, onCancel, isLoading = false }: 
         placeholder="0.00"
       />
 
+      <Input
+        label="Initial Quantity"
+        type="number"
+        value={formData.quantity}
+        onChange={(e) => handleChange('quantity', parseInt(e.target.value) || 0)}
+        error={errors.quantity}
+        required
+        min="0"
+        placeholder="0"
+        helperText="Starting stock quantity for this product"
+      />
+
+      <Input
+        label="Low Stock Threshold"
+        type="number"
+        value={formData.low_stock_threshold}
+        onChange={(e) => handleChange('low_stock_threshold', parseInt(e.target.value) || 10)}
+        error={errors.low_stock_threshold}
+        required
+        min="0"
+        placeholder="10"
+        helperText="Alert when stock falls below this number"
+      />
+
       <div className={styles.formGroup}>
         <label htmlFor="category" className={styles.label}>
           Category <span className={styles.required}>*</span>
         </label>
-        <select
-          id="category"
-          value={formData.category}
-          onChange={(e) => handleChange('category', e.target.value)}
-          className={`${styles.select} ${errors.category ? styles.error : ''}`}
-          required
-        >
-          <option value="">Select a category</option>
-          {CATEGORIES.map((cat) => (
-            <option key={cat} value={cat}>
-              {cat}
-            </option>
-          ))}
-        </select>
+        {isCategoriesLoading ? (
+          <div className={styles.loadingText}>Loading categories...</div>
+        ) : (
+          <select
+            id="category"
+            value={formData.category}
+            onChange={(e) => handleChange('category', e.target.value)}
+            className={`${styles.select} ${errors.category ? styles.error : ''}`}
+            required
+            disabled={categories.length === 0}
+          >
+            <option value="">Select a category</option>
+            {categories.map((cat) => (
+              <option key={cat._id} value={cat._id}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+        )}
         {errors.category && (
           <span className={styles.errorText}>{errors.category}</span>
+        )}
+        {!isCategoriesLoading && categories.length === 0 && (
+          <span className={styles.warningText}>
+            No categories available. Please create categories first.
+          </span>
         )}
       </div>
 

@@ -74,10 +74,26 @@ async function deleteProduct(req, res){
     }
 }
 
+async function updateProductStock(req, res){
+    try {
+        const { quantity, operation } = req.body;
+        const product = await productService.updateStock(
+            req.params.id,
+            quantity,
+            operation
+        );
+        res.status(200).json(successResponse(product, 'Stock updated successfully'));
+    } catch (error) {
+        const status = error.status || 500;
+        res.status(status).json(errorResponse(error.message, status));
+    }
+}
+
 module.exports = { 
     getAllProducts,
     getProductById,
     createProduct,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    updateProductStock
 }

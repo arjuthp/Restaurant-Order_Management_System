@@ -98,7 +98,7 @@ const AdminProductDetailPage = () => {
           <div className={styles.infoGrid}>
             <div className={styles.infoItem}>
               <span className={styles.infoLabel}>Category</span>
-              <span className={styles.infoValue}>{product.category}</span>
+              <span className={styles.infoValue}>{product.category?.name || 'N/A'}</span>
             </div>
 
             <div className={styles.infoItem}>

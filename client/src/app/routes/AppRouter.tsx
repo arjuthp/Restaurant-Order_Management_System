@@ -12,6 +12,11 @@ import { RoleBasedRedirect } from './RoleBasedRedirect';
 const AuthPage = lazy(() => import('@/features/auth/pages/AuthPage'));
 const AdminLoginPage = lazy(() => import('@/features/auth/pages/AdminLoginPage'));
 const AdminDashboardPage = lazy(() => import('@/features/admin/pages/AdminDashboardPage'));
+const AdminCategoriesPage = lazy(() => import('@/features/admin/pages/AdminCategoriesPage'));
+const AdminInventoryPage = lazy(() => import('@/features/admin/pages/AdminInventoryPage'));
+const RevenueAnalyticsPage = lazy(() => import('@/features/admin/pages/RevenueAnalyticsPage'));
+const ProductsAnalyticsPage = lazy(() => import('@/features/admin/pages/ProductsAnalyticsPage'));
+const UsersAnalyticsPage = lazy(() => import('@/features/admin/pages/UsersAnalyticsPage'));
 const AdminProductsPage = lazy(() => import('@/features/admin/pages/AdminProductsPage'));
 const AdminProductDetailPage = lazy(() => import('@/features/admin/pages/AdminProductDetailPage'));
 const AdminOrdersPage = lazy(() => import('@/features/admin/pages/AdminOrdersPage'));
@@ -47,6 +52,51 @@ export const AppRouter = () => {
             element={
               <AdminRoute>
                 <AdminDashboardPage />
+              </AdminRoute>
+            }
+          />
+          
+          <Route
+            path="/admin/analytics/revenue"
+            element={
+              <AdminRoute>
+                <RevenueAnalyticsPage />
+              </AdminRoute>
+            }
+          />
+          
+          <Route
+            path="/admin/analytics/products"
+            element={
+              <AdminRoute>
+                <ProductsAnalyticsPage />
+              </AdminRoute>
+            }
+          />
+          
+          <Route
+            path="/admin/analytics/users"
+            element={
+              <AdminRoute>
+                <UsersAnalyticsPage />
+              </AdminRoute>
+            }
+          />
+          
+          <Route
+            path="/admin/categories"
+            element={
+              <AdminRoute>
+                <AdminCategoriesPage />
+              </AdminRoute>
+            }
+          />
+          
+          <Route
+            path="/admin/inventory"
+            element={
+              <AdminRoute>
+                <AdminInventoryPage />
               </AdminRoute>
             }
           />

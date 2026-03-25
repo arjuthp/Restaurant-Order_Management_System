@@ -2,27 +2,13 @@ const { body } = require('express-validator');
 const { handleValidationErrors } = require('../middlewares/validation.middleware');
 
 /**
- * Valid product categories
- * These match the actual categories used in the database
- */
-
-const VALID_CATEGORIES = [
-    'Nepali',
-    'Fusion',
-    'Western',
-    'Snacks',
-    'Desserts',
-    'Drinks'
-];
-
-/**
  * Validation rules for creating a new product
  * 
  * Validates:
  * - name: Required, 3-100 characters
  * - description: Optional, max 500 characters
  * - price: Required, positive number
- * - category: Required, must be valid category
+ * - category: Required, must be valid MongoDB ObjectId
  * - is_available: Optional, must be boolean
  */
 
@@ -50,13 +36,13 @@ const validateCreateProduct = [
         .withMessage("Price must be a positive number")
         .toFloat(), //conv string to number
     
-    //Category validation
+    //Category validation - now accepts MongoDB ObjectId
     body('category')
-    .trim()
-    .notEmpty()
-    .withMessage('Category is required')
-    .isIn(VALID_CATEGORIES) // must be in allowed lists
-    .withMessage(`Category must be one of: ${VALID_CATEGORIES.join(', ')}`),
+        .trim()
+        .notEmpty()
+        .withMessage('Category is required')
+        .isMongoId()
+        .withMessage('Category must be a valid category ID'),
 
     //Availability validation(optional)
     body('is_available')
@@ -97,12 +83,13 @@ const validateUpdateProduct = [
         .isFloat({ min: 0.01 })
         .withMessage('Price must be a positive number')
         .toFloat(),
-        // Category validation (optional)
+        
+    // Category validation (optional) - now accepts MongoDB ObjectId
     body('category')
         .optional()
         .trim()
-        .isIn(VALID_CATEGORIES)
-        .withMessage(`Category must be one of: ${VALID_CATEGORIES.join(', ')}`),
+        .isMongoId()
+        .withMessage('Category must be a valid category ID'),
     
     // Availability validation (optional)
     body('is_available')

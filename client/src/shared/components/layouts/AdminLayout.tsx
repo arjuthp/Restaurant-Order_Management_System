@@ -73,6 +73,24 @@ export const AdminLayout = () => {
           </Link>
 
           <Link
+            to="/admin/categories"
+            className={`${styles.navItem} ${isActive('/admin/categories') ? styles.navItemActive : ''}`}
+            onClick={closeSidebar}
+          >
+            <span className={styles.navIcon}>📂</span>
+            <span className={styles.navText}>Categories</span>
+          </Link>
+
+          <Link
+            to="/admin/inventory"
+            className={`${styles.navItem} ${isActive('/admin/inventory') ? styles.navItemActive : ''}`}
+            onClick={closeSidebar}
+          >
+            <span className={styles.navIcon}>📊</span>
+            <span className={styles.navText}>Inventory</span>
+          </Link>
+
+          <Link
             to="/admin/orders"
             className={`${styles.navItem} ${isActive('/admin/orders') ? styles.navItemActive : ''}`}
             onClick={closeSidebar}

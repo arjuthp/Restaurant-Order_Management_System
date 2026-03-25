@@ -1,20 +1,26 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { productsApi, Product } from '@/services/api/productsApi';
+import { categoriesApi } from '@/services/api/categoriesApi';
 import { Button } from '@/shared/components/Button';
 import { LoadingSpinner } from '@/shared/components/LoadingSpinner';
 import { Modal } from '@/shared/components/Modal';
 import { Toast } from '@/shared/components/Toast';
+import { Pagination } from '@/shared/components/Pagination';
 import { ProductForm, ProductFormData } from '../components/ProductForm';
 import styles from './AdminProductsPage.module.css';
 
 const AdminProductsPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [preSelectedCategoryId, setPreSelectedCategoryId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [deleteConfirmation, setDeleteConfirmation] = useState<{ isOpen: boolean; product: Product | null }>({
@@ -22,16 +28,61 @@ const AdminProductsPage = () => {
     product: null,
   });
   const [isDeleting, setIsDeleting] = useState(false);
+  
+  // Filter states
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [availabilityFilter, setAvailabilityFilter] = useState<string>('all');
+  const [categories, setCategories] = useState<string[]>([]);
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+  const [paginatedProducts, setPaginatedProducts] = useState<Product[]>([]);
 
   useEffect(() => {
     fetchProducts();
-  }, []);
+    fetchCategories();
+    
+    // Check if category filter is in URL
+    const categoryFromUrl = searchParams.get('category');
+    if (categoryFromUrl) {
+      setSelectedCategory(categoryFromUrl);
+    }
+
+    // Check if we should open add product modal with pre-selected category
+    const state = location.state as any;
+    if (state?.addProduct && state?.preSelectedCategoryId) {
+      setPreSelectedCategoryId(state.preSelectedCategoryId);
+      setIsModalOpen(true);
+      // Clear the state to prevent reopening on refresh
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    applyFilters();
+  }, [products, searchQuery, selectedCategory, availabilityFilter]);
+
+  useEffect(() => {
+    applyPagination();
+  }, [filteredProducts, currentPage]);
+
+  const fetchCategories = async () => {
+    try {
+      const allCategories = await categoriesApi.getAll();
+      const categoryNames = allCategories.map((c) => c.name).sort();
+      setCategories(categoryNames);
+    } catch (error) {
+      console.error('Failed to fetch categories:', error);
+    }
+  };
 
   const fetchProducts = async () => {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await productsApi.getAll();
+      const response = await productsApi.getAll({ limit: 100 });
       setProducts(response.products);
     } catch (err: any) {
       const errorMessage = err?.response?.data?.message || 'Failed to load products. Please try again.';
@@ -45,6 +96,44 @@ const AdminProductsPage = () => {
       setIsLoading(false);
     }
   };
+
+  const applyFilters = () => {
+    let filtered = [...products];
+
+    // Search filter
+    if (searchQuery) {
+      filtered = filtered.filter((product) =>
+        product.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    // Category filter
+    if (selectedCategory !== 'all') {
+      filtered = filtered.filter((product) => product.category?.name === selectedCategory);
+    }
+
+    // Availability filter
+    if (availabilityFilter === 'available') {
+      filtered = filtered.filter((product) => product.is_available);
+    } else if (availabilityFilter === 'unavailable') {
+      filtered = filtered.filter((product) => !product.is_available);
+    }
+
+    setFilteredProducts(filtered);
+    setCurrentPage(1); // Reset to first page when filters change
+  };
+
+  const applyPagination = () => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    setPaginatedProducts(filteredProducts.slice(startIndex, endIndex));
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -67,11 +156,13 @@ const AdminProductsPage = () => {
 
   const handleOpenAddModal = () => {
     setEditingProduct(null);
+    setPreSelectedCategoryId(null);
     setIsModalOpen(true);
   };
 
   const handleOpenEditModal = (product: Product) => {
     setEditingProduct(product);
+    setPreSelectedCategoryId(null);
     setIsModalOpen(true);
   };
 
@@ -82,6 +173,7 @@ const AdminProductsPage = () => {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setEditingProduct(null);
+    setPreSelectedCategoryId(null);
   };
 
   const handleSubmit = async (data: ProductFormData) => {
@@ -248,9 +340,51 @@ const AdminProductsPage = () => {
         <Button variant="primary" onClick={handleOpenAddModal}>Add Product</Button>
       </div>
 
-      {products.length === 0 ? (
+      {/* Filters */}
+      <div className={styles.filtersContainer}>
+        <div className={styles.searchBox}>
+          <input
+            type="text"
+            placeholder="Search products..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className={styles.searchInput}
+          />
+        </div>
+        
+        <select
+          value={selectedCategory}
+          onChange={(e) => setSelectedCategory(e.target.value)}
+          className={styles.filterSelect}
+        >
+          <option value="all">All Categories</option>
+          {categories.map((cat) => (
+            <option key={cat} value={cat}>{cat}</option>
+          ))}
+        </select>
+
+        <select
+          value={availabilityFilter}
+          onChange={(e) => setAvailabilityFilter(e.target.value)}
+          className={styles.filterSelect}
+        >
+          <option value="all">All Status</option>
+          <option value="available">Available</option>
+          <option value="unavailable">Unavailable</option>
+        </select>
+      </div>
+
+      {isLoading ? (
+        <div className={styles.container}>
+          <LoadingSpinner size="lg" />
+        </div>
+      ) : filteredProducts.length === 0 ? (
         <div className={styles.empty}>
-          <p>No products found. Add your first product to get started.</p>
+          <p>
+            {searchQuery || selectedCategory !== 'all' || availabilityFilter !== 'all'
+              ? 'No products match your filters. Try adjusting your search.'
+              : 'No products found. Add your first product to get started.'}
+          </p>
         </div>
       ) : (
         <div className={styles.tableWrapper}>
@@ -266,7 +400,7 @@ const AdminProductsPage = () => {
               </tr>
             </thead>
             <tbody>
-              {products.map((product) => (
+              {paginatedProducts.map((product) => (
                 <tr key={product._id}>
                   <td>
                     <div className={styles.imageCell}>
@@ -284,7 +418,7 @@ const AdminProductsPage = () => {
                     </div>
                   </td>
                   <td className={styles.nameCell}>{product.name}</td>
-                  <td className={styles.categoryCell}>{product.category}</td>
+                  <td className={styles.categoryCell}>{product.category?.name || 'Unknown'}</td>
                   <td className={styles.priceCell}>{formatPrice(product.price)}</td>
                   <td>{getAvailabilityBadge(product.is_available)}</td>
                   <td>
@@ -316,6 +450,14 @@ const AdminProductsPage = () => {
               ))}
             </tbody>
           </table>
+
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          )}
         </div>
       )}
 
@@ -330,6 +472,7 @@ const AdminProductsPage = () => {
           onSubmit={handleSubmit}
           onCancel={handleCloseModal}
           isLoading={isSubmitting}
+          preSelectedCategoryId={preSelectedCategoryId}
         />
       </Modal>
 

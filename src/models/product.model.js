@@ -16,7 +16,8 @@ const productSchema = new mongoose.Schema({
     min: 0
   },
   category: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Category',
     required: true
   },
   image_url: {
@@ -27,6 +28,21 @@ const productSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
+  quantity: {
+    type: Number,
+    default: 10,
+    min: 0
+  },
+  low_stock_threshold: {
+    type: Number,
+    default: 10,
+    min: 0
+  },
+  track_inventory:{
+    type: Boolean,
+    default: true
+  },
+
   is_deleted: {
     type: Boolean,
     default: false
@@ -37,7 +53,4 @@ const productSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-module.exports = mongoose.model('Product', productSchema);
-
-//isdeleted 
-// /deleted_at 
+module.exports = mongoose.model('Product', productSchema); 

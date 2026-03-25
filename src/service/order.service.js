@@ -28,6 +28,28 @@ class OrderService {
             //order all items
             itemsForOrder = cart.items;
         }
+
+        //check stock availability for all items
+        const Product = require('../models/product.model');
+        
+        for (const item of itemsForOrder) {
+            const product = await Product.findById(item.product_id._id);
+
+            if(!product) {
+                throw { status: 404, message: `Product ${item.product_id.name} not found`};
+            }
+
+            //only check stock if inventory tracking is enabled
+            if (product.track_inventory) {
+                if (product.quantity < item.quantity) {
+                    throw {
+                        status: 400,
+                        message: `Not enough stock for ${product.name}. Available: ${product.quantity}, Requested: ${item.quantity}`
+                    };
+                }
+            }
+        }
+        ////////////////////
         let totalPrice = 0;
         const orderItems = itemsForOrder.map(item => {
             totalPrice += item.unit_price;
@@ -46,6 +68,21 @@ class OrderService {
             notes: notes,
             status: 'pending'
         });
+        //Reduce stock for each ordered item
+        for (const item of itemsForOrder) {
+            const product = await Product.findById(item.product_id._id);
+
+            if (product && product.track_inventory) {
+                product.quantity -= item.quantity;
+
+                //Auto-disable product if out of stock
+                if (product.quantity <= 0) {
+                    product.quantity = 0;
+                    product.is_available = false;
+                }
+                await product.save();
+            }
+        }
 
         //remove only ordered items from cart
         if(itemsToOrder && itemsToOrder.length > 0){
@@ -67,6 +104,25 @@ class OrderService {
         // Add status filter if provided
         if(queryParams.status){
             filter.status = queryParams.status;
+        }
+        
+        // Add date range filter if provided
+        if(queryParams.startDate || queryParams.endDate){
+            filter.createdAt = {};
+
+            if(queryParams.startDate){
+                // Start of the day (00:00:00 UTC)
+                const startDate = new Date(queryParams.startDate);
+                startDate.setUTCHours(0, 0, 0, 0);
+                filter.createdAt.$gte = startDate;
+            }
+
+            if(queryParams.endDate){
+                // End of the day (23:59:59.999 UTC)
+                const endDate = new Date(queryParams.endDate);
+                endDate.setUTCHours(23, 59, 59, 999);
+                filter.createdAt.$lte = endDate;
+            }
         }
         
         // Get total count for pagination
@@ -109,7 +165,25 @@ class OrderService {
         if(queryParams.status){
             filter.status = queryParams.status;
         }
-        
+        //Add date range filter if provided
+        if(queryParams.startDate || queryParams.endDate){
+            filter.createdAt = {};
+
+            if(queryParams.startDate){
+                //start of the day(00:00:00 UTC)
+                const startDate = new Date(queryParams.startDate);
+                startDate.setUTCHours(0, 0, 0, 0);
+                filter.createdAt.$gte = startDate;
+            }
+
+            if(queryParams.endDate){
+                //End of the day(23:59:59.999 UTC)
+                const endDate = new Date(queryParams.endDate);
+                endDate.setUTCHours(23, 59, 59, 999);
+                filter.createdAt.$lte = endDate;
+            }
+        }
+
         // Get total count for pagination
         const totalOrders = await Order.countDocuments(filter);
         

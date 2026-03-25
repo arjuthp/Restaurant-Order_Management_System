@@ -5,7 +5,8 @@ const {
     getProductById,
     createProduct,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    updateProductStock
 } = require('../controllers/product.controller');
 const { authorize } = require('../auth/auth.middlewares');
 const { uploadProductImage, handleUploadError } = require('../middlewares/upload.middleware');
@@ -21,4 +22,5 @@ router.post('/', authorize('admin'), uploadProductImage, handleUploadError, vali
 router.patch('/:id', authorize('admin'), uploadProductImage, handleUploadError, validateUpdateProduct, updateProduct);
 router.delete('/:id', authorize('admin'), deleteProduct);
 
+router.patch('/:id/stock', authorize('admin'), updateProductStock);
 module.exports = router;

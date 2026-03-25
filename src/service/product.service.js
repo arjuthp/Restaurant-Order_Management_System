@@ -1,4 +1,5 @@
 const Product = require('../models/product.model');
+const Category = require('../models/category.model');
 const mongoose = require('mongoose');
 const { calculatePagination } = require('../utils/paginationHelper');
 const { buildProductFilters } = require('../utils/searchFilterHelper');
@@ -24,6 +25,7 @@ class ProductService {
     
         // STEP 4: Query with filters + pagination
         const products = await Product.find(filter)
+            .populate('category', 'name slug')
             .skip(skip)
             .limit(pagination.itemsPerPage)
             .sort({ createdAt: -1 });
@@ -46,33 +48,63 @@ class ProductService {
     }
 
     async getProductById(productId){
-        const product = await Product.findById(productId);
-        if(!product){
-            throw {status: 404, message: 'Product not found'};
+        const product = await Product.findById(productId).populate('category', 'name slug description');
+            if(!product){
+                throw {status: 404, message: 'Product not found'};
+            }
+            return product;
         }
-        return product;
-    }
 
-    async createProduct(productData){
-        const {name, price, category} = productData;
+    async createProduct(productData) {
+        const { name, price, category } = productData;
         
-        if(!name || !price || !category){
-            throw {status: 400, message: 'Name, price, and category are required'};
+        if (!name || !price || !category) {
+            throw { status: 400, message: 'Name, price, and category are required' };
+        }
+
+        // ✅ Category already imported at top
+        const categoryExists = await Category.findOne({ 
+            _id: category, 
+            is_deleted: false,
+            is_active: true 
+        });
+        
+        if (!categoryExists) {
+            throw { status: 400, message: 'Invalid or inactive category' };
         }
 
         const product = await Product.create(productData);
+        await product.populate('category', 'name slug');
+        
         return product;
-    }
+}
+
+
 
     async updateProduct(productId, updateData){
+        //Validate category if being updated 
+        if (updateData.category) {
+            const categoryExists = await Category.findOne({
+                _id: updateData.category,
+                is_deleted: false,
+                is_active: true
+            });
+
+            if (!categoryExists) {
+                throw { status: 400, message: 'Invalid or inactive category' };
+            }
+        }
+
         const product = await Product.findByIdAndUpdate(
             productId,
             updateData,
             {new: true, runValidators: true}
-        );
+        ).populate('category', 'name slug');
+
         if(!product){
             throw {status: 404, message: 'Product not Found'};
         }
+
         return product;
     }
 
@@ -89,6 +121,31 @@ class ProductService {
              throw {status: 404, message: 'Product not Found'};
         }
         return {message: 'Product deleted successfully'};
+    }
+
+    async updateStock(productId, quantityChange, operation = 'add'){
+        const product = await Product.findById(productId);
+
+        if (!product) {
+            throw { status: 404, message: 'Product not found' };
+        }
+
+        if (operation === 'add'){
+            product.quantity += quantityChange;
+        } else if (operation === 'set'){
+            product.quantity = quantityChange;
+        }
+
+        // Auto-update availability based on quantity
+        if (product.quantity <= 0) {
+            product.quantity = 0;
+            product.is_available = false;
+        } else {
+            product.is_available = true;
+        }
+
+        await product.save();
+        return product;
     }
 }
 

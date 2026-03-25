@@ -12,8 +12,15 @@ export interface Product {
   name: string;
   description: string;
   price: number;
-  category: string;
+  category: {
+    _id: string;
+    name: string;
+    slug: string;
+  };
   image_url: string | null;
+  quantity: number;
+  low_stock_threshold: number;
+  track_inventory: boolean;
   is_available: boolean;
   is_deleted: boolean;
   createdAt: string;
@@ -140,6 +147,21 @@ export const productsApi = {
       console.log('✅ [PRODUCTS API] Product deleted');
     } catch (error) {
       console.error('❌ [PRODUCTS API] Failed to delete product');
+      throw error;
+    }
+  },
+
+  updateStock: async (id: string, quantity: number, operation: 'add' | 'set' = 'add'): Promise<Product> => {
+    console.log('📦 [PRODUCTS API] Updating stock:', { id, quantity, operation });
+    try {
+      const response = await apiClient.patch<ApiResponse<Product>>(`/products/${id}/stock`, {
+        quantity,
+        operation
+      });
+      console.log('✅ [PRODUCTS API] Stock updated');
+      return response.data;
+    } catch (error) {
+      console.error('❌ [PRODUCTS API] Failed to update stock');
       throw error;
     }
   },

@@ -12,9 +12,9 @@ export const useCartInitialization = () => {
   const hasInitialized = useRef(false);
 
   useEffect(() => {
-    // Only load once when user is authenticated
-    if (user && !hasInitialized.current) {
-      console.log('🚀 [CART INIT] User logged in, initializing cart');
+    // Only load cart for customer users (not admins)
+    if (user && user.role === 'customer' && !hasInitialized.current) {
+      console.log('🚀 [CART INIT] Customer logged in, initializing cart');
       console.log('👤 [CART INIT] User:', { name: user.name, email: user.email, role: user.role });
       hasInitialized.current = true;
       

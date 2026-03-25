@@ -118,7 +118,7 @@ const ProductDetailPage = () => {
           </div>
 
           <div className={styles.meta}>
-            <span className={styles.category}>{product.category}</span>
+            <span className={styles.category}>{product.category?.name || 'Unknown'}</span>
             <span className={styles.price}>${product.price.toFixed(2)}</span>
           </div>
 
