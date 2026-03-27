@@ -30,17 +30,21 @@ const AdminUserDetailPage = () => {
     try {
       setIsLoading(true);
       const userData = await usersApi.getUserById(id);
+      console.log('User data loaded:', userData);
       setUser(userData);
 
       // Load user's orders and reservations
       try {
         const allOrders = await ordersApi.getAllOrders();
+        console.log('All orders:', allOrders);
         const filteredOrders = allOrders.orders.filter(
           (order: any) => {
             const userId = typeof order.user_id === 'object' ? order.user_id._id : order.user_id;
+            console.log('Comparing order userId:', userId, 'with target:', id);
             return userId === id;
           }
         );
+        console.log('Filtered orders for user:', filteredOrders);
         setUserOrders(filteredOrders);
       } catch (err) {
         console.error('Failed to load user orders:', err);
@@ -48,12 +52,15 @@ const AdminUserDetailPage = () => {
 
       try {
         const allReservations = await reservationsApi.getAllReservations();
+        console.log('All reservations:', allReservations);
         const filteredReservations = allReservations.filter(
           (res: any) => {
             const userId = typeof res.user === 'object' ? res.user._id : res.user;
+            console.log('Comparing reservation userId:', userId, 'with target:', id);
             return userId === id;
           }
         );
+        console.log('Filtered reservations for user:', filteredReservations);
         setUserReservations(filteredReservations);
       } catch (err) {
         console.error('Failed to load user reservations:', err);
@@ -61,6 +68,7 @@ const AdminUserDetailPage = () => {
 
       setError('');
     } catch (err: any) {
+      console.error('Failed to load user details:', err);
       setError(err.response?.data?.error?.message || 'Failed to load user details');
     } finally {
       setIsLoading(false);

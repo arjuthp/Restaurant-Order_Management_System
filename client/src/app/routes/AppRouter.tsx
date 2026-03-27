@@ -25,6 +25,8 @@ const AdminTablesPage = lazy(() => import('@/features/admin/pages/AdminTablesPag
 const AdminReservationsPage = lazy(() => import('@/features/admin/pages/AdminReservationsPage'));
 const AdminUsersPage = lazy(() => import('@/features/admin/pages/AdminUsersPage'));
 const AdminUserDetailPage = lazy(() => import('@/features/admin/pages/AdminUserDetailPage'));
+const AdminRolesPage = lazy(() => import('@/features/admin/pages/AdminRolesPage'));
+const AdminStaffPage = lazy(() => import('@/features/admin/pages/AdminStaffPage'));
 const DashboardPage = lazy(() => import('@/features/dashboard/pages/DashboardPage'));
 const ProductsPage = lazy(() => import('@/features/products/pages/ProductsPage'));
 const ProductDetailPage = lazy(() => import('@/features/products/pages/ProductDetailPage'));
@@ -169,6 +171,24 @@ export const AppRouter = () => {
             element={
               <AdminRoute>
                 <AdminUserDetailPage />
+              </AdminRoute>
+            }
+          />
+          
+          <Route
+            path="/admin/roles"
+            element={
+              <AdminRoute>
+                <AdminRolesPage />
+              </AdminRoute>
+            }
+          />
+          
+          <Route
+            path="/admin/staff"
+            element={
+              <AdminRoute>
+                <AdminStaffPage />
               </AdminRoute>
             }
           />

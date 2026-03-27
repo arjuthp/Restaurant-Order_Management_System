@@ -74,7 +74,9 @@ class AuthService {
             email: user.email,
             role: user.role,
             phone: user.phone,
-            address: user.address
+            address: user.address,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt
         };
     }
 

@@ -5,15 +5,20 @@ const userService = new UserService();
 
 async function getAllUsers(req, res){
     try{
+        console.log('getAllUsers controller called');
         // Get pagination params from query
         const page = req.query.page || 1;
         const limit = req.query.limit || 10;
+        console.log('Pagination params:', { page, limit });
         
         const result = await userService.getAllUsers(page, limit);
+        console.log('Service returned result:', { usersCount: result.users?.length, pagination: result.pagination });
 
-        res.status(200).json(
-            successResponse(result.users, null, result.pagination));
+        const response = successResponse(result, null, null);
+        console.log('Sending response:', JSON.stringify(response).substring(0, 200));
+        res.status(200).json(response);
     }catch(error){
+        console.error('Error in getAllUsers:', error);
         const status = error.status || 500;
         res.status(status).json(errorResponse(error.message, status));
     }

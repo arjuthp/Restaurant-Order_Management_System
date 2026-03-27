@@ -109,6 +109,24 @@ export const AdminLayout = () => {
           </Link>
 
           <Link
+            to="/admin/roles"
+            className={`${styles.navItem} ${isActive('/admin/roles') ? styles.navItemActive : ''}`}
+            onClick={closeSidebar}
+          >
+            <span className={styles.navIcon}>🎭</span>
+            <span className={styles.navText}>Roles</span>
+          </Link>
+
+          <Link
+            to="/admin/staff"
+            className={`${styles.navItem} ${isActive('/admin/staff') ? styles.navItemActive : ''}`}
+            onClick={closeSidebar}
+          >
+            <span className={styles.navIcon}>👔</span>
+            <span className={styles.navText}>Staff</span>
+          </Link>
+
+          <Link
             to="/admin/profile"
             className={`${styles.navItem} ${isActive('/admin/profile') ? styles.navItemActive : ''}`}
             onClick={closeSidebar}

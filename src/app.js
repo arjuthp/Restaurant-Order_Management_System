@@ -12,6 +12,10 @@ const orderRoutes = require('./routes/order.routes');
 const tableRoutes = require('./routes/table.routes');
 const reservationRoutes = require('./routes/reservation.routes');
 const dashboardRoutes = require('./routes/dashboard.router');
+const roleRoutes = require('./routes/role.routes');
+const staffRoutes = require('./routes/staff.routes');
+const uploadRoutes = require('./routes/upload.routes');
+
 
 const app = express();
 
@@ -47,6 +51,11 @@ app.use('/api/tables', tableRoutes);
 app.use('/api/reservations', reservationRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/categories', categoryRoutes);
+app.use('/api/admin/roles', roleRoutes);
+app.use('/api/admin/staff', staffRoutes);
+app.use('/api/upload', uploadRoutes);
+
+
 
 // 404 handler for undefined routes
 app.use((req, res) => {

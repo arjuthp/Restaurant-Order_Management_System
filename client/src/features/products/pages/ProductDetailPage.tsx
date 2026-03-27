@@ -4,6 +4,7 @@ import { productsApi, Product } from '@/services/api/productsApi';
 import { useCartStore } from '@/store/cartStore';
 import { LoadingSpinner } from '@/shared/components/LoadingSpinner';
 import { Button } from '@/shared/components/Button';
+import { getImageUrl } from '@/shared/utils/imageUrl';
 import styles from './ProductDetailPage.module.css';
 
 const ProductDetailPage = () => {
@@ -14,6 +15,7 @@ const ProductDetailPage = () => {
   const [error, setError] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const addItem = useCartStore((state) => state.addItem);
 
   useEffect(() => {
@@ -94,9 +96,30 @@ const ProductDetailPage = () => {
 
       <div className={styles.content}>
         <div className={styles.imageSection}>
-          {product.image_url ? (
+          {product.images && product.images.length > 0 ? (
+            <>
+              <img
+                src={getImageUrl(product.images[selectedImageIndex])}
+                alt={`${product.name} - Image ${selectedImageIndex + 1}`}
+                className={styles.image}
+              />
+              {product.images.length > 1 && (
+                <div className={styles.imageThumbnails}>
+                  {product.images.map((img, index) => (
+                    <button
+                      key={index}
+                      className={`${styles.thumbnail} ${index === selectedImageIndex ? styles.thumbnailActive : ''}`}
+                      onClick={() => setSelectedImageIndex(index)}
+                    >
+                      <img src={getImageUrl(img)} alt={`Thumbnail ${index + 1}`} />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </>
+          ) : product.image_url ? (
             <img
-              src={product.image_url}
+              src={getImageUrl(product.image_url)}
               alt={product.name}
               className={styles.image}
             />

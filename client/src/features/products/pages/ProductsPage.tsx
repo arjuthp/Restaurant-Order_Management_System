@@ -5,6 +5,7 @@ import { useCartStore } from '@/store/cartStore';
 import { LoadingSpinner } from '@/shared/components/LoadingSpinner';
 import { Button } from '@/shared/components/Button';
 import { Pagination } from '@/shared/components/Pagination';
+import { getImageUrl } from '@/shared/utils/imageUrl';
 import styles from './ProductsPage.module.css';
 
 const ProductsPage = () => {
@@ -301,7 +302,7 @@ const ProductsPage = () => {
             >
               {product.image_url ? (
                 <img
-                  src={product.image_url}
+                  src={getImageUrl(product.image_url)}
                   alt={product.name}
                   className={styles.image}
                 />

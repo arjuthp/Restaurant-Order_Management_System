@@ -18,6 +18,7 @@ export interface Product {
     slug: string;
   };
   image_url: string | null;
+  images?: string[];
   quantity: number;
   low_stock_threshold: number;
   track_inventory: boolean;
@@ -45,6 +46,7 @@ export interface CreateProductData {
   price: number;
   category: string;
   image_url?: string;
+  images?: string[];
   is_available: boolean;
 }
 
@@ -54,6 +56,7 @@ export interface UpdateProductData {
   price?: number;
   category?: string;
   image_url?: string;
+  images?: string[];
   is_available?: boolean;
 }
 

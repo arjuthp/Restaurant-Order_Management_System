@@ -1,0 +1,607 @@
+{
+	"info": {
+		"_postman_id": "staff-role-management-001",
+		"name": "Staff & Role Management API",
+		"description": "Complete API testing collection for Staff and Role Management System",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{adminToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:5000/api",
+			"type": "string"
+		},
+		{
+			"key": "adminToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "roleId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "staffId",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "0. Setup - Admin Login",
+			"item": [
+				{
+					"name": "Admin Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Save admin token for subsequent requests",
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('adminToken', response.data.accessToken);",
+									"    console.log('✅ Admin token saved:', response.data.accessToken);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"admin@restaurant.com\",\n  \"password\": \"admin123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/admin/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "admin", "login"]
+						},
+						"description": "Login as admin to get access token. Token is automatically saved for other requests."
+					},
+					"response": []
+				}
+			],
+			"description": "First, login as admin to get the access token"
+		},
+		{
+			"name": "1. Role Management",
+			"item": [
+				{
+					"name": "Create Role",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Save roleId for subsequent requests",
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('roleId', response.data._id);",
+									"    console.log('✅ Role created with ID:', response.data._id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Kitchen Helper\",\n  \"description\": \"Assists chefs in the kitchen\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/admin/roles",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", "roles"]
+						},
+						"description": "Create a new role (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Roles",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/admin/roles",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", "roles"]
+						},
+						"description": "Get all roles (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Active Roles",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/admin/roles?isActive=true",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", "roles"],
+							"query": [
+								{
+									"key": "isActive",
+									"value": "true"
+								}
+							]
+						},
+						"description": "Get only active roles (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Role by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/admin/roles/{{roleId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", "roles", "{{roleId}}"]
+						},
+						"description": "Get a specific role by ID (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Role",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Kitchen Helper\",\n  \"description\": \"Assists chefs and maintains kitchen cleanliness\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/admin/roles/{{roleId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", "roles", "{{roleId}}"]
+						},
+						"description": "Update role details (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Deactivate Role",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"isActive\": false\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/admin/roles/{{roleId}}/status",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", "roles", "{{roleId}}", "status"]
+						},
+						"description": "Deactivate a role (Admin only). Will fail if role has active staff."
+					},
+					"response": []
+				},
+				{
+					"name": "Activate Role",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/admin/roles/{{roleId}}/status",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", "roles", "{{roleId}}", "status"]
+						},
+						"description": "Activate a role (Admin only)"
+					},
+					"response": []
+				}
+			],
+			"description": "Role CRUD operations"
+		},
+		{
+			"name": "2. Staff Management",
+			"item": [
+				{
+					"name": "Create Staff",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Save staffId for subsequent requests",
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('staffId', response.data._id);",
+									"    console.log('✅ Staff created with ID:', response.data._id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john.doe@restaurant.com\",\n  \"password\": \"password123\",\n  \"phone\": \"+1234567890\",\n  \"roleId\": \"{{roleId}}\",\n  \"employeeId\": \"EMP1001\",\n  \"hireDate\": \"2024-01-15\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/admin/staff",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", "staff"]
+						},
+						"description": "Create a new staff member (Admin only). Use a valid roleId from seeded roles."
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Staff",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/admin/staff",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", "staff"]
+						},
+						"description": "Get all staff with pagination (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Staff with Pagination",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/admin/staff?page=1&limit=5",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", "staff"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "5"
+								}
+							]
+						},
+						"description": "Get staff with custom pagination (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Search Staff by Name",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/admin/staff?search=john",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", "staff"],
+							"query": [
+								{
+									"key": "search",
+									"value": "john"
+								}
+							]
+						},
+						"description": "Search staff by name or email (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Filter Staff by Role",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/admin/staff?roleId={{roleId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", "staff"],
+							"query": [
+								{
+									"key": "roleId",
+									"value": "{{roleId}}"
+								}
+							]
+						},
+						"description": "Filter staff by specific role (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Filter Active Staff",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/admin/staff?isActive=true",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", "staff"],
+							"query": [
+								{
+									"key": "isActive",
+									"value": "true"
+								}
+							]
+						},
+						"description": "Get only active staff (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Staff by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/admin/staff/{{staffId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", "staff", "{{staffId}}"]
+						},
+						"description": "Get a specific staff member by ID (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Staff",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"John Doe Updated\",\n  \"phone\": \"+1234567899\",\n  \"employeeId\": \"EMP1001\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/admin/staff/{{staffId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", "staff", "{{staffId}}"]
+						},
+						"description": "Update staff details (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Staff Password",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"password\": \"newpassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/admin/staff/{{staffId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", "staff", "{{staffId}}"]
+						},
+						"description": "Update staff password (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Deactivate Staff",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"isActive\": false\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/admin/staff/{{staffId}}/status",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", "staff", "{{staffId}}", "status"]
+						},
+						"description": "Deactivate a staff member (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Activate Staff",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/admin/staff/{{staffId}}/status",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", "staff", "{{staffId}}", "status"]
+						},
+						"description": "Activate a staff member (Admin only)"
+					},
+					"response": []
+				}
+			],
+			"description": "Staff CRUD operations"
+		},
+		{
+			"name": "3. Error Testing",
+			"item": [
+				{
+					"name": "Create Role - Duplicate Name",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Waiter\",\n  \"description\": \"Duplicate role test\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/admin/roles",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", "roles"]
+						},
+						"description": "Should return 400 - Role already exists"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Staff - Invalid Role ID",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Test Staff\",\n  \"email\": \"test@restaurant.com\",\n  \"password\": \"password123\",\n  \"roleId\": \"507f1f77bcf86cd799439011\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/admin/staff",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", "staff"]
+						},
+						"description": "Should return 400 - Invalid role ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Staff - Duplicate Email",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Jane Doe\",\n  \"email\": \"john.doe@restaurant.com\",\n  \"password\": \"password123\",\n  \"roleId\": \"{{roleId}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/admin/staff",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", "staff"]
+						},
+						"description": "Should return 400 - Email already exists"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Role - Invalid ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/admin/roles/507f1f77bcf86cd799439011",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", "roles", "507f1f77bcf86cd799439011"]
+						},
+						"description": "Should return 404 - Role not found"
+					},
+					"response": []
+				},
+				{
+					"name": "Access Without Token",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/admin/roles",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", "roles"]
+						},
+						"description": "Should return 401 - Access token required"
+					},
+					"response": []
+				}
+			],
+			"description": "Test error scenarios and validation"
+		}
+	]
+}

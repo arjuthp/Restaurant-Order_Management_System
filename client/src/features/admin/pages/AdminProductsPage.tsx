@@ -195,6 +195,11 @@ const AdminProductsPage = () => {
           formData.append('category', data.category);
           formData.append('is_available', data.is_available.toString());
           
+          // Append images array if exists
+          if (data.images && data.images.length > 0) {
+            formData.append('images', JSON.stringify(data.images));
+          }
+          
           // Call PATCH /api/products/:id with FormData
           await productsApi.updateWithImage(editingProduct._id, formData);
         } else {
@@ -205,6 +210,7 @@ const AdminProductsPage = () => {
             price: data.price,
             category: data.category,
             image_url: data.image_url || undefined,
+            images: data.images || undefined,
             is_available: data.is_available,
           });
         }
@@ -226,6 +232,11 @@ const AdminProductsPage = () => {
           formData.append('category', data.category);
           formData.append('is_available', data.is_available.toString());
           
+          // Append images array if exists
+          if (data.images && data.images.length > 0) {
+            formData.append('images', JSON.stringify(data.images));
+          }
+          
           // Call POST /api/products with FormData
           await productsApi.createWithImage(formData);
         } else {
@@ -236,6 +247,7 @@ const AdminProductsPage = () => {
             price: data.price,
             category: data.category,
             image_url: data.image_url || undefined,
+            images: data.images || undefined,
             is_available: data.is_available,
           });
         }
