@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { productsApi, Product } from '@/services/api/productsApi';
+import { Select } from '@/shared/components/Select';
 import styles from './AdminInventoryPage.module.css';
 
 const AdminInventoryPage = () => {
@@ -180,13 +181,14 @@ const AdminInventoryPage = () => {
 
             <div className={styles.formGroup}>
               <label>Operation</label>
-              <select
+              <Select
                 value={stockData.operation}
-                onChange={(e) => setStockData({ ...stockData, operation: e.target.value as 'add' | 'set' })}
-              >
-                <option value="add">Add to Stock</option>
-                <option value="set">Set Stock</option>
-              </select>
+                onChange={(value) => setStockData({ ...stockData, operation: value as 'add' | 'set' })}
+                options={[
+                  { value: 'add', label: 'Add to Stock' },
+                  { value: 'set', label: 'Set Stock' }
+                ]}
+              />
             </div>
 
             <div className={styles.formGroup}>

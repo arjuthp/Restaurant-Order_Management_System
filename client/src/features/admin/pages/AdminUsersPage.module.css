@@ -3,6 +3,23 @@
   max-width: 1400px;
   margin: 0 auto;
   width: 100%;
+  min-height: 100vh;
+  background: #FFF8F0;
+  position: relative;
+}
+
+.container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 30%, rgba(255, 152, 0, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(230, 81, 0, 0.3) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
 }
 
 .header {
@@ -12,14 +29,17 @@
   margin-bottom: 2rem;
   gap: 1rem;
   flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
 }
 
 .title {
   font-family: var(--font-display);
   font-size: 2.5rem;
-  font-weight: 700;
-  color: var(--color-secondary);
+  font-weight: 800;
+  color: #FFFFFF;
   letter-spacing: -0.02em;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
 .filters {
@@ -28,30 +48,64 @@
 }
 
 .filterSelect {
-  padding: 0.625rem 1.25rem;
-  border: 2px solid var(--color-border);
-  border-radius: var(--radius);
+  padding: 1.125rem 2.5rem 1.125rem 1.5rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: var(--radius-xl);
   font-size: 0.9375rem;
-  font-weight: 500;
+  font-weight: 700;
   cursor: pointer;
-  background: var(--color-bg);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   color: var(--color-text);
   transition: var(--transition);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='%231B7C38' d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 16px;
+  letter-spacing: 0.02em;
 }
 
 .filterSelect:hover {
-  border-color: var(--color-primary);
+  border-color: rgba(255, 255, 255, 0.5);
+  background: #FFFFFF;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
 }
 
 .filterSelect:focus {
   outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.1);
+  border-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  background: #FFFFFF;
+}
+
+.filterSelect option {
+  background: #FFFFFF;
+  color: var(--color-text);
+  padding: 1rem;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+}
+
+.filterSelect option:checked {
+  background: var(--color-primary-lightest);
+  color: var(--color-primary);
+}
+
+.filterSelect option:hover {
+  background: var(--color-bg-green);
+  color: var(--color-text);
 }
 
 .error {
   padding: 1rem 1.5rem;
-  background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
+  background: #FFEBEE;
   border-left: 4px solid var(--color-danger);
   border-radius: var(--radius);
   color: var(--color-danger);
@@ -67,8 +121,8 @@
 }
 
 .statCard {
-  background: linear-gradient(135deg, #FFFEF9 0%, #FFF9ED 100%);
-  border: 2px solid rgba(201, 169, 97, 0.3);
+  background: #FFFFFF;
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: 1.75rem 1.5rem;
   text-align: center;
@@ -76,34 +130,13 @@
   overflow: hidden;
   transition: var(--transition);
   box-shadow: var(--shadow-sm);
-}
-
-.statCard::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-primary-light) 50%, var(--color-primary) 100%);
-  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.4);
-}
-
-.statCard::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.05) 0%, transparent 70%);
-  pointer-events: none;
+  border-top: 4px solid var(--color-primary);
 }
 
 .statCard:hover {
   transform: translateY(-3px);
-  box-shadow: var(--shadow-gold);
-  border-color: var(--color-primary);
+  box-shadow: var(--shadow-lg);
+  border-top-color: var(--color-primary-dark);
 }
 
 .statValue {
@@ -124,114 +157,115 @@
 }
 
 .tableContainer {
-  background: linear-gradient(135deg, #FFFEF9 0%, #FFF9ED 100%);
-  border: 2px solid rgba(201, 169, 97, 0.3);
-  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, var(--color-bg) 0%, var(--color-bg-secondary) 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-xl);
   overflow: hidden;
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-lg);
   width: 100%;
   overflow-x: auto;
   position: relative;
-}
-
-.tableContainer::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: radial-gradient(circle at 30% 30%, rgba(212, 175, 55, 0.03) 0%, transparent 60%);
-  pointer-events: none;
 }
 
 .table {
   width: 100%;
   min-width: 100%;
   border-collapse: collapse;
+  font-family: var(--font-body);
 }
 
 .table thead {
-  background: linear-gradient(135deg, #2C2416 0%, #3D3220 50%, #2C2416 100%);
+  background: linear-gradient(135deg, #1B7C38 0%, #2D9B4E 100%);
   position: relative;
 }
 
-.table thead::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, 
-    #A68B4E 0%, 
-    #C9A961 25%,
-    #D4AF37 50%, 
-    #C9A961 75%,
-    #A68B4E 100%
-  );
-  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.4);
-}
-
 .table th {
-  padding: 1.125rem 1rem;
+  padding: 1.125rem 1.25rem;
   text-align: left;
-  font-weight: 600;
+  font-family: var(--font-body);
+  font-weight: 700;
   font-size: 0.8125rem;
-  color: var(--color-text-inverse);
+  color: #FFFFFF;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   white-space: nowrap;
   position: relative;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  line-height: 1.4;
 }
 
 .table td {
-  padding: 1rem;
-  border-bottom: 1px solid var(--color-border-light);
+  padding: 1rem 1.25rem;
+  border-bottom: 2px solid var(--color-border);
+  font-family: var(--font-body);
   font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--color-text);
   vertical-align: middle;
+  line-height: 1.5;
+  text-shadow: none;
 }
 
 .table tbody tr {
   transition: var(--transition-fast);
+  background: var(--color-bg);
 }
 
 .table tbody tr:hover {
-  background: linear-gradient(90deg, rgba(201, 169, 97, 0.05) 0%, rgba(201, 169, 97, 0.12) 100%);
+  background: var(--color-bg-success);
+  transform: scale(1.002);
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
 }
 
 .userName {
+  font-family: var(--font-body);
   font-weight: 600;
   color: var(--color-text);
+  text-shadow: none;
+  font-size: 0.9375rem;
+  line-height: 1.5;
 }
 
 .roleAdmin {
   display: inline-block;
   padding: 0.375rem 0.875rem;
-  background: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-primary) 100%);
-  color: var(--color-secondary);
+  background: linear-gradient(135deg, rgba(45, 80, 22, 0.95) 0%, rgba(74, 124, 44, 0.95) 100%);
+  color: white;
   border-radius: var(--radius-full);
   font-size: 0.8125rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(45, 80, 22, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .roleCustomer {
   display: inline-block;
   padding: 0.375rem 0.875rem;
-  background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
-  color: #2E7D32;
+  background: linear-gradient(135deg, rgba(211, 84, 0, 0.95) 0%, rgba(230, 126, 34, 0.95) 100%);
+  color: white;
   border-radius: var(--radius-full);
   font-size: 0.8125rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(211, 84, 0, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .viewButton {
   padding: 0.625rem 1.25rem;
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  background: #4CAF50;
   color: white;
   border: none;
   border-radius: var(--radius);
@@ -277,9 +311,13 @@
     font-size: 2.25rem;
   }
 
-  .table th,
+  .table th {
+    padding: 0.875rem 1rem;
+    font-size: 0.75rem;
+  }
+
   .table td {
-    padding: 0.75rem 0.5rem;
+    padding: 0.875rem 1rem;
     font-size: 0.875rem;
   }
 

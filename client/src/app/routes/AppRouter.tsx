@@ -25,6 +25,9 @@ const AdminTablesPage = lazy(() => import('@/features/admin/pages/AdminTablesPag
 const AdminReservationsPage = lazy(() => import('@/features/admin/pages/AdminReservationsPage'));
 const AdminUsersPage = lazy(() => import('@/features/admin/pages/AdminUsersPage'));
 const AdminUserDetailPage = lazy(() => import('@/features/admin/pages/AdminUserDetailPage'));
+const AdminRestaurantSettingsPage = lazy(() => import('@/features/admin/pages/AdminRestaurantSettingsPage'));
+const AdminStaffPage = lazy(() => import('@/features/admin/pages/AdminStaffPage'));
+const AdminRolesPage = lazy(() => import('@/features/admin/pages/AdminRolesPage'));
 const DashboardPage = lazy(() => import('@/features/dashboard/pages/DashboardPage'));
 const ProductsPage = lazy(() => import('@/features/products/pages/ProductsPage'));
 const ProductDetailPage = lazy(() => import('@/features/products/pages/ProductDetailPage'));
@@ -174,10 +177,37 @@ export const AppRouter = () => {
           />
           
           <Route
+            path="/admin/staff"
+            element={
+              <AdminRoute>
+                <AdminStaffPage />
+              </AdminRoute>
+            }
+          />
+          
+          <Route
+            path="/admin/roles"
+            element={
+              <AdminRoute>
+                <AdminRolesPage />
+              </AdminRoute>
+            }
+          />
+          
+          <Route
             path="/admin/profile"
             element={
               <AdminRoute>
                 <ProfilePage />
+              </AdminRoute>
+            }
+          />
+          
+          <Route
+            path="/admin/settings"
+            element={
+              <AdminRoute>
+                <AdminRestaurantSettingsPage />
               </AdminRoute>
             }
           />

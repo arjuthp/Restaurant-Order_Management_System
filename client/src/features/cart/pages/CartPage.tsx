@@ -74,7 +74,7 @@ const CartPage = () => {
   if (items.length === 0) {
     return (
       <div className={styles.empty}>
-        <div className={styles.emptyIcon}>🛒</div>
+        <div className={styles.emptyIcon}></div>
         <h2>Your cart is empty</h2>
         <p>Add some delicious items to get started!</p>
         <Button onClick={() => navigate('/products')}>Browse Menu</Button>

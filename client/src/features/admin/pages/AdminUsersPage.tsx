@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usersApi, User } from '@/services/api/usersApi';
 import { LoadingSpinner } from '@/shared/components/LoadingSpinner';
+import { Select } from '@/shared/components/Select';
 import { formatDateTime } from '@/shared/utils/formatters';
 import styles from './AdminUsersPage.module.css';
 
@@ -46,15 +47,15 @@ const AdminUsersPage = () => {
       <div className={styles.header}>
         <h1 className={styles.title}>Users Management</h1>
         <div className={styles.filters}>
-          <select
+          <Select
             value={roleFilter}
-            onChange={(e) => setRoleFilter(e.target.value)}
-            className={styles.filterSelect}
-          >
-            <option value="all">All Roles</option>
-            <option value="customer">Customers</option>
-            <option value="admin">Admins</option>
-          </select>
+            onChange={setRoleFilter}
+            options={[
+              { value: 'all', label: 'All Roles' },
+              { value: 'customer', label: 'Customers' },
+              { value: 'admin', label: 'Admins' },
+            ]}
+          />
         </div>
       </div>
 

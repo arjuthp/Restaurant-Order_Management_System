@@ -139,7 +139,7 @@ const ProductsPage = () => {
         <div className={styles.filtersContainer}>
           <div className={styles.searchContainer}>
             <div className={styles.searchWrapper}>
-              <span className={styles.searchIcon}>🔍</span>
+              <span className={styles.searchIcon}></span>
               <input
                 type="text"
                 placeholder="Search for dishes..."
@@ -153,7 +153,7 @@ const ProductsPage = () => {
                   className={styles.clearButton}
                   aria-label="Clear search"
                 >
-                  ✕
+                  ×
                 </button>
               )}
             </div>
@@ -196,9 +196,7 @@ const ProductsPage = () => {
         </div>
         
         <div className={styles.emptyState}>
-          <div className={styles.emptyIcon}>
-            {debouncedSearchQuery || selectedCategory !== 'all' || showOnlyAvailable ? '🔍' : '🍽️'}
-          </div>
+          <div className={styles.emptyIcon}></div>
           <h2 className={styles.emptyTitle}>
             {debouncedSearchQuery || selectedCategory !== 'all' || showOnlyAvailable ? 'No Results Found' : 'No Products Available'}
           </h2>
@@ -232,7 +230,7 @@ const ProductsPage = () => {
       <div className={styles.filtersContainer}>
         <div className={styles.searchContainer}>
           <div className={styles.searchWrapper}>
-            <span className={styles.searchIcon}>🔍</span>
+            <span className={styles.searchIcon}></span>
             <input
               type="text"
               placeholder="Search for dishes..."
@@ -246,7 +244,7 @@ const ProductsPage = () => {
                 className={styles.clearButton}
                 aria-label="Clear search"
               >
-                ✕
+                ×
               </button>
             )}
           </div>
@@ -307,7 +305,7 @@ const ProductsPage = () => {
                 />
               ) : (
                 <div className={styles.placeholder}>
-                  <span className={styles.placeholderIcon}>🍽️</span>
+                  <span className={styles.placeholderIcon}></span>
                 </div>
               )}
               {!product.is_available && (

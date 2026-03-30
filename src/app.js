@@ -12,6 +12,8 @@ const orderRoutes = require('./routes/order.routes');
 const tableRoutes = require('./routes/table.routes');
 const reservationRoutes = require('./routes/reservation.routes');
 const dashboardRoutes = require('./routes/dashboard.router');
+const staffRoutes = require('./routes/staff.routes');
+const roleRoutes = require('./routes/role.routes');
 
 const app = express();
 
@@ -47,6 +49,8 @@ app.use('/api/tables', tableRoutes);
 app.use('/api/reservations', reservationRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/categories', categoryRoutes);
+app.use('/api/staff', staffRoutes);
+app.use('/api/roles', roleRoutes);
 
 // 404 handler for undefined routes
 app.use((req, res) => {

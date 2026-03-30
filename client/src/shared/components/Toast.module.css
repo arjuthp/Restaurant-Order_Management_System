@@ -1,17 +1,19 @@
 .toast {
   position: fixed;
-  top: 20px;
-  right: 20px;
+  top: 24px;
+  right: 24px;
   padding: 16px 24px;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
   display: flex;
   align-items: center;
   gap: 12px;
-  min-width: 300px;
+  min-width: 320px;
   max-width: 500px;
   z-index: 9999;
   animation: slideIn 0.3s ease-out;
+  font-weight: 500;
+  letter-spacing: 0.01em;
 }
 
 @keyframes slideIn {
@@ -26,18 +28,21 @@
 }
 
 .toast.success {
-  background-color: #10b981;
+  background: linear-gradient(135deg, #2D9B4E 0%, #3FBF63 100%);
   color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .toast.error {
-  background-color: #ef4444;
+  background: linear-gradient(135deg, #DC2626 0%, #EF4444 100%);
   color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .toast.info {
-  background-color: #3b82f6;
+  background: linear-gradient(135deg, #0EA5E9 0%, #38BDF8 100%);
   color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .message {

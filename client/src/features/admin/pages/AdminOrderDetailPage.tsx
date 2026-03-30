@@ -4,6 +4,7 @@ import { ordersApi } from '@/services/api/ordersApi';
 import { Button } from '@/shared/components/Button';
 import { LoadingSpinner } from '@/shared/components/LoadingSpinner';
 import { Toast } from '@/shared/components/Toast';
+import { Select } from '@/shared/components/Select';
 import { formatDateTime, formatCurrency } from '@/shared/utils/formatters';
 import styles from './AdminOrderDetailPage.module.css';
 

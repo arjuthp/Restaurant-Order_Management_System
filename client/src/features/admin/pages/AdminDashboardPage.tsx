@@ -88,7 +88,7 @@ const AdminDashboardPage = () => {
     return (
       <div className={styles.container}>
         <div className={styles.errorContainer}>
-          <div className={styles.errorIcon}>📊</div>
+          <div className={styles.errorIcon}></div>
           <div className={styles.errorMessage}>No data available</div>
         </div>
       </div>
@@ -100,6 +100,26 @@ const AdminDashboardPage = () => {
       {/* Header */}
       <div className={styles.header}>
         <div className={styles.headerLeft}>
+          <div className={styles.logoContainer}>
+            <div className={styles.logo}>
+              <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                <circle cx="24" cy="24" r="22" fill="url(#logoGradient)" />
+                <path d="M24 12L28 20H20L24 12Z" fill="white" opacity="0.9" />
+                <path d="M18 22H30V28H18V22Z" fill="white" opacity="0.9" />
+                <path d="M20 30H28V34H20V30Z" fill="white" opacity="0.9" />
+                <defs>
+                  <linearGradient id="logoGradient" x1="0" y1="0" x2="48" y2="48">
+                    <stop offset="0%" stopColor="#2D5016" />
+                    <stop offset="100%" stopColor="#4A7C2C" />
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+            <div className={styles.logoText}>
+              <div className={styles.logoTitle}>Restaurant Admin</div>
+              <div className={styles.logoSubtitle}>Management Portal</div>
+            </div>
+          </div>
           <h1 className={styles.title}>My Dashboard</h1>
           <p className={styles.subtitle}>Your weekly restaurant dashboard of all</p>
         </div>
@@ -118,12 +138,16 @@ const AdminDashboardPage = () => {
 
       {/* Key Metrics Cards - Now Clickable! */}
       <div className={styles.metricsGrid}>
-        <div 
+          <div 
           className={styles.metricCard}
           onClick={() => navigate('/admin/analytics/products')}
         >
-          <div className={styles.metricIcon} style={{ background: '#FFE5E5' }}>
-            <span style={{ color: '#FF6B6B' }}>📦</span>
+          <div className={styles.metricIcon}>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="9" y1="9" x2="15" y2="9"></line>
+              <line x1="9" y1="15" x2="15" y2="15"></line>
+            </svg>
           </div>
           <div className={styles.metricContent}>
             <div className={styles.metricLabel}>Available Products</div>
@@ -138,8 +162,14 @@ const AdminDashboardPage = () => {
           className={styles.metricCard}
           onClick={() => navigate('/admin/orders')}
         >
-          <div className={styles.metricIcon} style={{ background: '#E8E5FF' }}>
-            <span style={{ color: '#7C3AED' }}>📋</span>
+          <div className={styles.metricIcon}>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
           </div>
           <div className={styles.metricContent}>
             <div className={styles.metricLabel}>Total Orders</div>
@@ -152,8 +182,11 @@ const AdminDashboardPage = () => {
           className={styles.metricCard}
           onClick={() => navigate('/admin/analytics/revenue')}
         >
-          <div className={styles.metricIcon} style={{ background: '#D1F4FF' }}>
-            <span style={{ color: '#0891B2' }}>💰</span>
+          <div className={styles.metricIcon}>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+              <line x1="12" y1="1" x2="12" y2="23"></line>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
           </div>
           <div className={styles.metricContent}>
             <div className={styles.metricLabel}>Total Revenue</div>
@@ -168,8 +201,12 @@ const AdminDashboardPage = () => {
           className={styles.metricCard}
           onClick={() => navigate('/admin/analytics/revenue')}
         >
-          <div className={styles.metricIcon} style={{ background: '#D1FAE5' }}>
-            <span style={{ color: '#10B981' }}>📊</span>
+          <div className={styles.metricIcon}>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
           </div>
           <div className={styles.metricContent}>
             <div className={styles.metricLabel}>Avg Order Value</div>
@@ -182,8 +219,12 @@ const AdminDashboardPage = () => {
           className={styles.metricCard}
           onClick={() => navigate('/admin/analytics/users')}
         >
-          <div className={styles.metricIcon} style={{ background: '#FEF3C7' }}>
-            <span style={{ color: '#F59E0B' }}>🛒</span>
+          <div className={styles.metricIcon}>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+              <circle cx="9" cy="21" r="1"></circle>
+              <circle cx="20" cy="21" r="1"></circle>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+            </svg>
           </div>
           <div className={styles.metricContent}>
             <div className={styles.metricLabel}>Active Carts</div>
@@ -196,8 +237,13 @@ const AdminDashboardPage = () => {
           className={styles.metricCard}
           onClick={() => navigate('/admin/analytics/users')}
         >
-          <div className={styles.metricIcon} style={{ background: '#E0E7FF' }}>
-            <span style={{ color: '#6366F1' }}>👥</span>
+          <div className={styles.metricIcon}>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
           </div>
           <div className={styles.metricContent}>
             <div className={styles.metricLabel}>Total Users</div>
@@ -230,13 +276,19 @@ const AdminDashboardPage = () => {
                 {stats.orders.statusBreakdown.map((status, index) => {
                   const maxCount = Math.max(...stats.orders.statusBreakdown.map(s => s.count));
                   const height = (status.count / maxCount) * 100;
+                  const colors = [
+                    'linear-gradient(135deg, #2D5016 0%, #4A7C2C 100%)',
+                    'linear-gradient(135deg, #D35400 0%, #E67E22 100%)',
+                    'linear-gradient(135deg, #1A3009 0%, #2D5016 100%)',
+                    'linear-gradient(135deg, #FF8C42 0%, #FFA666 100%)'
+                  ];
                   return (
                     <div key={status._id} className={styles.barWrapper}>
                       <div 
                         className={styles.bar} 
                         style={{ 
                           height: `${height}%`,
-                          background: index % 3 === 0 ? '#FF6B6B' : index % 3 === 1 ? '#4ECDC4' : '#FFD93D'
+                          background: colors[index % colors.length]
                         }}
                       ></div>
                       <div className={styles.barLabel}>{status._id.substring(0, 3)}</div>
@@ -282,7 +334,7 @@ const AdminDashboardPage = () => {
                   cy="100"
                   r="80"
                   fill="none"
-                  stroke="#f0f0f0"
+                  stroke="#E0E0E0"
                   strokeWidth="20"
                 />
                 <circle
@@ -290,12 +342,19 @@ const AdminDashboardPage = () => {
                   cy="100"
                   r="80"
                   fill="none"
-                  stroke="#FF6B6B"
+                  stroke="url(#performanceGradient)"
                   strokeWidth="20"
                   strokeDasharray={`${(stats.products.available / stats.products.total) * 502} 502`}
                   strokeLinecap="round"
                   transform="rotate(-90 100 100)"
                 />
+                <defs>
+                  <linearGradient id="performanceGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#2D5016" />
+                    <stop offset="50%" stopColor="#4A7C2C" />
+                    <stop offset="100%" stopColor="#D35400" />
+                  </linearGradient>
+                </defs>
                 <text
                   x="100"
                   y="100"
@@ -310,7 +369,7 @@ const AdminDashboardPage = () => {
             <div className={styles.performanceLabel}>Product Availability</div>
             <div className={styles.performanceStats}>
               <div className={styles.performanceStat}>
-                <span className={styles.statDot} style={{ background: '#FF6B6B' }}></span>
+                <span className={styles.statDot} style={{ background: 'linear-gradient(135deg, #2D5016 0%, #4A7C2C 100%)' }}></span>
                 <span>Available: {stats.products.available}</span>
               </div>
               <div className={styles.performanceStat}>
@@ -378,7 +437,7 @@ const AdminDashboardPage = () => {
             ))
           ) : (
             <div className={styles.emptyState}>
-              <div className={styles.emptyIcon}>📦</div>
+              <div className={styles.emptyIcon}></div>
               <div className={styles.emptyText}>No recent orders</div>
             </div>
           )}

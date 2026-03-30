@@ -181,76 +181,36 @@ const AdminProductsPage = () => {
       setIsSubmitting(true);
       
       if (editingProduct) {
-        // Update existing product
-        // Check if there's an image file to upload
-        if (data.image_file) {
-          // Create FormData for multipart/form-data
-          const formData = new FormData();
-          
-          // Append file and other product fields
-          formData.append('image', data.image_file);
-          formData.append('name', data.name);
-          formData.append('description', data.description);
-          formData.append('price', data.price.toString());
-          formData.append('category', data.category);
-          formData.append('is_available', data.is_available.toString());
-          
-          // Call PATCH /api/products/:id with FormData
-          await productsApi.updateWithImage(editingProduct._id, formData);
-        } else {
-          // No image file, use regular JSON API
-          await productsApi.update(editingProduct._id, {
-            name: data.name,
-            description: data.description,
-            price: data.price,
-            category: data.category,
-            image_url: data.image_url || undefined,
-            is_available: data.is_available,
-          });
-        }
+        // Update existing product - just send the data with images array
+        await productsApi.update(editingProduct._id, {
+          name: data.name,
+          description: data.description,
+          price: data.price,
+          category: data.category,
+          image_url: data.image_url || undefined,
+          images: data.images || [],
+          is_available: data.is_available,
+        });
         
-        // Show success message
         setToast({ message: 'Product updated successfully!', type: 'success' });
       } else {
-        // Create new product
-        // Check if there's an image file to upload
-        if (data.image_file) {
-          // Create FormData for multipart/form-data
-          const formData = new FormData();
-          
-          // Append file and other product fields
-          formData.append('image', data.image_file);
-          formData.append('name', data.name);
-          formData.append('description', data.description);
-          formData.append('price', data.price.toString());
-          formData.append('category', data.category);
-          formData.append('is_available', data.is_available.toString());
-          
-          // Call POST /api/products with FormData
-          await productsApi.createWithImage(formData);
-        } else {
-          // No image file, use regular JSON API
-          await productsApi.create({
-            name: data.name,
-            description: data.description,
-            price: data.price,
-            category: data.category,
-            image_url: data.image_url || undefined,
-            is_available: data.is_available,
-          });
-        }
+        // Create new product - just send the data with images array
+        await productsApi.create({
+          name: data.name,
+          description: data.description,
+          price: data.price,
+          category: data.category,
+          image_url: data.image_url || undefined,
+          images: data.images || [],
+          is_available: data.is_available,
+        });
         
-        // Show success message
         setToast({ message: 'Product created successfully!', type: 'success' });
       }
       
-      // Close modal
       handleCloseModal();
-      
-      // Refresh product list
       await fetchProducts();
     } catch (err: any) {
-      // Handle upload errors
       const errorMessage = err?.response?.data?.message || err?.response?.data?.error?.message || `Failed to ${editingProduct ? 'update' : 'create'} product. Please try again.`;
       setToast({ message: errorMessage, type: 'error' });
       console.error('Error submitting form:', {

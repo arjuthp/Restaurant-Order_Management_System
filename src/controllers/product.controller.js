@@ -34,9 +34,15 @@ async function createProduct(req, res){
     try{
         const productData = req.body;
         
-        // If file was uploaded, add the image URL to product data
-        if (req.file) {
+        // Handle multiple file uploads
+        if (req.files && req.files.length > 0) {
+            productData.images = req.files.map(file => `/uploads/products/${file.filename}`);
+            // Set the first image as the main image_url for backward compatibility
+            productData.image_url = productData.images[0];
+        } else if (req.file) {
+            // Single file upload (backward compatibility)
             productData.image_url = `/uploads/products/${req.file.filename}`;
+            productData.images = [productData.image_url];
         }
         
         const product = await productService.createProduct(productData);
@@ -51,9 +57,28 @@ async function updateProduct(req, res){
     try{
         const updateData = req.body;
         
-        // If file was uploaded, add the image URL to update data
-        if (req.file) {
-            updateData.image_url = `/uploads/products/${req.file.filename}`;
+        // Handle multiple file uploads
+        if (req.files && req.files.length > 0) {
+            const newImages = req.files.map(file => `/uploads/products/${file.filename}`);
+            
+            // If there are existing images, append new ones
+            const existingProduct = await productService.getProductById(req.params.id);
+            updateData.images = [...(existingProduct.images || []), ...newImages];
+            
+            // Update main image_url if it's not set or if this is the first image
+            if (!existingProduct.image_url || existingProduct.images.length === 0) {
+                updateData.image_url = newImages[0];
+            }
+        } else if (req.file) {
+            // Single file upload (backward compatibility)
+            const newImageUrl = `/uploads/products/${req.file.filename}`;
+            
+            const existingProduct = await productService.getProductById(req.params.id);
+            updateData.images = [...(existingProduct.images || []), newImageUrl];
+            
+            if (!existingProduct.image_url) {
+                updateData.image_url = newImageUrl;
+            }
         }
         
         const product = await productService.updateProduct(req.params.id, updateData);

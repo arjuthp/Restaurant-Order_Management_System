@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 *,
 *::before,
@@ -14,90 +14,116 @@ html {
 }
 
 :root {
-  /* Luxurious Gold Palette */
-  --color-primary: #C9A961;
-  --color-primary-light: #E0C589;
-  --color-primary-dark: #A68B4E;
-  --color-secondary: #2C2416;
-  --color-accent: #D4AF37;
-  --color-success: #4CAF50;
-  --color-danger: #E63946;
-  --color-warning: #F4A261;
+  /* Professional Restaurant Color Palette - Green, Orange & White */
+  
+  /* Green Family - Primary */
+  --color-primary: #1B7C38;
+  --color-primary-light: #2D9B4E;
+  --color-primary-lighter: #3FBF63;
+  --color-primary-lightest: #E8F5E9;
+  --color-primary-dark: #165A2E;
+  --color-primary-darker: #0F3F1F;
+  
+  /* Orange Family - Secondary */
+  --color-secondary: #E67E22;
+  --color-secondary-light: #F39C12;
+  --color-secondary-lighter: #F8B739;
+  --color-secondary-lightest: #FFF3E0;
+  --color-secondary-dark: #D35400;
+  --color-secondary-darker: #BA4A00;
+  
+  /* Neutral Family - White & Grays */
+  --color-white: #FFFFFF;
+  --color-bg: #FFFFFF;
+  --color-bg-secondary: #F7F9FB;
+  --color-bg-tertiary: #EEF2F6;
+  --color-bg-light: #FFF8F0;
+  --color-bg-dark: #1F2937;
   
   /* Text Colors */
-  --color-text: #2C2416;
-  --color-text-light: #6B5D47;
-  --color-text-lighter: #9E8E73;
+  --color-text: #1F2937;
+  --color-text-light: #6B7280;
+  --color-text-lighter: #9CA3AF;
   --color-text-inverse: #FFFFFF;
   
-  /* Background Colors */
-  --color-bg: #FAF8F3;
-  --color-bg-secondary: #F5F1E8;
-  --color-bg-tertiary: #EDE7D9;
-  --color-bg-dark: #2C2416;
-  --color-bg-gold: linear-gradient(135deg, #C9A961 0%, #E0C589 100%);
+  /* Semantic Colors */
+  --color-success: #2D9B4E;
+  --color-danger: #DC2626;
+  --color-warning: #F59E0B;
+  --color-info: #0EA5E9;
+  --color-accent: #3FBF63;
+  
+  /* Background Accents */
+  --color-bg-success: #ECFDF5;
+  --color-bg-danger: #FEE2E2;
+  --color-bg-warning: #FFFBEB;
+  --color-bg-info: #F0F9FF;
+  --color-bg-green: #F0FDF4;
+  --color-bg-orange: #FFF7ED;
   
   /* Border & Dividers */
-  --color-border: #D4C5A9;
-  --color-border-light: #E8DCC4;
-  --color-border-gold: #C9A961;
+  --color-border: #E5E7EB;
+  --color-border-light: #F3F4F6;
+  --color-border-dark: #D1D5DB;
+  --color-border-green: #D1FAE5;
+  --color-border-orange: #FEDBA8;
   
-  /* Shadows - Luxurious */
-  --shadow-xs: 0 1px 3px 0 rgba(201, 169, 97, 0.1);
-  --shadow-sm: 0 2px 6px 0 rgba(201, 169, 97, 0.15);
-  --shadow-md: 0 4px 12px 0 rgba(201, 169, 97, 0.2);
-  --shadow-lg: 0 8px 24px 0 rgba(201, 169, 97, 0.25);
-  --shadow-xl: 0 16px 48px 0 rgba(201, 169, 97, 0.3);
-  --shadow-gold: 0 4px 16px rgba(212, 175, 55, 0.4);
+  /* Shadows - Enhanced */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.15);
+  --shadow-xxl: 0 20px 40px rgba(0, 0, 0, 0.2);
+  --shadow-green: 0 8px 20px rgba(27, 124, 56, 0.15);
+  --shadow-orange: 0 8px 20px rgba(230, 126, 34, 0.15);
+  --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.05);
   
   /* Border Radius */
-  --radius-sm: 4px;
-  --radius: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-2xl: 28px;
   --radius-full: 9999px;
   
   /* Transitions */
   --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
   
   /* Typography */
   --font-display: 'Playfair Display', serif;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  
+  /* Letter Spacing */
+  --letter-tight: -0.02em;
+  --letter-normal: 0em;
+  --letter-wide: 0.02em;
 }
 
 body {
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
   color: var(--color-text);
-  background: linear-gradient(135deg, #F5F1E8 0%, #EDE7D9 50%, #F5F1E8 100%);
+  background: #FFF8F0;
   line-height: 1.6;
   min-height: 100vh;
   overflow-x: hidden;
   width: 100%;
   position: relative;
-}
-
-body::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-image: 
-    radial-gradient(circle at 20% 30%, rgba(201, 169, 97, 0.08) 0%, transparent 50%),
-    radial-gradient(circle at 80% 70%, rgba(166, 139, 78, 0.06) 0%, transparent 50%);
-  pointer-events: none;
-  z-index: 0;
+  font-weight: 400;
+  letter-spacing: var(--letter-normal);
 }
 
 #root {
   min-height: 100vh;
   width: 100%;
   overflow-x: hidden;
+  background: transparent;
 }
 
 button {
@@ -116,10 +142,11 @@ a {
   text-decoration: none;
 }
 
-/* Focus styles for accessibility */
+/* Focus styles for accessibility - using green accent */
 *:focus-visible {
-  outline: 2px solid var(--color-primary);
+  outline: 3px solid var(--color-primary);
   outline-offset: 2px;
+  border-radius: var(--radius-sm);
 }
 
 /* Screen reader only class */
@@ -140,7 +167,7 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Selection color */
+/* Selection color - using green with white text */
 ::selection {
   background-color: var(--color-primary);
   color: var(--color-text-inverse);

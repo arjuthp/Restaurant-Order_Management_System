@@ -68,7 +68,27 @@ const AdminProductDetailPage = () => {
 
       <div className={styles.content}>
         <div className={styles.imageSection}>
-          {product.image_url ? (
+          {product.images && product.images.length > 0 ? (
+            <>
+              <img
+                src={product.images[0]}
+                alt={product.name}
+                className={styles.productImage}
+              />
+              {product.images.length > 1 && (
+                <div className={styles.thumbnailGrid}>
+                  {product.images.slice(1).map((image, index) => (
+                    <img
+                      key={index}
+                      src={image}
+                      alt={`${product.name} ${index + 2}`}
+                      className={styles.thumbnail}
+                    />
+                  ))}
+                </div>
+              )}
+            </>
+          ) : product.image_url ? (
             <img
               src={product.image_url}
               alt={product.name}

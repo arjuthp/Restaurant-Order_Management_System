@@ -1,4 +1,4 @@
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useEffect } from 'react';
 import { authApi } from '@/services/api/authApi';
 import { useAuthStore } from '@/store/authStore';
 import { Button } from '@/shared/components/Button';
@@ -13,11 +13,25 @@ interface LoginFormProps {
 export const LoginForm = ({ onSuccess }: LoginFormProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const setAuth = useAuthStore((state) => state.setAuth);
+
+  // Load remembered email and password on component mount
+  useEffect(() => {
+    const rememberedEmail = localStorage.getItem('rememberedEmail');
+    const rememberedPassword = localStorage.getItem('rememberedPassword');
+    if (rememberedEmail) {
+      setEmail(rememberedEmail);
+      setRememberMe(true);
+    }
+    if (rememberedPassword) {
+      setPassword(rememberedPassword);
+    }
+  }, []);
 
   const validateEmail = (email: string): boolean => {
     if (!email) {
@@ -59,6 +73,16 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
     try {
       const response = await authApi.login({ email, password });
       setAuth(response.data.user, response.data.accessToken, response.data.refreshToken);
+      
+      // Save email and password if Remember Me is checked
+      if (rememberMe) {
+        localStorage.setItem('rememberedEmail', email);
+        localStorage.setItem('rememberedPassword', password);
+      } else {
+        localStorage.removeItem('rememberedEmail');
+        localStorage.removeItem('rememberedPassword');
+      }
+      
       onSuccess(response.data.user.role);
     } catch (err: any) {
       console.log('Login error:', err);
@@ -110,6 +134,19 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
         autoComplete="current-password"
         placeholder="••••••••"
       />
+
+      <div className={styles.rememberSection}>
+        <input
+          type="checkbox"
+          id="rememberMe"
+          checked={rememberMe}
+          onChange={(e) => setRememberMe(e.target.checked)}
+          className={styles.checkbox}
+        />
+        <label htmlFor="rememberMe" className={styles.checkboxLabel}>
+          Remember me
+        </label>
+      </div>
 
       <Button type="submit" fullWidth isLoading={isLoading}>
         Sign In

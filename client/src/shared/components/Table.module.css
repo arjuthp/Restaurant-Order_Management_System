@@ -1,0 +1,113 @@
+/* ============================================
+   STANDARDIZED TABLE STYLES
+   Professional, consistent table design system
+   ============================================ */
+
+/* Table Container */
+.tableContainer {
+  background: linear-gradient(135deg, var(--color-bg) 0%, var(--color-bg-secondary) 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  width: 100%;
+  overflow-x: auto;
+  position: relative;
+}
+
+/* Base Table */
+.table {
+  width: 100%;
+  min-width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-body);
+}
+
+/* Table Header */
+.table thead {
+  background: linear-gradient(135deg, #1B7C38 0%, #2D9B4E 100%);
+  position: relative;
+}
+
+.table th {
+  padding: 1.125rem 1.25rem;
+  text-align: left;
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+  position: relative;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  line-height: 1.4;
+}
+
+/* Table Body */
+.table tbody tr {
+  border-bottom: 2px solid var(--color-border);
+  transition: var(--transition-fast);
+  background: var(--color-bg);
+}
+
+.table tbody tr:hover {
+  background: var(--color-bg-success);
+  transform: scale(1.002);
+  border-bottom-color: var(--color-primary-lighter);
+}
+
+.table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.table td {
+  padding: 1rem 1.25rem;
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--color-text);
+  vertical-align: middle;
+  line-height: 1.5;
+  text-shadow: none;
+}
+
+/* Responsive Table Styles */
+@media (max-width: 1024px) {
+  .table th,
+  .table td {
+    padding: 0.875rem 1rem;
+    font-size: 0.875rem;
+  }
+
+  .table th {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .table th,
+  .table td {
+    padding: 0.75rem 0.625rem;
+    font-size: 0.8125rem;
+  }
+
+  .table th {
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+  }
+}
+
+@media (max-width: 480px) {
+  .table th,
+  .table td {
+    padding: 0.625rem 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  .table th {
+    font-size: 0.625rem;
+  }
+}

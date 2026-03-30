@@ -3,6 +3,7 @@ import { reservationsApi, Reservation } from '@/services/api/reservationsApi';
 import { Button } from '@/shared/components/Button';
 import { LoadingSpinner } from '@/shared/components/LoadingSpinner';
 import { Toast } from '@/shared/components/Toast';
+import { Select } from '@/shared/components/Select';
 import { formatDateTime } from '@/shared/utils/formatters';
 import styles from './AdminReservationsPage.module.css';
 
@@ -89,17 +90,18 @@ const AdminReservationsPage = () => {
       <div className={styles.header}>
         <h1 className={styles.title}>Reservations Management</h1>
         <div className={styles.filters}>
-          <select
+          <Select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+            onChange={(value) => setStatusFilter(value)}
+            options={[
+              { value: 'all', label: 'All Statuses' },
+              { value: 'pending', label: 'Pending' },
+              { value: 'confirmed', label: 'Confirmed' },
+              { value: 'completed', label: 'Completed' },
+              { value: 'cancelled', label: 'Cancelled' }
+            ]}
             className={styles.filterSelect}
-          >
-            <option value="all">All Statuses</option>
-            <option value="pending">Pending</option>
-            <option value="confirmed">Confirmed</option>
-            <option value="completed">Completed</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
+          />
         </div>
       </div>
 

@@ -118,8 +118,16 @@ describe('ProductForm', () => {
       name: 'Existing Product',
       description: 'Existing description',
       price: 50,
-      category: 'Western',
+      category: {
+        _id: '1',
+        name: 'Western',
+        slug: 'western'
+      },
       image_url: 'https://example.com/image.jpg',
+      images: ['https://example.com/image.jpg'],
+      quantity: 100,
+      low_stock_threshold: 20,
+      track_inventory: true,
       is_available: false,
       is_deleted: false,
       createdAt: '2024-01-01',

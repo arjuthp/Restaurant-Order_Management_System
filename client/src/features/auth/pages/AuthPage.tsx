@@ -60,7 +60,7 @@ const AuthPage = () => {
 
         <div className={styles.adminLink}>
           <a href="/admin/login" className={styles.link}>
-            🔐 Admin Portal
+            Admin Portal
           </a>
         </div>
       </div>

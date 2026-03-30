@@ -39,6 +39,9 @@ const upload = multer({
 //middleware for single image upload
 const uploadProductImage = upload.single('image');
 
+//middleware for multiple image uploads (up to 5 images)
+const uploadProductImages = upload.array('images', 5);
+
 //Error handling middleware for multer errors
 const handleUploadError = (err, req, res, next) => {
     if(err instanceof multer.MulterError){
@@ -72,5 +75,6 @@ const handleUploadError = (err, req, res, next) => {
 
 module.exports = {
     uploadProductImage,
+    uploadProductImages,
     handleUploadError
 };

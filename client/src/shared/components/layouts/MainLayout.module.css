@@ -2,14 +2,13 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background: #FFF8F0;
 }
 
 .main {
   flex: 1;
-  max-width: 1280px;
   width: 100%;
   margin: 0 auto;
-  padding: 2rem;
 }
 
 @media (max-width: 768px) {

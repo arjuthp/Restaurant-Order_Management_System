@@ -25,19 +25,13 @@ const AdminLoginPage = () => {
   return (
     <div className={styles.container}>
       <div className={styles.card}>
-        <div className={styles.header}>
-          <div className={styles.logo}>
-            <span className={styles.logoIcon}>🔐</span>
-          </div>
-          <h1 className={styles.title}>Admin Portal</h1>
-          <p className={styles.subtitle}>Sign in to manage your restaurant</p>
-        </div>
+        <h1 className={styles.title}>Admin Portal</h1>
         
         <AdminLoginForm onSuccess={handleSuccess} />
 
         <div className={styles.footer}>
           <a href="/auth" className={styles.link}>
-            ← Back to Customer Login
+            Back to Customer Login
           </a>
         </div>
       </div>

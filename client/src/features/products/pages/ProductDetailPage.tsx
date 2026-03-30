@@ -14,6 +14,7 @@ const ProductDetailPage = () => {
   const [error, setError] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const addItem = useCartStore((state) => state.addItem);
 
   useEffect(() => {
@@ -94,7 +95,28 @@ const ProductDetailPage = () => {
 
       <div className={styles.content}>
         <div className={styles.imageSection}>
-          {product.image_url ? (
+          {product.images && product.images.length > 0 ? (
+            <>
+              <img
+                src={product.images[selectedImageIndex]}
+                alt={product.name}
+                className={styles.image}
+              />
+              {product.images.length > 1 && (
+                <div className={styles.thumbnailGrid}>
+                  {product.images.map((image, index) => (
+                    <img
+                      key={index}
+                      src={image}
+                      alt={`${product.name} ${index + 1}`}
+                      className={`${styles.thumbnail} ${selectedImageIndex === index ? styles.thumbnailActive : ''}`}
+                      onClick={() => setSelectedImageIndex(index)}
+                    />
+                  ))}
+                </div>
+              )}
+            </>
+          ) : product.image_url ? (
             <img
               src={product.image_url}
               alt={product.name}
@@ -102,7 +124,7 @@ const ProductDetailPage = () => {
             />
           ) : (
             <div className={styles.placeholder}>
-              <span className={styles.placeholderIcon}>🍽️</span>
+              <span className={styles.placeholderIcon}></span>
             </div>
           )}
         </div>

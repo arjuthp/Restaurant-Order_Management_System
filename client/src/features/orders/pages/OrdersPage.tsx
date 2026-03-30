@@ -95,7 +95,7 @@ const OrdersPage = () => {
       <div className={styles.container}>
         <h1 className={styles.title}>My Orders</h1>
         <div className={styles.emptyState}>
-          <div className={styles.emptyIcon}>📦</div>
+          <div className={styles.emptyIcon}></div>
           <h2 className={styles.emptyTitle}>No Orders Yet</h2>
           <p className={styles.emptyText}>
             You haven't placed any orders yet. Start by browsing our menu!
