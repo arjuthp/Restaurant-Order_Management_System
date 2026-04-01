@@ -34,17 +34,35 @@ const AdminUserDetailPage = () => {
 
       // Load user's orders and reservations
       try {
+        console.log('🔍 [USER DETAIL] Current user ID from URL:', id);
+        console.log('🔍 [USER DETAIL] User data:', userData);
+        
         // Fetch all orders without pagination limit to get this user's orders
         const allOrders = await ordersApi.getAllOrders({ page: 1, limit: 1000 });
+        
+        console.log('📦 [USER DETAIL] Total orders fetched:', allOrders.orders.length);
+        
         const filteredOrders = allOrders.orders.filter(
           (order: any) => {
-            const userId = typeof order.user_id === 'object' ? order.user_id._id : order.user_id;
-            return userId === id;
+            const orderUserId = typeof order.user_id === 'object' && order.user_id !== null
+              ? order.user_id._id 
+              : order.user_id;
+            const match = orderUserId === id;
+            
+            if (match) {
+              console.log(`✅ [USER DETAIL] MATCH! Order ${order._id}: user_id=${orderUserId}`);
+            }
+            
+            return match;
           }
         );
+        
+        console.log('✅ [USER DETAIL] Filtered orders count:', filteredOrders.length);
+        console.log('✅ [USER DETAIL] Filtered orders:', filteredOrders);
+        
         setUserOrders(filteredOrders);
       } catch (err) {
-        console.error('Failed to load user orders:', err);
+        console.error('❌ [USER DETAIL] Failed to load user orders:', err);
       }
 
       try {
