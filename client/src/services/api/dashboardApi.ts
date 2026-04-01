@@ -23,8 +23,7 @@ export interface DashboardStats {
   categories: Array<{ category: string; count: number }>;
   recentActivity: Array<{
     _id: string;
-    order_number: string;
-    total_amount: number;
+    total_price: number;
     status: string;
     createdAt: string;
     user_id: {

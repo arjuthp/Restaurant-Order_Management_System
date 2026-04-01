@@ -75,10 +75,10 @@ export const usersApi = {
   /**
    * Get all users (admin only)
    */
-  getAllUsers: async (): Promise<User[]> => {
+  getAllUsers: async (page: number = 1, limit: number = 1000): Promise<User[]> => {
     console.log('👨‍💼 [USERS API] Fetching all users (admin)');
     try {
-      const response = await apiClient.get<ApiResponse<User[]>>('/users');
+      const response = await apiClient.get<ApiResponse<User[]>>(`/users?page=${page}&limit=${limit}`);
       console.log('✅ [USERS API] All users fetched:', response.data.length);
       // Normalize id to _id for consistency
       const normalizedUsers = response.data.map(user => ({

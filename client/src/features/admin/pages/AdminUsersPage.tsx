@@ -20,7 +20,8 @@ const AdminUsersPage = () => {
   const loadUsers = async () => {
     try {
       setIsLoading(true);
-      const data = await usersApi.getAllUsers();
+      // Fetch all users by setting a high limit
+      const data = await usersApi.getAllUsers(1, 1000);
       setUsers(data);
       setError('');
     } catch (err: any) {

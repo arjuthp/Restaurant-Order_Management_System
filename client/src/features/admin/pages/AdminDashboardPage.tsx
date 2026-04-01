@@ -425,11 +425,11 @@ const AdminDashboardPage = () => {
                   </div>
                   <div className={styles.customerInfo}>
                     <div className={styles.customerName}>{order.user_id?.name || 'Unknown'}</div>
-                    <div className={styles.orderNumber}>#{order.order_number}</div>
+                    <div className={styles.orderNumber}>#{order._id.slice(-8).toUpperCase()}</div>
                   </div>
                 </div>
                 <div className={styles.orderDate}>{formatDate(order.createdAt)}</div>
-                <div className={styles.orderAmount}>{formatCurrency(order.total_amount)}</div>
+                <div className={styles.orderAmount}>{formatCurrency(order.total_price)}</div>
                 <div className={`${styles.orderStatus} ${getStatusClass(order.status)}`}>
                   {order.status}
                 </div>

@@ -49,7 +49,7 @@ class DashboardService {
         const totalOrders = await Order.countDocuments();
         
         const revenueResult = await Order.aggregate([
-            { $group: { _id: null, totalRevenue: { $sum: '$total_amount' } } }
+            { $group: { _id: null, totalRevenue: { $sum: '$total_price' } } }
         ]);
         
         const totalRevenue = revenueResult.length > 0 ? revenueResult[0].totalRevenue : 0;
@@ -117,7 +117,7 @@ class DashboardService {
             .sort({ createdAt: -1 })
             .limit(limit)
             .populate('user_id', 'name email')
-            .select('order_number total_amount status createdAt');
+            .select('total_price status createdAt');
 
         return orders;
     }
