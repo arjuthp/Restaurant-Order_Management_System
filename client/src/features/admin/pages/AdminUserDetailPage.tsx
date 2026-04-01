@@ -34,7 +34,8 @@ const AdminUserDetailPage = () => {
 
       // Load user's orders and reservations
       try {
-        const allOrders = await ordersApi.getAllOrders();
+        // Fetch all orders without pagination limit to get this user's orders
+        const allOrders = await ordersApi.getAllOrders({ page: 1, limit: 1000 });
         const filteredOrders = allOrders.orders.filter(
           (order: any) => {
             const userId = typeof order.user_id === 'object' ? order.user_id._id : order.user_id;
