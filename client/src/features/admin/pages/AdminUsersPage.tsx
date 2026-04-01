@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { usersApi, User } from '@/services/api/usersApi';
 import { LoadingSpinner } from '@/shared/components/LoadingSpinner';
 import { Select } from '@/shared/components/Select';
+import { Pagination } from '@/shared/components/Pagination';
 import { formatDateTime } from '@/shared/utils/formatters';
 import styles from './AdminUsersPage.module.css';
 
@@ -12,23 +13,35 @@ const AdminUsersPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalUsers, setTotalUsers] = useState(0);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     loadUsers();
-  }, []);
+  }, [currentPage]);
 
   const loadUsers = async () => {
     try {
       setIsLoading(true);
-      // Fetch all users by setting a high limit
-      const data = await usersApi.getAllUsers(1, 1000);
+      const data = await usersApi.getAllUsers(currentPage, itemsPerPage);
       setUsers(data);
+      // Calculate total pages based on total users
+      const total = data.length >= itemsPerPage ? currentPage * itemsPerPage + 1 : currentPage * itemsPerPage;
+      setTotalUsers(total);
+      setTotalPages(Math.ceil(total / itemsPerPage));
       setError('');
     } catch (err: any) {
       setError(err.response?.data?.error?.message || 'Failed to load users');
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleViewUser = (userId: string) => {
@@ -121,6 +134,15 @@ const AdminUsersPage = () => {
         <div className={styles.emptyState}>
           <p>No users found.</p>
         </div>
+      )}
+
+      {filteredUsers.length > 0 && totalPages > 1 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalUsers}
+          onPageChange={handlePageChange}
+        />
       )}
     </div>
   );

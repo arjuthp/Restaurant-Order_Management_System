@@ -75,7 +75,7 @@ export const usersApi = {
   /**
    * Get all users (admin only)
    */
-  getAllUsers: async (page: number = 1, limit: number = 1000): Promise<User[]> => {
+  getAllUsers: async (page: number = 1, limit: number = 10): Promise<User[]> => {
     console.log('👨‍💼 [USERS API] Fetching all users (admin)');
     try {
       const response = await apiClient.get<ApiResponse<User[]>>(`/users?page=${page}&limit=${limit}`);
