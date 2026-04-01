@@ -460,24 +460,23 @@ export const ProductForm = ({ product, onSubmit, onCancel, isLoading = false, pr
                     {url.substring(0, 60)}...
                   </div>
                   {formData.image_url === url && (
-                    <span className={styles.mainImageBadge}>Main Image</span>
+                    <span className={styles.mainImageBadge}>✓ Main Image</span>
                   )}
                 </div>
                 <div className={styles.imageUrlActions}>
-                  {formData.image_url !== url && (
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="secondary"
-                      onClick={() => handleSetAsMainImage(url)}
-                    >
-                      Set as Main
-                    </Button>
-                  )}
                   <Button
                     type="button"
                     size="sm"
-                    variant="secondary"
+                    variant={formData.image_url === url ? "primary" : "secondary"}
+                    onClick={() => handleSetAsMainImage(url)}
+                    disabled={formData.image_url === url}
+                  >
+                    {formData.image_url === url ? "Main Image" : "Set as Main"}
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="danger"
                     onClick={() => handleRemoveImageFromArray(index)}
                   >
                     Remove

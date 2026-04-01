@@ -2,12 +2,12 @@
 ### 🪑 TABLE MANAGEMENT API TESTS
 ### ============================================
 ### Prerequisites: 
-### 1. Server running on http://localhost:5000
+### 1. Server running on http://localhost:5002
 ### 2. Admin user created in database
 ### 3. Run auth tests first to get tokens
 ### ============================================
 
-@baseUrl = http://localhost:5000/api
+@baseUrl = http://localhost:5002/api
 @adminToken = 
 @tableId = 
 

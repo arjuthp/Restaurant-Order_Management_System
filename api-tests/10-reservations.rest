@@ -2,12 +2,12 @@
 ### 📅 RESERVATION SYSTEM API TESTS
 ### ============================================
 ### Prerequisites:
-### 1. Server running on http://localhost:5000
+### 1. Server running on http://localhost:5002
 ### 2. At least one table created (run 09-tables.rest first)
 ### 3. Customer and Admin users logged in
 ### ============================================
 
-@baseUrl = http://localhost:5000/api
+@baseUrl = http://localhost:5002/api
 @accessToken = 
 @adminToken = 
 @tableId = 

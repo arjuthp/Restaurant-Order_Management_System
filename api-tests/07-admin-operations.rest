@@ -3,7 +3,7 @@
 ### ============================================
 ### This file contains all admin-specific operations across modules
 
-@baseUrl = http://localhost:5000/api
+@baseUrl = http://localhost:5002/api
 @adminToken = your_admin_token_here
 @customerToken = your_customer_token_here
 @productId = your_product_id_here

@@ -2,7 +2,7 @@
 ### 🛒 CART API TESTS
 ### ============================================
 
-@baseUrl = http://localhost:5000/api
+@baseUrl = http://localhost:5002/api
 # IMPORTANT: Replace this with actual token from login response
 @accessToken = your_customer_token_here
 @productId = your_product_id_here

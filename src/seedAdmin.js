@@ -48,15 +48,15 @@ async function seedAdmin() {
             address: null
         });
 
-        console.log('\n✅ Admin user created successfully!');
+        console.log('\n[SUCCESS] Admin user created successfully!');
         console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.log('📧 Email:', admin.email);
-        console.log('🔑 Password:', ADMIN_PASSWORD);
-        console.log('👤 Name:', admin.name);
-        console.log('🎭 Role:', admin.role);
+        console.log('[EMAIL] Email:', admin.email);
+        console.log('[PASSWORD] Password:', ADMIN_PASSWORD);
+        console.log('[NAME] Name:', admin.name);
+        console.log('[ROLE] Role:', admin.role);
         console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.log('\n⚠️  IMPORTANT: Change the password after first login!');
-        console.log('🔗 Login at: http://localhost:5173/admin/login\n');
+        console.log('\n[WARNING] IMPORTANT: Change the password after first login!');
+        console.log('[INFO] Login at: http://localhost:5173/admin/login\n');
 
     } catch (error) {
         console.error('❌ Error creating admin user:', error.message);

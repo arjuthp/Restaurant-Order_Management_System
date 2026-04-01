@@ -2,7 +2,7 @@
 ### 🍕 PRODUCT API TESTS
 ### ============================================
 
-@baseUrl = http://localhost:5000/api
+@baseUrl = http://localhost:5002/api
 @accessToken = your_token_here
 @adminToken = your_admin_token_here
 @productId = 

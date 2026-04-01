@@ -508,7 +508,7 @@ async function seedDatabase() {
     // ========== STEP 2: Create Categories ==========
     console.log('\n📁 Creating categories...');
     const createdCategories = await Category.insertMany(categories);
-    console.log(`   ✓ ${createdCategories.length} categories created`);
+    console.log(`   [OK] ${createdCategories.length} categories created`);
 
     // Create a map of category names to their ObjectIds
     const categoryMap = {};
@@ -517,26 +517,26 @@ async function seedDatabase() {
     });
 
     // Display created categories
-    console.log('\n📋 Category IDs:');
+    console.log('\n[CATEGORIES] Category IDs:');
     createdCategories.forEach(cat => {
       console.log(`   - ${cat.name}: ${cat._id}`);
     });
 
     // ========== STEP 3: Create Products with Category References ==========
-    console.log('\n🍽️  Creating products with category references...');
+    console.log('\n[PRODUCTS] Creating products with category references...');
     const productsData = getProductsData(categoryMap);
     const createdProducts = await Product.insertMany(productsData);
     console.log(`   ✓ ${createdProducts.length} products created`);
 
     // Display product count by category
-    console.log('\n📊 Products by category:');
+    console.log('\n[STATS] Products by category:');
     for (const [categoryName, categoryId] of Object.entries(categoryMap)) {
       const count = createdProducts.filter(p => p.category.toString() === categoryId.toString()).length;
       console.log(`   - ${categoryName}: ${count} products`);
     }
 
     // ========== STEP 4: Verify Data ==========
-    console.log('\n🔍 Verifying data...');
+    console.log('\n[VERIFY] Verifying data...');
     const totalCategories = await Category.countDocuments();
     const totalProducts = await Product.countDocuments();
     const activeProducts = await Product.countDocuments({ is_available: true });
@@ -555,8 +555,8 @@ async function seedDatabase() {
     }
 
     // Close connection
-    console.log('\n✅ Database seeding completed successfully!');
-    console.log('👋 Closing database connection...\n');
+    console.log('\n[SUCCESS] Database seeding completed successfully!');
+    console.log('[DONE] Closing database connection...\n');
     mongoose.connection.close();
 
   } catch (error) {

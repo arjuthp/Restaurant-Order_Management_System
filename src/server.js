@@ -3,13 +3,13 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const app = require('./app');
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5002;
 
 // Graceful shutdown handler
 const gracefulShutdown = () => {
-    console.log('\n🛑 Shutting down gracefully...');
+    console.log('\n[SHUTDOWN] Shutting down gracefully...');
     server.close(() => {
-        console.log('✅ Server closed');
+        console.log('[SUCCESS] Server closed');
         mongoose.connection.close(false, () => {
             console.log('✅ MongoDB connection closed');
             process.exit(0);
@@ -36,18 +36,18 @@ let server;
 
 mongoose.connect(process.env.MONGO_URI)
 .then(() => {
-    console.log('✅ MongoDB connected');
+    console.log('[SUCCESS] MongoDB connected');
     server = app.listen(PORT, () => {
-        console.log(`🚀 Server Started: http://localhost:${PORT}`);
-        console.log(`📚 API Base: http://localhost:${PORT}/api`);
+        console.log(`[SERVER] Server Started: http://localhost:${PORT}`);
+        console.log(`[API] API Base: http://localhost:${PORT}/api`);
     });
     
     // Handle server errors
     server.on('error', (err) => {
         if (err.code === 'EADDRINUSE') {
-            console.error(`❌ Port ${PORT} is already in use!`);
-            console.log(`💡 Try: kill -9 $(lsof -ti:${PORT})`);
-            console.log(`💡 Or change PORT in .env file`);
+            console.error(`[ERROR] Port ${PORT} is already in use!`);
+            console.log(`[TIP] Try: kill -9 $(lsof -ti:${PORT})`);
+            console.log(`[TIP] Or change PORT in .env file`);
             process.exit(1);
         } else {
             console.error('❌ Server error:', err);

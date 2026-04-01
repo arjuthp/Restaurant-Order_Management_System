@@ -213,6 +213,84 @@
   border-left: 4px solid var(--color-orange);
 }
 
+/* Stock Information */
+.stockInfo {
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  border: 3px solid;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  margin: 1rem 0;
+}
+
+.inStock,
+.lowStock,
+.outOfStock {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.stockIcon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.stockTitle {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.stockText {
+  font-size: 0.9375rem;
+  opacity: 0.9;
+}
+
+.inStock {
+  color: #1B7C38;
+}
+
+.lowStock {
+  color: #E67E22;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.outOfStock {
+  color: #C84B31;
+}
+
+.stockInfo:has(.inStock) {
+  background: linear-gradient(135deg, rgba(27, 124, 56, 0.1) 0%, rgba(27, 124, 56, 0.05) 100%);
+  border-color: rgba(27, 124, 56, 0.3);
+}
+
+.stockInfo:has(.lowStock) {
+  background: linear-gradient(135deg, rgba(230, 126, 34, 0.1) 0%, rgba(230, 126, 34, 0.05) 100%);
+  border-color: rgba(230, 126, 34, 0.3);
+}
+
+.stockInfo:has(.outOfStock) {
+  background: linear-gradient(135deg, rgba(200, 75, 49, 0.1) 0%, rgba(200, 75, 49, 0.05) 100%);
+  border-color: rgba(200, 75, 49, 0.3);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.maxQuantityNote {
+  font-size: 0.875rem;
+  color: #E67E22;
+  font-weight: 600;
+  margin-left: 1rem;
+}
+
 .actions {
   display: flex;
   flex-direction: column;

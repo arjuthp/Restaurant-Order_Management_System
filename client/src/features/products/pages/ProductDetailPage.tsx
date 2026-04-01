@@ -148,6 +148,41 @@ const ProductDetailPage = () => {
             {product.description || 'No description available'}
           </p>
 
+          {/* Stock Information */}
+          {product.track_inventory && (
+            <div className={styles.stockInfo}>
+              {product.quantity > 0 ? (
+                <>
+                  {product.quantity <= product.low_stock_threshold ? (
+                    <div className={styles.lowStock}>
+                      <span className={styles.stockIcon}>⚠️</span>
+                      <div>
+                        <div className={styles.stockTitle}>Low Stock Alert</div>
+                        <div className={styles.stockText}>Only {product.quantity} items left in stock!</div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className={styles.inStock}>
+                      <span className={styles.stockIcon}>✓</span>
+                      <div>
+                        <div className={styles.stockTitle}>In Stock</div>
+                        <div className={styles.stockText}>{product.quantity} items available</div>
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className={styles.outOfStock}>
+                  <span className={styles.stockIcon}>✗</span>
+                  <div>
+                    <div className={styles.stockTitle}>Out of Stock</div>
+                    <div className={styles.stockText}>This item is currently unavailable</div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           <div className={styles.actions}>
             <div className={styles.quantitySelector}>
               <label className={styles.quantityLabel}>Quantity:</label>
@@ -163,20 +198,23 @@ const ProductDetailPage = () => {
                 <button
                   className={styles.quantityButton}
                   onClick={() => handleQuantityChange(quantity + 1)}
-                  disabled={quantity >= 10}
+                  disabled={quantity >= 10 || (product.track_inventory && quantity >= product.quantity)}
                 >
                   +
                 </button>
               </div>
+              {product.track_inventory && quantity >= product.quantity && (
+                <span className={styles.maxQuantityNote}>Max available: {product.quantity}</span>
+              )}
             </div>
 
             <Button
               onClick={handleAddToCart}
-              disabled={!product.is_available || isAddingToCart}
+              disabled={!product.is_available || isAddingToCart || product.quantity === 0}
               size="lg"
               className={styles.addToCartButton}
             >
-              {isAddingToCart ? 'Adding...' : product.is_available ? 'Add to Cart' : 'Unavailable'}
+              {isAddingToCart ? 'Adding...' : product.is_available && product.quantity > 0 ? 'Add to Cart' : 'Out of Stock'}
             </Button>
           </div>
         </div>

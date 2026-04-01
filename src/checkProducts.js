@@ -9,7 +9,7 @@ async function checkProducts() {
 
     const products = await Product.find().sort({ category: 1, name: 1 });
     
-    console.log(`📦 Total Products in Database: ${products.length}\n`);
+    console.log(`[TOTAL] Total Products in Database: ${products.length}\n`);
     
     // Group by category
     const categories = {};
@@ -22,7 +22,7 @@ async function checkProducts() {
 
     // Display by category
     Object.keys(categories).sort().forEach(category => {
-      console.log(`\n🍽️  ${category.toUpperCase()} (${categories[category].length} items)`);
+      console.log(`\n[CATEGORY] ${category.toUpperCase()} (${categories[category].length} items)`);
       console.log('─'.repeat(60));
       categories[category].forEach(product => {
         const status = product.is_available ? '✅' : '❌';

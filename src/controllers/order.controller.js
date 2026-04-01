@@ -5,9 +5,9 @@ const orderService = new OrderService();
 
 async function createOrder(req, res) {
     try{
-        console.log('🔍 [CREATE ORDER] Request body:', JSON.stringify(req.body, null, 2));
-        console.log('🔍 [CREATE ORDER] itemsToOrder type:', typeof req.body.itemsToOrder);
-        console.log('🔍 [CREATE ORDER] itemsToOrder value:', req.body.itemsToOrder);
+        console.log('[DEBUG] [CREATE ORDER] Request body:', JSON.stringify(req.body, null, 2));
+        console.log('[DEBUG] [CREATE ORDER] itemsToOrder type:', typeof req.body.itemsToOrder);
+        console.log('[DEBUG] [CREATE ORDER] itemsToOrder value:', req.body.itemsToOrder);
         
         const {itemsToOrder, notes } = req.body;
 

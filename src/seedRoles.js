@@ -49,9 +49,9 @@ async function seedRoles() {
         // Connect to MongoDB
         const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/restaurant_db';
         await mongoose.connect(mongoUri);
-        console.log('✅ Connected to MongoDB');
+        console.log('[SUCCESS] Connected to MongoDB');
 
-        console.log('\n🔄 Starting role seeding process...\n');
+        console.log('\n[START] Starting role seeding process...\n');
 
         let createdCount = 0;
         let skippedCount = 0;
@@ -72,17 +72,17 @@ async function seedRoles() {
         }
 
         console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.log('📊 Seeding Summary:');
-        console.log(`   ✅ Created: ${createdCount} role(s)`);
-        console.log(`   ⏭️  Skipped: ${skippedCount} role(s) (already existed)`);
-        console.log(`   📝 Total: ${DEFAULT_ROLES.length} role(s)`);
+        console.log('[SUMMARY] Seeding Summary:');
+        console.log(`   [OK] Created: ${createdCount} role(s)`);
+        console.log(`   [SKIP] Skipped: ${skippedCount} role(s) (already existed)`);
+        console.log(`   [TOTAL] Total: ${DEFAULT_ROLES.length} role(s)`);
         console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
 
         if (createdCount > 0) {
-            console.log('✅ Default roles seeded successfully!');
-            console.log('🎯 You can now test staff creation with these roles.\n');
+            console.log('[SUCCESS] Default roles seeded successfully!');
+            console.log('[INFO] You can now test staff creation with these roles.\n');
         } else {
-            console.log('ℹ️  All roles already exist. No new roles were created.\n');
+            console.log('[INFO] All roles already exist. No new roles were created.\n');
         }
 
     } catch (error) {

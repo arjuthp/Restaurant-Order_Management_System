@@ -2,7 +2,9 @@
  * Build MongoDB query filters for products
  * Handles: search (text), category, availability
  */
-const buildProductFilters = (queryParams) => {
+const Category = require('../models/category.model');
+
+const buildProductFilters = async (queryParams) => {
     const filter = {
         is_deleted: false // Always exclude deleted products
     };
@@ -15,9 +17,28 @@ const buildProductFilters = (queryParams) => {
         ];
     }
     
-    // CATEGORY FILTER - Exact match
+    // CATEGORY FILTER - Handle both name and ID
     if (queryParams.category && queryParams.category !== 'all') {
-        filter.category = queryParams.category;
+        // Check if it's a valid ObjectId
+        const mongoose = require('mongoose');
+        if (mongoose.Types.ObjectId.isValid(queryParams.category)) {
+            // It's an ID, use directly
+            filter.category = queryParams.category;
+        } else {
+            // It's a name, look up the category ID
+            const category = await Category.findOne({ 
+                name: queryParams.category,
+                is_deleted: false,
+                is_active: true
+            });
+            
+            if (category) {
+                filter.category = category._id;
+            } else {
+                // Category not found, return filter that matches nothing
+                filter.category = null;
+            }
+        }
     }
     
     // AVAILABILITY FILTER - Boolean

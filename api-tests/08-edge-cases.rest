@@ -3,7 +3,7 @@
 ### ============================================
 ### This file tests error handling, validation, and edge cases
 
-@baseUrl = http://localhost:5000/api
+@baseUrl = http://localhost:5002/api
 @customerToken = your_customer_token_here
 @adminToken = your_admin_token_here
 

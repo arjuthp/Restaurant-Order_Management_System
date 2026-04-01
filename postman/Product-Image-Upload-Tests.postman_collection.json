@@ -18,7 +18,7 @@
 	"variable": [
 		{
 			"key": "baseUrl",
-			"value": "http://localhost:5000/api",
+			"value": "http://localhost:5002/api",
 			"type": "string"
 		},
 		{
@@ -346,10 +346,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:5000{{imageUrl}}",
+					"raw": "http://localhost:5002{{imageUrl}}",
 					"protocol": "http",
 					"host": ["localhost"],
-					"port": "5000",
+					"port": "5002",
 					"path": ["{{imageUrl}}"]
 				},
 				"description": "**Test:** Verify uploaded image is accessible via URL\n\n**Expected Result:**\n- Status: 200 OK\n- Content-Type: image/jpeg, image/png, or image/webp\n- Image file is returned\n- No authentication required (public access)"

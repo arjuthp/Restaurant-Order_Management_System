@@ -11,8 +11,8 @@ class ProductService {
         console.log('Database:', mongoose.connection.name);
         console.log('Connection state:', mongoose.connection.readyState);
     
-        // STEP 1: Build filter from query params
-        const filter = buildProductFilters(queryParams);
+        // STEP 1: Build filter from query params (now async)
+        const filter = await buildProductFilters(queryParams);
         console.log('MongoDB filter:', filter);
 
         // STEP 2: Count total matching items (AFTER filters)

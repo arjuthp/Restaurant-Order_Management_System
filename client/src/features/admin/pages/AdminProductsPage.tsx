@@ -62,10 +62,12 @@ const AdminProductsPage = () => {
 
   useEffect(() => {
     applyFilters();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [products, searchQuery, selectedCategory, availabilityFilter]);
 
   useEffect(() => {
     applyPagination();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filteredProducts, currentPage]);
 
   const fetchCategories = async () => {
@@ -120,7 +122,10 @@ const AdminProductsPage = () => {
     }
 
     setFilteredProducts(filtered);
-    setCurrentPage(1); // Reset to first page when filters change
+    // Reset to first page when filters change (only if not already on page 1)
+    if (currentPage !== 1) {
+      setCurrentPage(1);
+    }
   };
 
   const applyPagination = () => {

@@ -332,7 +332,7 @@ async function seedProducts() {
 
     // Clear existing products (optional - comment out if you want to keep existing)
     await Product.deleteMany();
-    console.log('🗑️  Old products cleared...');
+    console.log('[CLEANUP] Old products cleared...');
 
     // Insert menu items
     await Product.insertMany(menuItems);
@@ -340,9 +340,9 @@ async function seedProducts() {
 
     // Close connection
     mongoose.connection.close();
-    console.log('👋 Database connection closed');
+    console.log('[DONE] Database connection closed');
   } catch (error) {
-    console.error('❌ Error seeding products:', error);
+    console.error('[ERROR] Error seeding products:', error);
     mongoose.connection.close();
   }
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { productsApi, Product, PaginationMetadata } from '@/services/api/productsApi';
 import { useCartStore } from '@/store/cartStore';
@@ -13,7 +13,7 @@ const ProductsPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
+  const [activeSearchQuery, setActiveSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [showOnlyAvailable, setShowOnlyAvailable] = useState(false);
   const [categories, setCategories] = useState<string[]>([]);
@@ -26,25 +26,26 @@ const ProductsPage = () => {
   });
   const addItem = useCartStore((state) => state.addItem);
 
-  // Debounce search query
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearchQuery(searchQuery);
-    }, 300);
+  // Handle search submission
+  const handleSearch = () => {
+    setActiveSearchQuery(searchQuery);
+  };
 
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
+  // Handle Enter key press in search input
+  const handleSearchKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
 
-  // Reset to page 1 when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [debouncedSearchQuery, selectedCategory, showOnlyAvailable]);
+  // Clear search
+  const handleClearSearch = () => {
+    setSearchQuery('');
+    setActiveSearchQuery('');
+  };
 
-  useEffect(() => {
-    loadProducts();
-  }, [debouncedSearchQuery, selectedCategory, showOnlyAvailable, currentPage]);
-
-  const loadProducts = async () => {
+  // Memoized load function
+  const loadProducts = useCallback(async () => {
     try {
       setIsLoading(true);
       const params: { 
@@ -58,8 +59,8 @@ const ProductsPage = () => {
         limit: 12,
       };
       
-      if (debouncedSearchQuery) {
-        params.search = debouncedSearchQuery;
+      if (activeSearchQuery) {
+        params.search = activeSearchQuery;
       }
       
       if (selectedCategory && selectedCategory !== 'all') {
@@ -91,7 +92,23 @@ const ProductsPage = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [currentPage, activeSearchQuery, selectedCategory, showOnlyAvailable]);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    if (currentPage !== 1) {
+      setCurrentPage(1);
+    } else {
+      // If already on page 1, load products directly
+      loadProducts();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeSearchQuery, selectedCategory, showOnlyAvailable]);
+
+  // Load products when page changes (but not when filters change)
+  useEffect(() => {
+    loadProducts();
+  }, [currentPage, loadProducts]);
 
   const handleAddToCart = async (product: Product) => {
     try {
@@ -145,17 +162,25 @@ const ProductsPage = () => {
                 placeholder="Search for dishes..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyPress={handleSearchKeyPress}
                 className={styles.searchInput}
               />
               {searchQuery && (
                 <button
-                  onClick={() => setSearchQuery('')}
+                  onClick={handleClearSearch}
                   className={styles.clearButton}
                   aria-label="Clear search"
                 >
                   ×
                 </button>
               )}
+              <Button
+                size="sm"
+                onClick={handleSearch}
+                className={styles.searchButton}
+              >
+                Search
+              </Button>
             </div>
           </div>
           
@@ -198,17 +223,18 @@ const ProductsPage = () => {
         <div className={styles.emptyState}>
           <div className={styles.emptyIcon}></div>
           <h2 className={styles.emptyTitle}>
-            {debouncedSearchQuery || selectedCategory !== 'all' || showOnlyAvailable ? 'No Results Found' : 'No Products Available'}
+            {activeSearchQuery || selectedCategory !== 'all' || showOnlyAvailable ? 'No Results Found' : 'No Products Available'}
           </h2>
           <p className={styles.emptyText}>
-            {debouncedSearchQuery || selectedCategory !== 'all' || showOnlyAvailable
+            {activeSearchQuery || selectedCategory !== 'all' || showOnlyAvailable
               ? `No products match your filters. Try adjusting your search or category.`
               : 'Check back later for delicious menu items!'}
           </p>
-          {(debouncedSearchQuery || selectedCategory !== 'all' || showOnlyAvailable) && (
+          {(activeSearchQuery || selectedCategory !== 'all' || showOnlyAvailable) && (
             <Button 
               onClick={() => {
                 setSearchQuery('');
+                setActiveSearchQuery('');
                 setSelectedCategory('all');
                 setShowOnlyAvailable(false);
               }} 
@@ -236,17 +262,25 @@ const ProductsPage = () => {
               placeholder="Search for dishes..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyPress={handleSearchKeyPress}
               className={styles.searchInput}
             />
             {searchQuery && (
               <button
-                onClick={() => setSearchQuery('')}
+                onClick={handleClearSearch}
                 className={styles.clearButton}
                 aria-label="Clear search"
               >
                 ×
               </button>
             )}
+            <Button
+              size="sm"
+              onClick={handleSearch}
+              className={styles.searchButton}
+            >
+              Search
+            </Button>
           </div>
         </div>
         
@@ -327,14 +361,37 @@ const ProductsPage = () => {
                 {product.description || 'No description available'}
               </p>
               
+              {/* Stock Information */}
+              {product.track_inventory && (
+                <div className={styles.stockInfo}>
+                  {product.quantity > 0 ? (
+                    <>
+                      {product.quantity <= product.low_stock_threshold ? (
+                        <span className={styles.lowStock}>
+                          ⚠️ Only {product.quantity} left in stock!
+                        </span>
+                      ) : (
+                        <span className={styles.inStock}>
+                          ✓ {product.quantity} available
+                        </span>
+                      )}
+                    </>
+                  ) : (
+                    <span className={styles.outOfStock}>
+                      ✗ Out of stock
+                    </span>
+                  )}
+                </div>
+              )}
+              
               <div className={styles.footer}>
                 <span className={styles.price}>${product.price.toFixed(2)}</span>
                 <Button
                   size="sm"
                   onClick={() => handleAddToCart(product)}
-                  disabled={!product.is_available}
+                  disabled={!product.is_available || product.quantity === 0}
                 >
-                  {product.is_available ? 'Add to Cart' : 'Unavailable'}
+                  {product.is_available && product.quantity > 0 ? 'Add to Cart' : 'Out of Stock'}
                 </Button>
               </div>
             </div>
