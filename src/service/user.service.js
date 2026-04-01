@@ -12,10 +12,11 @@ class UserService {
         const totalItems = await User.countDocuments({});
         //calculate pagination
         const { skip, pagination } = calculatePagination(page, limit, totalItems);
-        //get paginated users
+        //get paginated users sorted by creation date (newest first)
         
         const users = await User.find()
         .select('-password')
+        .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit);
         //format users and return with pagination
