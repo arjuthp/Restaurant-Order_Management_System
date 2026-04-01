@@ -37,6 +37,8 @@ const AdminOrdersPage = () => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
+  const [tempStartDate, setTempStartDate] = useState<string>('');
+  const [tempEndDate, setTempEndDate] = useState<string>('');
   const [pagination, setPagination] = useState<PaginationMetadata>({
     currentPage: 1,
     totalPages: 1,
@@ -45,12 +47,14 @@ const AdminOrdersPage = () => {
   });
 
   useEffect(() => {
-    loadOrders(pagination.currentPage, statusFilter, startDate, endDate);
-  }, [statusFilter, startDate, endDate]);
+    loadOrders(1, statusFilter, startDate, endDate);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [statusFilter]);
 
   const loadOrders = async (page: number = 1, status?: string, start?: string, end?: string) => {
     try {
       setIsLoading(true);
+      setError(''); // Clear previous errors
       const params: { page: number; limit: number; status?: string; startDate?: string; endDate?: string } = { page, limit: 10 };
       if (status && status !== 'all') {
         params.status = status;
@@ -61,12 +65,20 @@ const AdminOrdersPage = () => {
       if (end) {
         params.endDate = end;
       }
+      
+      console.log('Loading orders with params:', params);
+      
       const response = await ordersApi.getAllOrders(params);
       setOrders(response.orders);
       setPagination(response.pagination);
-      setError('');
     } catch (err: any) {
-      setError(err.response?.data?.error?.message || 'Failed to load orders');
+      console.error('Failed to load orders:', err);
+      const errorMessage = err.response?.data?.error?.message 
+        || err.response?.data?.message 
+        || err.message 
+        || 'Failed to load orders';
+      setError(errorMessage);
+      setOrders([]); // Clear orders on error
     } finally {
       setIsLoading(false);
     }
@@ -84,19 +96,27 @@ const AdminOrdersPage = () => {
   };
 
   const handleStartDateChange = (date: string) => {
-    setStartDate(date);
-    setPagination((prev) => ({ ...prev, currentPage: 1 }));
+    setTempStartDate(date);
   };
 
   const handleEndDateChange = (date: string) => {
-    setEndDate(date);
+    setTempEndDate(date);
+  };
+
+  const handleApplyDateFilter = () => {
+    setStartDate(tempStartDate);
+    setEndDate(tempEndDate);
     setPagination((prev) => ({ ...prev, currentPage: 1 }));
+    loadOrders(1, statusFilter, tempStartDate, tempEndDate);
   };
 
   const handleClearDateFilter = () => {
     setStartDate('');
     setEndDate('');
+    setTempStartDate('');
+    setTempEndDate('');
     setPagination((prev) => ({ ...prev, currentPage: 1 }));
+    loadOrders(1, statusFilter, '', '');
   };
 
   const getStatusColor = (status: string): string => {
@@ -186,15 +206,92 @@ const AdminOrdersPage = () => {
   }
 
   if (orders.length === 0) {
+    const hasActiveFilters = statusFilter !== 'all' || startDate || endDate;
     return (
       <div className={styles.container}>
         <h1 className={styles.title}>Manage Orders</h1>
+        
+        {/* Show filters even in empty state */}
+        <div className={styles.filterContainer}>
+          <div className={styles.filterGroup}>
+            <label htmlFor="status-filter" className={styles.filterLabel}>
+              Filter by Status:
+            </label>
+            <select
+              id="status-filter"
+              className={styles.filterDropdown}
+              value={statusFilter}
+              onChange={(e) => handleStatusFilterChange(e.target.value)}
+            >
+              <option value="all">All Orders</option>
+              <option value="pending">Pending</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="preparing">Preparing</option>
+              <option value="delivered">Delivered</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+
+          <div className={styles.filterGroup}>
+            <label htmlFor="start-date" className={styles.filterLabel}>
+              From:
+            </label>
+            <input
+              type="date"
+              id="start-date"
+              className={styles.dateInput}
+              value={tempStartDate}
+              onChange={(e) => handleStartDateChange(e.target.value)}
+            />
+          </div>
+
+          <div className={styles.filterGroup}>
+            <label htmlFor="end-date" className={styles.filterLabel}>
+              To:
+            </label>
+            <input
+              type="date"
+              id="end-date"
+              className={styles.dateInput}
+              value={tempEndDate}
+              onChange={(e) => handleEndDateChange(e.target.value)}
+            />
+          </div>
+
+          <button
+            className={styles.searchButton}
+            onClick={handleApplyDateFilter}
+            disabled={!tempStartDate && !tempEndDate}
+          >
+            Search
+          </button>
+
+          {(startDate || endDate) && (
+            <button
+              className={styles.clearButton}
+              onClick={handleClearDateFilter}
+              title="Clear date filter"
+            >
+              Clear Dates
+            </button>
+          )}
+        </div>
+
         <div className={styles.emptyState}>
           <div className={styles.emptyIcon}>📋</div>
-          <h2 className={styles.emptyTitle}>No Orders Yet</h2>
+          <h2 className={styles.emptyTitle}>
+            {hasActiveFilters ? 'No Orders Found' : 'No Orders Yet'}
+          </h2>
           <p className={styles.emptyText}>
-            No customer orders have been placed yet.
+            {hasActiveFilters 
+              ? `No orders found matching your filters${startDate || endDate ? ` (${startDate || 'any'} to ${endDate || 'any'})` : ''}.`
+              : 'No customer orders have been placed yet.'}
           </p>
+          {hasActiveFilters && (
+            <button className={styles.clearFiltersButton} onClick={handleClearDateFilter}>
+              Clear All Filters
+            </button>
+          )}
         </div>
       </div>
     );
@@ -242,7 +339,7 @@ const AdminOrdersPage = () => {
             type="date"
             id="start-date"
             className={styles.dateInput}
-            value={startDate}
+            value={tempStartDate}
             onChange={(e) => handleStartDateChange(e.target.value)}
           />
         </div>
@@ -255,10 +352,18 @@ const AdminOrdersPage = () => {
             type="date"
             id="end-date"
             className={styles.dateInput}
-            value={endDate}
+            value={tempEndDate}
             onChange={(e) => handleEndDateChange(e.target.value)}
           />
         </div>
+
+        <button
+          className={styles.searchButton}
+          onClick={handleApplyDateFilter}
+          disabled={!tempStartDate && !tempEndDate}
+        >
+          Search
+        </button>
 
         {(startDate || endDate) && (
           <button
