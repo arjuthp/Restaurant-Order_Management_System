@@ -1,15 +1,13 @@
 .overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
   padding: 1.5rem;
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  animation: fadeIn 0.25s ease-out;
+  animation: fadeIn 0.2s ease-out;
 }
 
 @keyframes fadeIn {
@@ -23,22 +21,22 @@
 
 .modal {
   background-color: var(--color-bg);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-xxl);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
   max-height: 90vh;
   overflow-y: auto;
-  animation: slideUp 0.3s ease-out;
-  border: 1px solid var(--color-border-light);
+  animation: slideUp 0.25s ease-out;
+  border: 1px solid var(--color-border);
 }
 
 @keyframes slideUp {
   from {
     opacity: 0;
-    transform: translateY(30px) scale(0.95);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
   }
 }
 
@@ -61,42 +59,41 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 2rem;
-  border-bottom: 2px solid var(--color-border-light);
-  background: linear-gradient(to right, var(--color-bg-green), var(--color-bg));
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg);
 }
 
 .title {
   font-family: var(--font-display);
-  font-size: 1.75rem;
+  font-size: 1.5rem;
   font-weight: 600;
   color: var(--color-text);
   letter-spacing: -0.01em;
 }
 
 .closeButton {
-  background: var(--color-bg-secondary);
-  border: 2px solid var(--color-border);
-  font-size: 1.5rem;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  font-size: 1.25rem;
   line-height: 1;
   color: var(--color-text-light);
   cursor: pointer;
   padding: 0;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2rem;
+  height: 2rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius);
   transition: var(--transition);
-  font-weight: 700;
+  font-weight: 400;
 }
 
 .closeButton:hover {
-  background: linear-gradient(135deg, #DC2626 0%, #EF4444 100%);
+  background: var(--color-danger);
   color: white;
-  border-color: #DC2626;
-  transform: rotate(90deg) scale(1.1);
+  border-color: var(--color-danger);
 }
 
 .closeButton:focus {
@@ -105,7 +102,7 @@
 }
 
 .content {
-  padding: 2rem;
+  padding: 1.5rem;
 }
 
 @media (max-width: 640px) {
@@ -114,14 +111,14 @@
   }
 
   .header {
-    padding: 1.5rem;
+    padding: 1.25rem;
   }
 
   .title {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
   }
 
   .content {
-    padding: 1.5rem;
+    padding: 1.25rem;
   }
 }

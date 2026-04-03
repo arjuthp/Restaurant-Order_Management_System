@@ -2,12 +2,21 @@ import { useAuthStore } from '@/store/authStore';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/shared/components/Button';
 import { authApi } from '@/services/api/authApi';
+import { useEffect } from 'react';
 import styles from './DashboardPage.module.css';
 
 const DashboardPage = () => {
   const user = useAuthStore((state) => state.user);
   const clearAuth = useAuthStore((state) => state.clearAuth);
   const navigate = useNavigate();
+
+  // Add class to body for dashboard-specific styling
+  useEffect(() => {
+    document.body.classList.add('dashboard-page');
+    return () => {
+      document.body.classList.remove('dashboard-page');
+    };
+  }, []);
 
   const handleLogout = async () => {
     try {

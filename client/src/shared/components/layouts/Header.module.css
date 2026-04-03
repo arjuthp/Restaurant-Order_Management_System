@@ -1,12 +1,10 @@
 .header {
-  background: linear-gradient(135deg, #1B7C38 0%, #2D9B4E 50%, #165A2E 100%);
-  border-bottom: 2px solid var(--color-primary-lighter);
+  background: linear-gradient(135deg, #2E7D32 0%, #1B7C38 100%);
+  border-bottom: 3px solid #165A2E;
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: var(--shadow-green);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px rgba(46, 125, 50, 0.3);
 }
 
 .container {
@@ -22,16 +20,18 @@
 .logo {
   font-family: var(--font-display);
   font-size: 1.75rem;
-  font-weight: 600;
-  color: #FFFFFF;
+  font-weight: 700;
+  color: white;
   text-decoration: none;
   white-space: nowrap;
   letter-spacing: -0.02em;
   transition: var(--transition);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .logo:hover {
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--color-secondary);
+  transform: scale(1.05);
 }
 
 .mobileMenuButton {
@@ -48,7 +48,7 @@
   display: block;
   width: 1.75rem;
   height: 2.5px;
-  background-color: #FFFFFF;
+  background-color: white;
   transition: var(--transition);
   border-radius: 2px;
 }
@@ -61,9 +61,9 @@
 }
 
 .navLink {
-  color: rgba(255, 255, 255, 0.9);
+  color: white;
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 600;
   transition: var(--transition);
   padding: 0.625rem 1rem;
   border-bottom: 2px solid transparent;
@@ -74,8 +74,8 @@
 }
 
 .navLink:hover {
-  color: #FFFFFF;
-  background: rgba(255, 255, 255, 0.15);
+  color: var(--color-secondary);
+  background: rgba(255, 255, 255, 0.1);
   border-bottom-color: transparent;
 }
 
@@ -87,24 +87,25 @@
 
 .cartButton {
   position: relative;
-  padding: 0.625rem;
+  padding: 0.75rem;
   text-decoration: none;
   transition: var(--transition);
-  color: #FFFFFF;
+  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 2px solid white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .cartButton:hover {
   transform: translateY(-2px);
-  background: #FFFFFF;
-  color: var(--color-primary);
-  border-color: #FFFFFF;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  background: var(--color-secondary);
+  color: white;
+  border-color: var(--color-secondary);
+  box-shadow: 0 4px 16px rgba(255, 111, 0, 0.4);
 }
 
 .cartButton svg {
@@ -116,7 +117,7 @@
   position: absolute;
   top: -4px;
   right: -4px;
-  background: linear-gradient(135deg, #FF9500 0%, #FFB340 100%);
+  background: var(--color-secondary);
   color: white;
   font-size: 0.75rem;
   font-weight: 700;
@@ -124,18 +125,8 @@
   border-radius: var(--radius-full);
   min-width: 1.5rem;
   text-align: center;
-  box-shadow: 0 3px 10px rgba(255, 149, 0, 0.5);
-  border: 2px solid #FFFFFF;
-  animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.15);
-  }
+  box-shadow: var(--shadow-sm);
+  border: 2px solid var(--color-bg);
 }
 
 .userMenu {
@@ -145,8 +136,8 @@
 }
 
 .userName {
-  font-weight: 600;
-  color: #FFFFFF;
+  font-weight: 700;
+  color: white;
   font-size: 0.9375rem;
 }
 
@@ -172,12 +163,12 @@
     top: 100%;
     left: 0;
     right: 0;
-    background: #1B5E20;
+    background: #2E7D32;
     flex-direction: column;
     gap: 0;
     padding: 1.5rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: var(--shadow-lg);
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
   }
 
   .navOpen {
@@ -225,4 +216,44 @@
   .actions {
     gap: 0.75rem;
   }
+}
+
+
+/* Dashboard page specific styling - light green header */
+body.dashboard-page .header {
+  background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+  border-bottom: 3px solid var(--color-primary);
+  box-shadow: 0 4px 20px rgba(46, 125, 50, 0.2);
+}
+
+body.dashboard-page .logo {
+  color: #1B7C38;
+}
+
+body.dashboard-page .navLink {
+  color: #1B7C38;
+}
+
+body.dashboard-page .navLink:hover {
+  color: var(--color-primary-dark);
+  background: rgba(255, 255, 255, 0.5);
+}
+
+body.dashboard-page .userName {
+  color: #1B7C38;
+}
+
+body.dashboard-page .cartButton {
+  background: linear-gradient(135deg, #FFFFFF 0%, #F1F8E9 100%);
+  border-color: #1B7C38;
+  color: #1B7C38;
+}
+
+body.dashboard-page .cartButton:hover {
+  background: linear-gradient(135deg, #1B7C38 0%, #2E7D32 100%);
+  color: white;
+}
+
+body.dashboard-page .hamburger {
+  background-color: #1B7C38;
 }

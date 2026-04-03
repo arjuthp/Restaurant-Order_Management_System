@@ -14,91 +14,80 @@ html {
 }
 
 :root {
-  /* Professional Restaurant Color Palette - Green, Orange & White */
+  /* Minimal Color Palette - Green, Orange & White */
   
-  /* Green Family - Primary */
-  --color-primary: #1B7C38;
-  --color-primary-light: #2D9B4E;
-  --color-primary-lighter: #3FBF63;
-  --color-primary-lightest: #E8F5E9;
-  --color-primary-dark: #165A2E;
-  --color-primary-darker: #0F3F1F;
+  /* Green - Primary (Nature, Growth, Success) */
+  --color-primary: #2E7D32;
+  --color-primary-light: #4CAF50;
+  --color-primary-lighter: #81C784;
+  --color-primary-lightest: #F1F8F4;
+  --color-primary-dark: #1B5E20;
   
-  /* Orange Family - Secondary */
-  --color-secondary: #E67E22;
-  --color-secondary-light: #F39C12;
-  --color-secondary-lighter: #F8B739;
+  /* Orange - Accent (Energy, Warmth, Action) */
+  --color-secondary: #FF6F00;
+  --color-secondary-light: #FF8F00;
+  --color-secondary-lighter: #FFB74D;
   --color-secondary-lightest: #FFF3E0;
-  --color-secondary-dark: #D35400;
-  --color-secondary-darker: #BA4A00;
+  --color-secondary-dark: #E65100;
   
-  /* Neutral Family - White & Grays */
+  /* Neutral - White & Grays (Clean, Minimal) */
   --color-white: #FFFFFF;
   --color-bg: #FFFFFF;
-  --color-bg-secondary: #F7F9FB;
-  --color-bg-tertiary: #EEF2F6;
-  --color-bg-light: #FFF8F0;
-  --color-bg-dark: #1F2937;
+  --color-bg-secondary: #FAFAFA;
+  --color-bg-tertiary: #F5F5F5;
+  --color-bg-light: #FEFEFE;
   
-  /* Text Colors */
-  --color-text: #1F2937;
-  --color-text-light: #6B7280;
-  --color-text-lighter: #9CA3AF;
+  /* Text Colors (High Contrast for Readability) */
+  --color-text: #212121;
+  --color-text-light: #757575;
+  --color-text-lighter: #BDBDBD;
   --color-text-inverse: #FFFFFF;
   
   /* Semantic Colors */
-  --color-success: #2D9B4E;
-  --color-danger: #DC2626;
-  --color-warning: #F59E0B;
-  --color-info: #0EA5E9;
-  --color-accent: #3FBF63;
+  --color-success: #2E7D32;
+  --color-danger: #D32F2F;
+  --color-warning: #F57C00;
+  --color-info: #1976D2;
   
-  /* Background Accents */
-  --color-bg-success: #ECFDF5;
-  --color-bg-danger: #FEE2E2;
-  --color-bg-warning: #FFFBEB;
-  --color-bg-info: #F0F9FF;
-  --color-bg-green: #F0FDF4;
-  --color-bg-orange: #FFF7ED;
+  /* Background Accents (Subtle) */
+  --color-bg-success: #F1F8F4;
+  --color-bg-danger: #FFEBEE;
+  --color-bg-warning: #FFF3E0;
+  --color-bg-info: #E3F2FD;
+  --color-bg-green: #F1F8F4;
+  --color-bg-orange: #FFF3E0;
   
-  /* Border & Dividers */
-  --color-border: #E5E7EB;
-  --color-border-light: #F3F4F6;
-  --color-border-dark: #D1D5DB;
-  --color-border-green: #D1FAE5;
-  --color-border-orange: #FEDBA8;
+  /* Border & Dividers (Minimal) */
+  --color-border: #E0E0E0;
+  --color-border-light: #F5F5F5;
+  --color-border-dark: #BDBDBD;
   
-  /* Shadows - Enhanced */
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.12);
-  --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.15);
-  --shadow-xxl: 0 20px 40px rgba(0, 0, 0, 0.2);
-  --shadow-green: 0 8px 20px rgba(27, 124, 56, 0.15);
-  --shadow-orange: 0 8px 20px rgba(230, 126, 34, 0.15);
-  --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+  /* Shadows (Subtle, Minimal) */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 8px 24px rgba(0, 0, 0, 0.12);
   
-  /* Border Radius */
-  --radius-sm: 6px;
-  --radius: 10px;
-  --radius-lg: 14px;
-  --radius-xl: 20px;
-  --radius-2xl: 28px;
+  /* Border Radius (Minimal, Clean) */
+  --radius-sm: 4px;
+  --radius: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
   --radius-full: 9999px;
   
-  /* Transitions */
-  --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-smooth: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* Transitions (Smooth, Fast) */
+  --transition-fast: all 0.15s ease;
+  --transition: all 0.2s ease;
+  --transition-slow: all 0.3s ease;
   
   /* Typography */
   --font-display: 'Playfair Display', serif;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   
   /* Letter Spacing */
-  --letter-tight: -0.02em;
+  --letter-tight: -0.01em;
   --letter-normal: 0em;
   --letter-wide: 0.02em;
 }
@@ -109,7 +98,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   color: var(--color-text);
-  background: #FFF8F0;
+  background: var(--color-bg-secondary);
   line-height: 1.6;
   min-height: 100vh;
   overflow-x: hidden;

@@ -1,7 +1,7 @@
 .adminLayout {
   display: flex;
   min-height: 100vh;
-  background: #FFF8F0;
+  background: #FFFFFF;
   position: relative;
   width: 100%;
   overflow-x: hidden;
@@ -53,7 +53,7 @@
 /* Sidebar */
 .sidebar {
   width: 280px;
-  background: linear-gradient(180deg, #1B7C38 0%, #165A2E 100%);
+  background: var(--color-bg);
   display: flex;
   flex-direction: column;
   position: fixed;
@@ -64,34 +64,23 @@
   transition: transform 0.3s ease-in-out;
   overflow-y: auto;
   overflow-x: hidden;
-  border-right: 2px solid var(--color-border-green);
-  box-shadow: 4px 0 20px rgba(27, 124, 56, 0.15);
-}
-
-.sidebar::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 1px;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.1);
-  opacity: 1;
+  border-right: 3px solid var(--color-primary);
+  box-shadow: var(--shadow-lg);
 }
 
 .sidebarHeader {
   padding: 2rem 1.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  background: transparent;
+  border-bottom: 2px solid var(--color-border);
+  background: var(--color-bg);
   position: relative;
 }
 
 .sidebarTitle {
   font-family: var(--font-display);
   font-size: 1.75rem;
-  font-weight: 600;
+  font-weight: 700;
   margin: 0;
-  color: #FFFFFF;
+  color: var(--color-primary);
   letter-spacing: -0.02em;
 }
 
@@ -107,63 +96,63 @@
   align-items: center;
   gap: 1rem;
   padding: 1rem 1.5rem;
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--color-text);
   text-decoration: none;
   transition: var(--transition);
   border-left: 3px solid transparent;
   position: relative;
   margin: 0.25rem 0.75rem;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius);
+  font-weight: 600;
+  background: var(--color-bg);
 }
 
 .navItem:hover {
-  background: rgba(45, 155, 78, 0.2);
-  color: #FFFFFF;
-  border-left-color: var(--color-secondary);
+  background: var(--color-primary-lightest);
+  color: var(--color-primary);
+  border-left-color: var(--color-primary);
   transform: translateX(4px);
+  box-shadow: var(--shadow-sm);
 }
 
 .navItem:hover .navIcon {
-  filter: none;
   opacity: 1;
+  color: var(--color-primary);
 }
 
 .navItemActive {
-  background: rgba(63, 191, 99, 0.25);
-  color: #FFFFFF;
-  border-left-color: var(--color-secondary);
-  font-weight: 600;
+  background: var(--color-primary-lightest);
+  color: var(--color-primary);
+  border-left-color: var(--color-primary);
+  font-weight: 700;
+  box-shadow: var(--shadow-sm);
 }
 
 .navItemActive .navIcon {
-  filter: none;
   opacity: 1;
+  color: var(--color-primary);
 }
 
 .navIcon {
   width: 20px;
   height: 20px;
   flex-shrink: 0;
-  filter: brightness(0) invert(1);
-  opacity: 0.8;
-}
-
-.navItemActive .navIcon,
-.navItem:hover .navIcon {
-  opacity: 1;
+  opacity: 0.7;
+  color: var(--color-text-light);
+  transition: var(--transition);
 }
 
 .navText {
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: inherit;
   transition: var(--transition);
 }
 
 /* Sidebar footer with user info */
 .sidebarFooter {
   padding: 1.5rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  background: transparent;
+  border-top: 2px solid var(--color-border);
+  background: var(--color-bg);
   position: relative;
 }
 
@@ -173,25 +162,24 @@
   gap: 1rem;
   margin-bottom: 1rem;
   padding: 0.75rem;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: var(--radius-lg);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
 }
 
 .userAvatar {
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 50%;
-  background: linear-gradient(135deg, #E67E22 0%, #F39C12 100%);
+  background: var(--color-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
   font-size: 1.125rem;
   color: white;
-  box-shadow: 0 3px 10px rgba(230, 126, 34, 0.3);
+  box-shadow: var(--shadow-sm);
   flex-shrink: 0;
-  border: 2px solid rgba(255, 255, 255, 0.3);
 }
 
 .userDetails {
@@ -200,9 +188,9 @@
 }
 
 .userName {
-  font-weight: 600;
+  font-weight: 700;
   font-size: 0.9375rem;
-  color: #FFFFFF;
+  color: var(--color-text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -210,8 +198,9 @@
 
 .userRole {
   font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--color-text-light);
   text-transform: capitalize;
+  font-weight: 600;
 }
 
 .logoutButton {
