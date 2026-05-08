@@ -1,0 +1,43 @@
+version: '3.8'  # Docker Compose file format version
+
+services:  # Define all containers/services here
+  
+  # Backend API Service
+  restaurant-backend:  # Name of this service
+    build:  # Build instructions (instead of using pre-built image)
+      context: .  # Build from current directory (project root)
+      dockerfile: Dockerfile.backend  # Use this specific Dockerfile
+    
+    container_name: restaurant-backend  # Name the running container
+    
+    network_mode: host  # Use server's localhost network (required for MongoDB access)
+    
+    environment:  # Environment variables passed to the container
+      - NODE_ENV=production  # Tell Node.js this is production
+      - PORT=5015  # Backend will listen on this port (picked from free ports)
+      - MONGO_URI=mongodb://localhost:27017/restaurant_dev  # MongoDB connection string
+      - JWT_ACCESS_SECRET=your_super_secret_access_key_change_this_in_production_12345  # Secret for access tokens
+      - JWT_REFRESH_SECRET=your_super_secret_refresh_key_change_this_in_production_67890  # Secret for refresh tokens
+      - FRONTEND_URL=https://dev.kaha.com.np/restaurant  # CORS - allow frontend to call API
+    
+    volumes:  # Mount folders from host to container (persists data)
+      - ./src/uploads:/app/uploads  # Product images persist even if container restarts
+    
+    restart: unless-stopped  # Auto-restart if crashes (but not if manually stopped)
+
+  # Frontend Service
+  restaurant-frontend:  # Name of frontend service
+    build:  # Build instructions
+      context: .  # Build from project root
+      dockerfile: Dockerfile.frontend  # Use frontend Dockerfile
+      args:  # Build-time arguments (baked into the build)
+        - VITE_API_BASE_URL=https://dev.kaha.com.np/restaurant-api/api  # API URL for frontend
+    
+    container_name: restaurant-frontend  # Name the running container
+    
+    network_mode: host  # Use server's localhost network
+    
+    environment:  # Runtime environment variables
+      - PORT=3016  # Nginx will serve frontend on this port
+    
+    restart: unless-stopped  # Auto-restart if crashes
