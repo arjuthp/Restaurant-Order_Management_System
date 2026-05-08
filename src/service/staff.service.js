@@ -1,6 +1,6 @@
 const Staff = require('../models/staff.model');
 const Role = require('../models/role.model');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const { calculatePagination } = require('../utils/paginationHelper');
 
 class StaffService {
