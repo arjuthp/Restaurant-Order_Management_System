@@ -74,6 +74,11 @@ const Navbar = () => {
                       <span className="link-icon">Box</span> Orders
                     </Link>
                   </li>
+                  <li>
+                    <Link to="/reservations" className={`navbar-link ${isActive('/reservations') ? 'active' : ''}`} onClick={closeMenu}>
+                      <span className="link-icon">🪑</span> Reservations
+                    </Link>
+                  </li>
                 </>
               )}
 
@@ -87,6 +92,16 @@ const Navbar = () => {
                   <li>
                     <Link to="/admin/products" className={`navbar-link ${isActive('/admin/products') ? 'active' : ''}`} onClick={closeMenu}>
                       Products
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/admin/tables" className={`navbar-link ${isActive('/admin/tables') ? 'active' : ''}`} onClick={closeMenu}>
+                      Tables
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/admin/reservations" className={`navbar-link ${isActive('/admin/reservations') ? 'active' : ''}`} onClick={closeMenu}>
+                      Reservations
                     </Link>
                   </li>
                 </>

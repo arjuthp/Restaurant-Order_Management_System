@@ -14,6 +14,9 @@ import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/admin/Dashboard';
 import AdminProducts from './pages/admin/Products';
 import AdminOrders from './pages/admin/Orders';
+import AdminTables from './pages/admin/Tables';
+import AdminReservations from './pages/admin/Reservations';
+import Reservations from './pages/Reservations';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 import './App.css';
@@ -60,6 +63,14 @@ function App() {
                     </ProtectedRoute>
                   }
                 />
+                <Route
+                  path="/reservations"
+                  element={
+                    <ProtectedRoute>
+                      <Reservations />
+                    </ProtectedRoute>
+                  }
+                />
 
                 {/* Admin Protected Routes */}
                 <Route
@@ -83,6 +94,22 @@ function App() {
                   element={
                     <AdminRoute>
                       <AdminOrders />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="/admin/tables"
+                  element={
+                    <AdminRoute>
+                      <AdminTables />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="/admin/reservations"
+                  element={
+                    <AdminRoute>
+                      <AdminReservations />
                     </AdminRoute>
                   }
                 />

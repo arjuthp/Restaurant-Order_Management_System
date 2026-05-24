@@ -10,6 +10,7 @@
     "prod": "npm run build && cd src && npm start",
     "install-all": "cd src && npm install && cd ../client && npm install",
     "seed": "cd src && node seedProducts.js",
+    "seed-tables": "cd src && node seedTables.js",
     "kill-port": "bash kill-port.sh",
     "clean-start": "bash kill-port.sh && npm start"
   },
