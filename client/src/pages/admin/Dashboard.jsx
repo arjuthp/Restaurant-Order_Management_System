@@ -2,13 +2,18 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import orderService from '../../services/orderService';
 import productService from '../../services/productService';
+import tableService from '../../services/tableService';
+import reservationService from '../../services/reservationService';
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
     totalOrders: 0,
     pendingOrders: 0,
     totalProducts: 0,
-    totalRevenue: 0
+    totalRevenue: 0,
+    totalTables: 0,
+    totalReservations: 0,
+    pendingReservations: 0
   });
   const [loading, setLoading] = useState(true);
 
@@ -18,9 +23,11 @@ const Dashboard = () => {
 
   const fetchStats = async () => {
     try {
-      const [orders, products] = await Promise.all([
+      const [orders, products, tablesData, reservationsData] = await Promise.all([
         orderService.getAllOrders(),
-        productService.getAllProducts()
+        productService.getAllProducts(),
+        tableService.getAllTables().catch(() => ({ data: [] })),
+        reservationService.getAllReservations().catch(() => ({ data: [] }))
       ]);
 
       const pendingOrders = orders.filter(o => o.status === 'pending').length;
@@ -28,11 +35,17 @@ const Dashboard = () => {
         .filter(o => o.status !== 'cancelled')
         .reduce((sum, o) => sum + o.total_price, 0);
 
+      const tables = tablesData.data || [];
+      const reservations = reservationsData.data || [];
+
       setStats({
         totalOrders: orders.length,
         pendingOrders,
         totalProducts: products.length,
-        totalRevenue
+        totalRevenue,
+        totalTables: tables.length,
+        totalReservations: reservations.length,
+        pendingReservations: reservations.filter(r => r.status === 'pending').length
       });
     } catch (err) {
       console.error('Failed to fetch stats:', err);
@@ -67,6 +80,16 @@ const Dashboard = () => {
           <h3 style={{ fontSize: '2.5rem', marginBottom: '10px' }}>Rs. {stats.totalRevenue}</h3>
           <p style={{ fontSize: '1.1rem' }}>Total Revenue</p>
         </div>
+
+        <div className="card" style={{ textAlign: 'center', background: 'linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%)', color: 'white' }}>
+          <h3 style={{ fontSize: '2.5rem', marginBottom: '10px' }}>{stats.totalTables}</h3>
+          <p style={{ fontSize: '1.1rem' }}>Tables</p>
+        </div>
+
+        <div className="card" style={{ textAlign: 'center', background: 'linear-gradient(135deg, #fb923c 0%, #ea580c 100%)', color: 'white' }}>
+          <h3 style={{ fontSize: '2.5rem', marginBottom: '10px' }}>{stats.pendingReservations}</h3>
+          <p style={{ fontSize: '1.1rem' }}>Pending Reservations</p>
+        </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
@@ -83,6 +106,22 @@ const Dashboard = () => {
           <p style={{ color: '#666', marginBottom: '20px' }}>View and update order status</p>
           <Link to="/admin/orders" className="btn btn-primary" style={{ width: '100%' }}>
             Go to Orders
+          </Link>
+        </div>
+
+        <div className="card">
+          <h2 style={{ marginBottom: '15px' }}>🪑 Manage Tables</h2>
+          <p style={{ color: '#666', marginBottom: '20px' }}>Add, edit, or remove tables</p>
+          <Link to="/admin/tables" className="btn btn-primary" style={{ width: '100%' }}>
+            Go to Tables
+          </Link>
+        </div>
+
+        <div className="card">
+          <h2 style={{ marginBottom: '15px' }}>📋 Manage Reservations</h2>
+          <p style={{ color: '#666', marginBottom: '20px' }}>View and manage table reservations</p>
+          <Link to="/admin/reservations" className="btn btn-primary" style={{ width: '100%' }}>
+            Go to Reservations
           </Link>
         </div>
       </div>

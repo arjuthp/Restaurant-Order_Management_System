@@ -108,6 +108,7 @@ const Home = () => {
             </div>
             <div className="greeting-actions">
               <Link to="/orders" className="btn btn-secondary">View My Orders</Link>
+              <Link to="/reservations" className="btn btn-secondary">Reserve a Table</Link>
               <Link to="/cart" className="btn btn-primary">Go to Cart</Link>
             </div>
           </motion.section>
